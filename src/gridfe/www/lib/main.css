@@ -14,15 +14,20 @@ body {
 
 .desc {
 	text-align: right;
-	background-color: #FFFF66;
+	background-color: #6699CC;
+	border: 1px solid black;
 }
 
 .data1 {
 	background-color: #FFFFFF;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
 }
 
 .data2 {
 	background-color: #EEEEEE;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
 }
 
 .hdr {
@@ -39,4 +44,12 @@ body {
 	color: #FFFFFF;
 	font-weight: bold;
 	font-size: 24px;
+}
+
+.tbl {
+}
+
+.tblftr {
+	text-align: center;
+	background-color: #000066;
 }

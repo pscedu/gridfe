@@ -27,7 +27,7 @@ public class RSLElement implements Serializable
 	private String vParam, kParam;
 
 	/*
-	** transient date will be reconstructed 
+	** transient date will be reconstructed
 	*/
 	private transient StringBuffer data;
 
@@ -160,7 +160,7 @@ public class RSLElement implements Serializable
 		throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
-		
+
 		/* Rebuild RSLElement */
 		this.build();
 	}

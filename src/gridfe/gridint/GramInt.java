@@ -30,7 +30,7 @@ public class GramInt
 	}
 
 	/* globus-job-submit: submit a request to the GRAM server */
-	public void jobSubmit(GridJob j) 
+	public void jobSubmit(GridJob j)
 		throws GramException, GSSException
 	{
 		/* Make sure the host is there */

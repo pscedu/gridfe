@@ -2,7 +2,6 @@
 
 package gridfe.gridint;
 
-import gridfe.gridint.*;
 import java.net.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
@@ -83,19 +82,18 @@ public class GramInt
 	public String getStatusAsString()
 		throws GSSException
 	{
-		String status;
-		status = new String("UNKNOWN");
+		String status = "UNKNOWN";
 
 		try
 		{
 			Gram.jobStatus(this.job);
-			status = new String(this.job.getStatusAsString());
+			status = this.job.getStatusAsString();
 		}
 		catch(GramException e)
 		{
 			/* See above .getStatus() for information on this... */
 			if(e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER)
-				status = new String("DONE/FAIL");
+				status = "DONE/FAIL";
 		}
 
 		return status;

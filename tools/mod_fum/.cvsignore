@@ -1,1 +1,3 @@
 driver .cvsignore
+.libs mod_fum.la
+mod_fum.lo mod_fum.slo

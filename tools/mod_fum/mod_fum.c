@@ -75,6 +75,7 @@ int mf_main(const char *principal, const char *password)
 	char *tkt_cache;
 
 	/* kinit - requires only principal/password */
+	mf_krb5_init(&kinst);
 	mf_kinit_set_defaults(&kprefs);
 	mf_kinit_set_uap(&kprefs, principal, password);
 	mf_kinit_setup(&kinst, &kprefs);
@@ -87,6 +88,7 @@ int mf_main(const char *principal, const char *password)
 	//DEBUG
 	printf("ticket cache: %s\n",tkt_cache);
 	
+	mf_krb5_free(&kinst);
 	mf_kinit_cleanup(&kinst);
 
 	/* kx509 - just call the kx509lib*/
@@ -433,8 +435,6 @@ static void mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 
 static void mf_kinit_cleanup(krb5_inst_ptr kinst)
 {
-	mf_krb5_free(kinst);
-
 	if(kinst->principal)
 		krb5_free_principal(kinst->context, kinst->principal);
 	if(kinst->context)

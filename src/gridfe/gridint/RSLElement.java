@@ -30,6 +30,22 @@ public class RSLElement
 	{
 		this.setGenerics(param, value);
 	}
+	public RSLElement(String[] gp, String[] gv, String vp, String[] vv)
+	{
+		this.setGenerics(gp, gv);
+		this.setVarArgs(vp, vv);
+	}
+	public RSLElement(String[] gp, String[] gv, String kp, String[] kk, String[] kv)
+	{
+		this.setGenerics(gp, gv);
+		this.setKeyPairs(kp, kk, kv);
+	}
+	public RSLElement(String[] gp, String[] gv, String vp, String[] vv, String kp, String[] kk, String[] kv)
+	{
+		this.setGenerics(gp, gv);
+		this.setVarArgs(vp, vv);
+		this.setKeyPairs(kp, kk, kv);
+	}
 
 	public void changeSpec(String s)
 	{
@@ -57,7 +73,7 @@ public class RSLElement
 	public void buildGenerics(String[] param, String[] value)
 	{
 		for(int i = 0; i < param.length; i++)
-			this.data.append(b+param[i]+m+value[i]+e);
+			this.data.append(b+param[i]+m+q+value[i]+q+e);
 	}
 
 	/* 
@@ -66,12 +82,15 @@ public class RSLElement
 	*/
 	public void buildVarArgs(String param, String[] value)
 	{
+		int i;
 		this.data.append(b+param+m);
 
 		/* Quote all args to be safe! */
-		for(int i = 0; i < value.length; i++)
+		for(i = 0; i < value.length - 1; i++)
 			this.data.append(q+value[i]+q+s);
 
+		/* Manually add last one to avoid extra " )" */
+		this.data.append(q+value[i]+q);
 		this.data.append(e);
 	}
 
@@ -85,7 +104,8 @@ public class RSLElement
 
 		/* Quote all args to be safe! */
 		for(int i = 0; i < key.length; i++)
-			this.data.append(b+q+key[i]+q+s+q+value[i]+q+e);
+			//this.data.append(b+q+key[i]+q+s+q+value[i]+q+e);
+			this.data.append(b+key[i]+s+q+value[i]+q+e);
 
 		this.data.append(e);
 	}

@@ -35,16 +35,20 @@ public class GridInt implements Serializable
 		this.list = new GridJobList();
 	}
 
+	/* Perform all Grid authentication */
 	public void auth()
 		throws GSSException, GlobusCredentialException
 	{
+		/* Read in the X.509 Cert */
 		this.ga = new GlobusAuth(this.uid);
 		this.ga.createCredential();
 
+		/* Convert to a GSSCredential */
 		this.gss = new GSSAuth(ga);
 		this.gss.createCredential();
 	}
 
+	/* globus-job-submit equivalent */
 	public void jobSubmit(GridJob job)
 		throws GramException, GSSException
 	{
@@ -53,6 +57,7 @@ public class GridInt implements Serializable
 		this.list.push(job);
 	}
 
+	/* Cancel Job and remove from Job List */
 	public boolean jobCancel(GridJob job)
 		throws GramException, GSSException
 	{
@@ -125,13 +130,14 @@ public class GridInt implements Serializable
 		return this.gss.getName();
 	}
 
-	/* Implement Serializable using revive() */
+	/* This could actually be omitted, (explicit declaration) */
 	private void writeObject(ObjectOutputStream out)
 		throws IOException
 	{
 		out.defaultWriteObject();
 	}
 
+	/* Implement Serializable using revive() */
 	private void readObject(ObjectInputStream in)
 		throws IOException, ClassNotFoundException,
 			GSSException, GlobusCredentialException

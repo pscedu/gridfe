@@ -101,14 +101,16 @@ public class Page
 
 		for (i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
-			t += " [ '" + m.getName() + "', ";
+			t += " [ '" + BasicServices.stripSpace(m.getName()) + "', ";
 			if (m.getItems() != null) {
 				t += "menu" + BasicServices.stripSpace(m.getName());
-				p = "var menu" + m.getName() + " = [";
+				p = "var menu" +
+				    BasicServices.stripSpace(m.getName()) + " = [";
 				for (j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
-					p += "'" + m.getName() + name + "'";
+					p += "'" + BasicServices.stripSpace(m.getName() + name) +
+					     "'";
 					if (j.hasNext())
 						p += ",";
 				}

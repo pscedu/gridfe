@@ -8,5 +8,5 @@ body {
 .bg {
 	background-color: #336699;
 	/* XXX: dynamically generate path */
-	background-image: url(img/background.png);
+	background-image: url(/gridfe/img/background.png);
 }

@@ -2,7 +2,7 @@
 
 package gridfe.gridint;
 
-import gridint.*;
+import gridfe.gridint.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import org.globus.gram.*;

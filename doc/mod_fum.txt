@@ -1,12 +1,18 @@
+$Id$
 
-Mod_fum Installation
---------------------
+mod_fum Installation
+====================
 
 Requirements:
--------------
-1) kerberos 5
+=============
+1) Kerberos 5
 2) kx509
 	When building kx509 the configuration option
-	--enable-libkx509 MUST be used. Mod_fum
-	relies on the shared library 'libkx509.so'
-	to be in the ld library path.
+	--enable-libkx509 must be used.  mod_fum relies on the shared
+	library libkx509.so to be in LD_LIBRARY_PATH, or for libkx509.so
+	to be properly installed, which the kx509 distribution does not
+	provide installation targets for, and must be installed
+	manually:
+
+	# cp libkx509.so /usr/lib
+	# ldconfig

@@ -116,7 +116,7 @@ public class GassInt extends RemoteGassServer
 
 			read += this.fin.read(tmp, 0, len - read);
 
-			buf.append(tmp);
+			buf.append(new String(tmp));
 		}
 
 		return read;

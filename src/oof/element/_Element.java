@@ -1,54 +1,70 @@
 /* $Id$ */
 package oof.element;
 
+import java.util.*;
+import oof.*;
+import oof.filter.*;
+
 public class ELEMENT {
 	private String name;
 	private LinkedList attrs;
 	private LinkedList children;
+	private FILTER filter;
 
 	ELEMENT() {
-		this.initWork(Object[] {}, null);
+		this.attrs	= new LinkedList();
+		this.children	= new LinkedList();
 	}
-	
+
 	ELEMENT(Object[] attrs) {
-		this.initWork(attrs, null);
+		this.attrs	= new LinkedList();
+		this.children	= new LinkedList();
+		for (int i = 0; i < attrs.length; i++)
+			this.attrs.add(attrs[i]);
 	}
 
 	ELEMENT(String s) {
-		this.initWork(Object[] {}, s);
+		this.attrs	= new LinkedList();
+		this.children	= new LinkedList();
+		this.children.add(s);
 	}
 
 	ELEMENT(ELEMENT e) {
-		this.initWork(Object[] {}, e);
+		this.attrs	= new LinkedList();
+		this.children	= new LinkedList();
+		this.children.add(e);
 	}
 
 	ELEMENT(Object[] attrs, String s) {
-		this.initWork(attrs, s);
+		this.attrs	= new LinkedList();
+		this.children	= new LinkedList();
+		for (int i = 0; i < attrs.length; i++)
+			this.attrs.add(attrs[i]);
+		this.children.add(s);
 	}
 
 	ELEMENT(Object[] attrs, ELEMENT e) {
-		this.initWork(attrs, e);
-	}
-
-	private void initWork(String name, Object[] attrs, Object value) {
-		this.attrs = new LinkedList(attrs);
-		this.children = value == null ? new LinkedList() : new LinkedList(value);
+		this.attrs	= new LinkedList();
+		this.children	= new LinkedList();
+		for (int i = 0; i < attrs.length; i++)
+			this.attrs.add(attrs[i]);
+		this.children.add(e);
 	}
 
 	public void append(String s) {
-		this.children.addLast(s);
+		this.children.addLast((Object)s);
 	}
 
 	public void append(ELEMENT e) {
-		this.children.addLast(e);
+		this.children.addLast((Object)e);
 	}
 
 	public void prepend(String s) {
-		this.children.addFirst(s);
+		this.children.addFirst((Object)s);
 	}
 
-	public void prepend(Element e) {
-		this.children.addFirst(e);
+	public void prepend(ELEMENT e) {
+		this.children.addFirst((Object)e);
 	}
 
 	public String toString() {

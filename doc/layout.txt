@@ -1,0 +1,9 @@
+$Id$
+
+/lib			Backend code root.
+/lib/oof		OOF (Object Output Formatting) root.
+/lib/oof/element	OOF Elements root.
+/lib/oof/filter		OOF Filters root.
+/lib/jasp		JASP (Java Application Suite for Programming) root.
+/www			Web-accessible content root.
+/doc			Documentation root.

@@ -36,7 +36,7 @@ public class Page {
 	public String footer() {
 		String s = new String();
 
-		s =		"</body>"
+		s =	"</body>"
 		  + "</html>";
 
 		return s;

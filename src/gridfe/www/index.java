@@ -13,7 +13,7 @@ public class index
 		OOF oof = page.getOOF();
 
 		return	page.header("Error") +
-				oof.p("You are already logged on.") +
+				oof.p("Welcome to the portal.") +
 				page.footer();
 	}
 };

@@ -103,6 +103,7 @@ public class GridFE extends HttpServlet
 		}
 
 		w.print(s);
+		w.print("uri: " + uri);
 	}
 
 	private String handleError(Page p, String msg)

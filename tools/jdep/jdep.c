@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <ctype.h>
 #include <dirent.h>
 #include <err.h>
 #include <stdio.h>
@@ -23,7 +24,7 @@ static void usage(void);
 int
 main(int argc, char *argv[])
 {
-	/* XXX: process ./*.java. */
+	/* XXX: process *.java in CWD. */
 	if (argc < 2)
 		usage();
 	/* XXX: put . into CLASSPATH. */
@@ -32,49 +33,63 @@ main(int argc, char *argv[])
 			warnx("%s: invalid Java source file", *argv);
 		else
 			jdep(*argv);
+	exit(0);
 }
 
 static void
 jdep(char *fil)
 {
 	FILE *fp;
-	int c, inimport, dquot, esc, squot;
+	int c, dquot, esc, squot;
 	struct lbuf lb;
 	char *pos, *tag = "import", *pkg;
 
 	if ((fp = fopen(fil, "r")) == NULL)
 		err(1, "%s", fil);
-	printf("%*s.class:\\\n", strstr(fil, ".java") - fil, fil);
+	printf("%.*s.class: \\\n", strstr(fil, ".java") - fil, fil);
 	pos = tag;
 	lbuf_init(&lb);
+	esc = dquot = squot = 0;
 	while ((c = fgetc(fp)) != EOF) {
 		switch (c) {
 		case '\\':
 			esc = !esc;
 			break;
 		case '\'':
-			squot = !squot;
+			if (esc)
+				esc = !esc;
+			else if (!dquot)
+				squot = !squot;
 			break;
 		case '"':
-			dquot = !dquot;
+			if (esc)
+				esc = !esc;
+			else if (!squot)
+				dquot = !dquot;
 			break;
 		default:
-			if (*pos == '\0') {
+			if (esc)
+				esc = !esc;
+			else if (squot || dquot)
+				;
+			else if (*pos == '\0') {
 				/* Currently processing an import. */
 				if (c == ';') {
 					pos = tag;
 					if ((pkg = lbuf_get(&lb)) !=
 					    NULL) {
+					    	lbuf_push(&lb, '\0');
+						while (isspace(*pkg))
+							pkg++;
 						pushq(xstrdup(pkg));
 						lbuf_reset(&lb);
 					}
-				} else {
+				} else
 					lbuf_push(&lb, (char)c);
-				}
-			} else if (*pos == *tag) {
+			} else if (c == *pos)
 				/* Currently processing 'import'. */
 				pos++;
-			} else
+			else
 				pos = tag;
 		}
 	}
@@ -131,16 +146,16 @@ find:
 			snprintf(dir, sizeof(dir), "%s/%s", *v, pkg);
 			/* XXX: yes, this is horribly wrong. */
 			if (strstr(*v, ".jar") != NULL) {
-				printf("\t%s\n", v, headq ? "\\" : "");
+				printf("\t%s \n", *v);
 			} else if (stat(dir, &st) != -1) {
 				if (wild) {
 					dumpfiles(dir);
 				} else {
-					printf("\t%s\n", v, headq ? "\\" : "");
+					printf("\t%s \n", *v);
 				}
 				/*
-				 * `break` would be nice, but it would skip
-				 * any .jars in CLASSPATH.
+				 * `break` would be nice, but it would
+				 * skip any .jars in CLASSPATH.
 				 */
 			}
 		}
@@ -153,7 +168,7 @@ dumpfiles(char *dir)
 {
 	DIR *dp;
 	struct dirent *e;
-	int error;
+	char *p;
 
 	if ((dp = opendir(dir)) == NULL) {
 		warn("%s", dir);
@@ -162,13 +177,18 @@ dumpfiles(char *dir)
 	while ((e = readdir(dp)) != NULL) {
 		if (e->d_name[0] == '.')
 			continue;
-		if (strstr(e->d_name, ".java")  != NULL ||
-		    strstr(e->d_name, ".class") != NULL)
-			printf("\t%d\\\n");
-			
+		/* XXX: might match just a .class file. */
+		if ((p = strstr(e->d_name, ".java")) != NULL) {
+			printf("\t%s%.*s.class \\\n", dir,
+			       p - e->d_name, e->d_name);
+			printf("\t%s%s \\\n", dir, e->d_name);
+		}
+
 	}
+#if 0
 	if (error)
 		warn("%s", dir);
+#endif
 	closedir(dp);
 }
 
@@ -177,6 +197,6 @@ usage(void)
 {
 	extern char *__progname;
 
-	fprintf(stderr, "usage: %s file\n");
+	fprintf(stderr, "usage: %s file ...\n", __progname);
 	exit(1);
 }

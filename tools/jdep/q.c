@@ -1,5 +1,7 @@
 /* $Id$ */
 
+#include <stdlib.h>
+
 #include "q.h"
 #include "xalloc.h"
 
@@ -19,11 +21,14 @@ pushq(char *pkg)
 char *
 popq(void)
 {
-	char *pkg;
 	struct workq *q;
+	char *pkg = NULL;
 
-	pkg = q->pkg;
-	headq = q->next;
-	free(q);
+	if (headq != NULL) {
+		q = headq;
+		pkg = q->pkg;
+		headq = q->next;
+		free(q);
+	}
 	return pkg;
 }

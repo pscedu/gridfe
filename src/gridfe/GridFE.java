@@ -84,17 +84,23 @@ public class GridFE extends HttpServlet
 		}
 
 		Class handler = null;
-		for (int i = 0; i < this.dtab.length; i++)
-			if (uri.startsWith(p.getServRoot() +
-			    this.dtab[i].getBase())) {
+		String s;
+		char c;
+		for (int i = 0; i < this.dtab.length; i++) {
+			s = p.getServRoot() + this.dtab[i].getBase();
+			if (uri.length() > s.length())
+				c = uri.charAt(s.length());
+			else
+				c = '\0';
+			if (uri.equals(s) || (uri.startsWith(s) &&
+			    (c == '/' || c == '?'))) {
 				handler = this.dtab[i].getHandler();
 				break;
 			}
+		}
 
 		if (handler == null)
 			handler = gridfe.www.notfound.class;
-
-		String s;
 
 		try {
 			s = (String)handler.getMethod("main",

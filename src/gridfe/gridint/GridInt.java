@@ -14,6 +14,11 @@ import org.ietf.jgss.*;
 
 public class GridInt implements Serializable
 {
+	/* 
+	** TODO: Serialize GSSAuth - so credentials can
+	** be read back in easliy without messing with KDC
+	** & mod_KCT, etc...
+	*/
 	private transient GlobusAuth ga;
 	private transient GSSAuth gss;
 	private Uid uid;

@@ -16,10 +16,13 @@
 #include "q.h"
 #include "xalloc.h"
 
+static void dumpfiles(const char *);
 static void jdep(char *);
-static void procpkgs(void);
-static void dumpfiles(char *);
+static void listdeps(char *);
+static void procpkgs(char *);
 static void usage(void);
+
+struct workq *sawq, *procq;
 
 int
 main(int argc, char *argv[])
@@ -46,7 +49,9 @@ jdep(char *fil)
 
 	if ((fp = fopen(fil, "r")) == NULL)
 		err(1, "%s", fil);
-	printf("%.*s.class: \\\n", strstr(fil, ".java") - fil, fil);
+
+	pushq(&procq, xstrdup(fil));
+
 	pos = tag;
 	lbuf_init(&lb);
 	esc = dquot = squot = 0;
@@ -81,7 +86,7 @@ jdep(char *fil)
 					    	lbuf_push(&lb, '\0');
 						while (isspace(*pkg))
 							pkg++;
-						pushq(xstrdup(pkg));
+						pushq(&sawq, xstrdup(pkg));
 						lbuf_reset(&lb);
 					}
 				} else
@@ -96,12 +101,11 @@ jdep(char *fil)
 	fclose(fp);
 	lbuf_free(&lb);
 
-	procpkgs();
-	printf("\t%s\n", fil);
+	procpkgs(fil);
 }
 
 static void
-procpkgs(void)
+procpkgs(char *fil)
 {
 	char *cp, *p, *pkg, **paths, **v;
 	char dir[MAXPATHLEN];
@@ -109,6 +113,8 @@ procpkgs(void)
 	struct stat st;
 
 	cp = getenv("CLASSPATH");
+	if (cp == NULL)
+		cp = "";
 	pos = max = 0;
 	paths = xmalloc(sizeof(*paths));
 	*paths = cp;
@@ -117,7 +123,7 @@ procpkgs(void)
 		case '\0':
 			if (++pos >= max) {
 				max++;
-				paths = xrealloc(paths, max);
+				paths = xrealloc(paths, max * sizeof(*paths));
 			}
 			paths[pos] = "";
 			goto find;
@@ -125,14 +131,14 @@ procpkgs(void)
 		case ':':
 			if (++pos >= max) {
 				max += 3;
-				paths = xrealloc(paths, max);
+				paths = xrealloc(paths, max * sizeof(*paths));
 			}
 			paths[pos] = p + 1;
 			*p = '\0';
 			break;
 		}
 find:
-	while ((pkg = popq()) != NULL) {
+	while ((pkg = popq(&sawq)) != NULL) {
 		wild = 0;
 		for (p = pkg; *p != '\0'; p++)
 			if (*p == '.')
@@ -143,16 +149,17 @@ find:
 			wild = 1;
 		}
 		for (v = paths; (*v)[0] != '\0'; v++) {
-			snprintf(dir, sizeof(dir), "%s/%s", *v, pkg);
 			/* XXX: yes, this is horribly wrong. */
 			if (strstr(*v, ".jar") != NULL) {
-				printf("\t%s \n", *v);
-			} else if (stat(dir, &st) != -1) {
-				if (wild) {
+				pushq(&procq, xstrdup(*v));
+				continue;
+			}
+			snprintf(dir, sizeof(dir), "%s/%s", *v, pkg);
+			if (stat(dir, &st) != -1) {
+				if (wild)
 					dumpfiles(dir);
-				} else {
-					printf("\t%s \n", *v);
-				}
+				else
+					pushq(&procq, xstrdup(*v));
 				/*
 				 * `break` would be nice, but it would
 				 * skip any .jars in CLASSPATH.
@@ -161,14 +168,41 @@ find:
 		}
 		free(pkg);
 	}
+	free(paths);
+
+	listdeps(fil);
 }
 
 static void
-dumpfiles(char *dir)
+listdeps(char *fil)
+{
+	char *pkg;
+	struct workq *q;
+
+	if (procq != NULL)
+		printf("%.*s.class: \\\n", strstr(fil, ".java") - fil,
+		       fil);
+	while ((pkg = popq(&procq)) != NULL) {
+		for (q = procq; q != NULL; q = q->next)
+			if (strcmp(q->buf, pkg) == 0)
+				/*
+				 * Skip it; it will be processed
+				 * subsequently.
+				 */
+				goto next;
+		printf("\t%s%s\n", pkg, procq == NULL ? "" : " \\");
+next:
+		free(pkg);
+	}
+}
+
+static void
+dumpfiles(const char *dir)
 {
 	DIR *dp;
 	struct dirent *e;
 	char *p;
+	size_t siz;
 
 	if ((dp = opendir(dir)) == NULL) {
 		warn("%s", dir);
@@ -178,10 +212,26 @@ dumpfiles(char *dir)
 		if (e->d_name[0] == '.')
 			continue;
 		/* XXX: might match just a .class file. */
-		if ((p = strstr(e->d_name, ".java")) != NULL) {
-			printf("\t%s%.*s.class \\\n", dir,
-			       p - e->d_name, e->d_name);
-			printf("\t%s%s \\\n", dir, e->d_name);
+		if (strstr(e->d_name, ".class") != NULL) {
+			siz = strlen(dir) + strlen(e->d_name) + 1;
+			p = xmalloc(siz);
+			snprintf(p, siz, "%s%s", dir, e->d_name);
+			pushq(&procq, p);
+		} else if ((p = strstr(e->d_name, ".java")) != NULL) {
+			/* .java -> .class + '\0' */
+			siz = strlen(dir) + strlen(e->d_name) + 2;
+			p = xmalloc(siz);
+			snprintf(p, siz, "%s%.*s.class", dir,
+				 p - e->d_name, e->d_name);
+			pushq(&sawq, p);
+
+			/*
+			 * There is probably an easier way to do this.
+			 */
+			siz--;
+			p = xmalloc(siz);
+			snprintf(p, siz, "%s%s", dir, e->d_name);
+			pushq(&sawq, p);
 		}
 
 	}

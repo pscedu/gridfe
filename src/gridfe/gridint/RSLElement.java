@@ -134,13 +134,13 @@ public class RSLElement implements Serializable
 	*/
 	private void buildKeyPairs(String param, String[] key, String[] value)
 	{
-		this.data.append(b+param+m);
-
 		/* Quote all args to be safe! */
 		for(int i = 0; i < key.length; i++)
+		{
+			this.data.append(b+param+m);
 			this.data.append(b+key[i]+s+q+value[i]+q+e);
-
-		this.data.append(e);
+			this.data.append(e);
+		}
 	}
 
 	public void build()

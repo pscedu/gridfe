@@ -4,6 +4,6 @@ SYSROOT = .
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-SUBDIRS += gridfe
+SUBDIRS += gridfe lib
 
 include ${MAINMK}

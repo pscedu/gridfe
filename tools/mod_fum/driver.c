@@ -46,6 +46,6 @@ usage(void)
 {
 	extern char *__progname;
 
-	fprintf(stderr, "usage: %s username [password]\n", __progname);
+	fprintf(stderr, "usage: %s [username [password]]\n", __progname);
 	exit(1);
 }

@@ -6,39 +6,30 @@ import gridfe.*;
 import gridfe.gridint.*;
 import gridfe.gridint.auth.*;
 import oof.*;
-import jasp.*;
+
+import java.io.*;
 import org.ietf.jgss.GSSException;
 import org.globus.gsi.GlobusCredentialException;
 
 public class certs
 {
 	public static String main(Page p)
-		throws OOFException
+		throws OOFException, IOException, GSSException, GlobusCredentialException
 	{
 		OOF oof = p.getOOF();
 		String s = "";
 
 		int uid = 6342;
 //		int uid = page.getUserID();
+		FileOutputStream fp = new FileOutputStream("/tmp/gridfe.err");
 
 		// DEBUG - use p.getGridInt() later;
-		//GridInt gi = new GridInt(uid);
-//		try
-//		{
-			GlobusAuth ga = new GlobusAuth(new Uid(uid));
-//			ga.createCredential();
-//		}
-//		catch(Exception e)
-//		{
-			s += oof.p("who wants a body massage");
-//		}
-
-		s += p.header("gijoe") + "badabadba!" + p.footer();
-/*
-		if (gi == null)
-			s += "GI IS NULL<br />";
-
+		fp.write(65);
+		GridInt gi = new GridInt(uid);
+		fp.write(66);
 		gi.auth();
+		fp.write(67);
+		fp.close();
 		
 		CertInfo ci;
 		ci = gi.getCertInfo();
@@ -166,7 +157,7 @@ public class certs
 				}
 		     )
 		   + p.footer();
-*/
+
 		return (s);
 	}
 };

@@ -4,8 +4,7 @@ package gridfe.gridint;
 
 import java.io.*;
 
-public class RSLElement implements Serializable
-{
+public class RSLElement implements Serializable {
 	/* Strings in the form "&(executable=`which hostname`)..." */
 	private final static String b = "(";
 	private final static String m = "=";
@@ -144,14 +143,12 @@ public class RSLElement implements Serializable
 
 	/* Serializable Implementation */
 	private void writeObject(ObjectOutputStream out)
-		throws IOException
-	{
+	    throws IOException {
 		out.defaultWriteObject();
 	}
 
 	private void readObject(ObjectInputStream in)
-		throws IOException, ClassNotFoundException
-	{
+	    throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
 
 		/* Rebuild RSLElement */

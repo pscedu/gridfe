@@ -20,8 +20,7 @@ public class GlobusAuth {
 
 	/* Grab the credential from the file */
 	public void createCredential()
-		throws GlobusCredentialException
-	{
+	    throws GlobusCredentialException {
 		this.gc = new GlobusCredential(this.file.getX509());
 	}
 

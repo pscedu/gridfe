@@ -8,30 +8,25 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-class DelegationHandler
-{
+class DelegationHandler {
 	private String base;
 	private Class handler;
 
-	public DelegationHandler(String base, Class handler)
-	{
+	public DelegationHandler(String base, Class handler) {
 		this.base = base;
 		this.handler = handler;
 	}
 
-	public String getBase()
-	{
+	public String getBase() {
 		return this.base;
 	}
 
-	public Class getHandler()
-	{
+	public Class getHandler() {
 		return this.handler;
 	}
 };
 
-public class GridFE extends HttpServlet
-{
+public class GridFE extends HttpServlet {
 	private HttpServletRequest req;
 	private HttpServletResponse res;
 
@@ -50,21 +45,18 @@ public class GridFE extends HttpServlet
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
-		throws IOException, ServletException
-	{
+	    throws IOException, ServletException {
 		this.workHorse(req, res);
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
-		throws IOException, ServletException
-	{
+	    throws IOException, ServletException {
 		this.workHorse(req, res);
 	}
 
 	/* XXX: remove exceptions to always output a gridfe page. */
 	private void workHorse(HttpServletRequest req, HttpServletResponse res)
-		throws IOException, ServletException
-	{
+	    throws IOException, ServletException {
 		this.req = req;
 		this.res = res;
 
@@ -119,20 +111,18 @@ w.print("<br />handler: " + handler);
 		w.print("<br />handler: " + handler);
 	}
 
-	private String handleError(Page p, String msg)
-	{
+	private String handleError(Page p, String msg) {
 		String s;
 
 		try {
-			s =	p.header("Fatal Error") +
-				p.getOOF().p("A fatal error has occured: " + msg) +
-				p.footer();
+			s = p.header("Fatal Error") +
+			    p.getOOF().p("A fatal error has occured: " + msg) +
+			    p.footer();
 		} catch (Exception e) {
 			/* This is bad. */
 			s = "Fatal error: " + e + ": " + e.getMessage();
 			s += "\nOriginally: " + msg;
 		}
-
-		return s;
+		return (s);
 	}
 }

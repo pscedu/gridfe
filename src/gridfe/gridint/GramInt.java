@@ -6,8 +6,7 @@ import java.net.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
-public class GramInt
-{
+public class GramInt {
 	private String host;
 	private String rsl;
 	private GramJob job = null;
@@ -15,14 +14,12 @@ public class GramInt
 	private GSSCredential gss;
 	private String jOut;
 
-	public GramInt(GSSCredential gss, String host)
-	{
+	public GramInt(GSSCredential gss, String host) {
 		this.gss = gss;
 		this.host = host;
 	}
 
-	public GramInt(GSSCredential gss, String host, String rsl)
-	{
+	public GramInt(GSSCredential gss, String host, String rsl) {
 		this.gss = gss;
 		this.host = host;
 		this.rsl = rsl;
@@ -30,8 +27,7 @@ public class GramInt
 
 	/* globus-job-submit: submit a request to the GRAM server */
 	public void jobSubmit(GridJob j)
-		throws GramException, GSSException
-	{
+	    throws GramException, GSSException {
 		/* Make sure the host is there */
 		Gram.ping(this.gss, this.host);
 
@@ -41,16 +37,14 @@ public class GramInt
 	}
 
 	/* Used internally to by this.gramRequest and GridJob.revive */
-	public GramJob createJob(String rsl)
-	{
+	public GramJob createJob(String rsl) {
 		this.job = new GramJob(this.gss, rsl);
 		return this.job;
 	}
 
 	/* globus-job-status */
 	public int getStatus()
-		throws GSSException
-	{
+	    throws GSSException {
 		/*
 		** TODO: Find a good way to tell if the
 		** job has a status of FAIL or DONE after
@@ -77,8 +71,7 @@ public class GramInt
 
 	/* Get the job status in human readable form */
 	public String getStatusAsString()
-		throws GSSException
-	{
+	    throws GSSException {
 		String status = "UNKNOWN";
 
 		try {
@@ -95,24 +88,20 @@ public class GramInt
 
 	/* globus-job-cancel */
 	public void cancel()
-		throws GramException, GSSException
-	{
+	    throws GramException, GSSException {
 		this.job.cancel();
 	}
 
-	public String getIDAsString()
-	{
+	public String getIDAsString() {
 		return (this.job.getIDAsString());
 	}
 
 	public void setID(String id)
-		throws MalformedURLException
-	{
+	    throws MalformedURLException {
 		this.job.setID(id);
 	}
 
-	public GramJob getJob()
-	{
+	public GramJob getJob() {
 		return (this.job);
 	}
 };

@@ -9,14 +9,12 @@ import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
 
-class Menu
-{
+class Menu {
 	private String name;
 	private String url;
 	private LinkedList items;
 
-	public Menu(String name, String url, Object[] items)
-	{
+	public Menu(String name, String url, Object[] items) {
 		this.name = name;
 		this.url = url;
 		this.items = new LinkedList();
@@ -25,24 +23,20 @@ class Menu
 				this.items.add(items[i]);
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return this.name;
 	}
 
-	public String getURL()
-	{
+	public String getURL() {
 		return this.url;
 	}
 
-	public LinkedList getItems()
-	{
+	public LinkedList getItems() {
 		return this.items;
 	}
 }
 
-public class Page
-{
+public class Page {
 	private HttpServletRequest req;
 	private HttpServletResponse res;
 	private LinkedList menus;
@@ -60,8 +54,7 @@ public class Page
 	public final static Object CCSUBHDR = (Object)"subhdr";
 	public final static int MENU_ITEM_HEIGHT = 35;
 
-	Page(HttpServletRequest req, HttpServletResponse res)
-	{
+	Page(HttpServletRequest req, HttpServletResponse res) {
 		this.req = req;
 		this.res = res;
 		this.jasp = new JASP();
@@ -80,18 +73,15 @@ public class Page
 		}
 	}
 
-	private void addMenu(String name, String url, Object[] items)
-	{
+	private void addMenu(String name, String url, Object[] items) {
 		this.menus.add(new Menu(name, url, items));
 	}
 
-	private LinkedList getMenus()
-	{
+	private LinkedList getMenus() {
 		return (this.menus);
 	}
 
-	private String addScript(String code)
-	{
+	private String addScript(String code) {
 		String s;
 
 		s =   "<script type=\"text/javascript\">"
@@ -103,8 +93,7 @@ public class Page
 		return (s);
 	}
 
-	public String divName(String name)
-	{
+	public String divName(String name) {
 		String t = "";
 
 		for (int i = 0; i < name.length(); i++)
@@ -113,8 +102,7 @@ public class Page
 		return (t);
 	}
 
-	public String imageName(String name)
-	{
+	public String imageName(String name) {
 		String t = "";
 
 		for (int i = 0; i < name.length(); i++)
@@ -125,8 +113,7 @@ public class Page
 		return (t);
 	}
 
-	public String buildMenu()
-	{
+	public String buildMenu() {
 		String name, url, p, t = "var menus = [";
 		Menu m;
 		Iterator i, j;
@@ -160,8 +147,7 @@ public class Page
 	}
 
 	public String header(String title)
-		throws OOFException
-	{
+	  throws OOFException {
 		String s, name, url;
 		String r = this.webroot;
 		Menu m;
@@ -275,8 +261,7 @@ public class Page
 		return (s);
 	}
 
-	public String footer()
-	{
+	public String footer() {
 		String s = "";
 
 		s +=			"</div>"
@@ -287,8 +272,7 @@ public class Page
 		return (s);
 	}
 
-	public void error(String error)
-	{
+	public void error(String error) {
 		try {
 			PrintWriter w;
 			w = this.res.getWriter();
@@ -298,33 +282,27 @@ public class Page
 		}
 	}
 
-	public void error(Exception e)
-	{
+	public void error(Exception e) {
 		this.error(e.toString() + ": " + e.getMessage());
 	}
 
-	public OOF getOOF()
-	{
+	public OOF getOOF() {
 		return (this.oof);
 	}
 
-	public JASP getJASP()
-	{
+	public JASP getJASP() {
 		return (this.jasp);
 	}
 
-	public String genClass()
-	{
+	public String genClass() {
 		return (this.classCount++ % 2 == 0 ? "data1" : "data2");
 	}
 
-	public GridInt getGridInt()
-	{
+	public GridInt getGridInt() {
 		return (this.gi);
 	}
 
-	public String getServRoot()
-	{
+	public String getServRoot() {
 		return (this.servroot);
 	}
 };

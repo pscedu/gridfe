@@ -45,7 +45,7 @@ public class JobList implements Serializable
 	public GridJob get(int index) {
 		return ((GridJob)this.list.get(index));
 	}
-	
+
 	public GridJob get(String name) {
 		/* Grab the index from the hashtable */
 		int index = (((Integer)(this.table.get(name))).intValue());
@@ -53,7 +53,7 @@ public class JobList implements Serializable
 		/* Then grab the job */
 		return ((GridJob)this.list.get(index));
 	}
-	
+
 	public int size() {
 		return (this.list.size());
 	}

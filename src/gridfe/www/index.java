@@ -5,8 +5,7 @@ package gridfe.www;
 import gridfe.*;
 import oof.*;
 
-public class index
-{
+public class index {
 	public static String main(Page p)
 		throws Exception
 	{

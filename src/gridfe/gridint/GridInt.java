@@ -13,30 +13,26 @@ import org.globus.gsi.*;
 import org.globus.io.gass.client.*;
 import org.ietf.jgss.*;
 
-public class GridInt implements Serializable
-{
+public class GridInt implements Serializable {
 	private transient GlobusAuth ga;
 	private transient GSSAuth gss;
 	private transient GassInt gass;
 	private Uid uid;
 	private JobList list;
 
-	public GridInt(String uid)
-	{
+	public GridInt(String uid) {
 		this.uid = new Uid(uid);
 		this.list = new JobList();
 	}
 
-	public GridInt(int uid)
-	{
+	public GridInt(int uid) {
 		this.uid = new Uid(uid);
 		this.list = new JobList();
 	}
 
 	/* Perform all Grid authentication */
 	public void auth()
-		throws GSSException, GlobusCredentialException
-	{
+	     throws GSSException, GlobusCredentialException {
 		/* Read in the X.509 Cert */
 		this.ga = new GlobusAuth(this.uid);
 		this.ga.createCredential();
@@ -47,13 +43,11 @@ public class GridInt implements Serializable
 	}
 
 	/* Cleanup and destroy credentials */
-	public void logout()
-	{
+	public void logout() {
 		this.logout(null);
 	}
 
-	public void logout(String file)
-	{
+	public void logout(String file) {
 		/*
 		** List of files to remove:
 		** 1) X.509 Certificate
@@ -78,8 +72,7 @@ public class GridInt implements Serializable
 
 	/* globus-job-submit equivalent */
 	public void jobSubmit(GridJob job)
-		throws GramException, GSSException
-	{
+	    throws GramException, GSSException {
 		job.init(this.gss.getGSSCredential());
 		job.run();
 
@@ -94,17 +87,15 @@ public class GridInt implements Serializable
 
 	/* Cancel job and remove from job list */
 	public boolean jobCancel(GridJob job)
-		throws GramException, GSSException
-	{
+	    throws GramException, GSSException {
 		job.cancel();
 		return (this.list.remove(job));
 	}
 
 	/* Required after deserialization */
 	public void revive()
-		throws MalformedURLException, GSSException,
-		       GlobusCredentialException
-	{
+	    throws MalformedURLException, GSSException,
+		   GlobusCredentialException {
 		this.auth();
 		for (int i = 0; i < this.list.size(); i++) {
 			this.list.get(i).revive(this.gss.getGSSCredential());
@@ -113,13 +104,12 @@ public class GridInt implements Serializable
 
 	/* Start the Gass Server on a random port within our range */
 	private void startGass(int min, int max, String host)
-		throws GassException, IOException
-	{
+	    throws GassException, IOException {
 		Random r;
 		int port;
 
 		/*
-		** If min/max are equal, use specific port 
+		** If min/max are equal, use specific port
 		** otherwise, random.
 		*/
 		if (min != max) {
@@ -143,8 +133,7 @@ public class GridInt implements Serializable
 
 	/* Allow override of random port in range */
 	private void startGass(int port, String host)
-		throws GassException, IOException
-	{
+	    throws GassException, IOException {
 		/* Create a GASS Server to connect to */
 		this.gass = new GassInt(this.gss.getGSSCredential(),
 		    host, port);
@@ -158,15 +147,13 @@ public class GridInt implements Serializable
 
 	/* Setup file retrieval */
 	public void startRetrieve(GridJob job, String file, int port)
-		throws GassException, IOException, GSSException
-	{
+	    throws GassException, IOException, GSSException {
 		/* Start with min/max == port */
 		this.startRetrieve(job, file, port, port);
 	}
 
 	public void startRetrieve(GridJob job, String file, int min, int max)
-		throws GassException, IOException, GSSException
-	{
+	    throws GassException, IOException, GSSException {
 		String data = "";
 
 		if (job.remote(file)) {
@@ -180,32 +167,25 @@ public class GridInt implements Serializable
 
 		/* Convert from GRAM -> GASS convention */
 		file = job.convert(file);
-
-		/* Open the file for reading */
 		this.gass.open(file);
 	}
 
 	/* End file retrieval */
 	public void stopRetrieve()
-		throws IOException
-	{
-		/* Close the file */
+	    throws IOException {
 		this.gass.close();
-
-		/* Close the Gass Server */
 		this.gass.shutdown();
 	}
 
 	/* File (Chunk of 'len' bytes, 'len < 1' read all) */
 	public String retrieve(int len, int off)
-		throws IOException
-	{
+	    throws IOException {
 		StringBuffer str = new StringBuffer("");
 		String data = "";
 		long size = this.gass.getSize();
 		long left = size - off;
 
-		/* 
+		/*
 		** Check len is not greater than len of file  (or
 		** what is left of reading it)
 		**
@@ -230,34 +210,29 @@ public class GridInt implements Serializable
 	}
 
 	/* Get a job from the list by index */
-	public GridJob getJob(int index)
-	{
+	public GridJob getJob(int index) {
 		return (this.list.get(index));
 	}
 
 	/* Get a job from the list by it's name */
-	public GridJob getJob(String name)
-	{
+	public GridJob getJob(String name) {
 		return (this.list.get(name));
 	}
 
 	/* Get the raw JobList class */
-	public JobList getJobList()
-	{
+	public JobList getJobList() {
 		return (this.list);
 	}
 
 	/* Get certificate information */
-	public CertInfo getCertInfo()
-	{
+	public CertInfo getCertInfo() {
 		return (this.ga.getCertInfo());
 	}
 
 	/* Implement Serializable using revive() */
 	private void readObject(ObjectInputStream in)
-		throws IOException, ClassNotFoundException,
-		       GSSException, GlobusCredentialException
-	{
+	    throws IOException, ClassNotFoundException, GSSException,
+		   GlobusCredentialException {
 		in.defaultReadObject();
 		this.revive();
 	}

@@ -47,9 +47,8 @@ public class GridJob extends RSLElement implements Serializable
 
 	/* Submit the job and save the id string */
 	public void run()
-		throws GramException, GSSException
-	{
-		/* 
+	    throws GramException, GSSException {
+		/*
 		** XXX - save a timestamp of when the job
 		** was submitted? (just a thought)
 		*/
@@ -59,8 +58,7 @@ public class GridJob extends RSLElement implements Serializable
 
 	/* cancel the job and dispose of gramint instance */
 	public void cancel()
-		throws GramException, GSSException
-	{
+	    throws GramException, GSSException {
 		this.gi.cancel();
 
 		/* Get rid of gi entirely */
@@ -136,14 +134,12 @@ public class GridJob extends RSLElement implements Serializable
 
 	/* GramInt wrappers */
 	public int getStatus()
-		throws GSSException
-	{
+	    throws GSSException {
 		return (this.gi.getStatus());
 	}
 
 	public String getStatusAsString()
-		throws GSSException
-	{
+	    throws GSSException {
 		return (this.gi.getStatusAsString());
 	}
 
@@ -159,8 +155,7 @@ public class GridJob extends RSLElement implements Serializable
 
 	/* This revive should be called ONLY after a deserialization */
 	public void revive(GSSCredential gss)
-		throws MalformedURLException
-	{
+	    throws MalformedURLException {
 		/* Revive GramInt and it's private data */
 		this.gi = new GramInt(gss, this.host, this.toString());
 		this.gi.createJob(this.toString());

@@ -23,8 +23,7 @@ public class GSSAuth {
 	}
 
 	public void createCredential()
-		throws GSSException
-	{
+	    throws GSSException {
 		/*
 		** The following class does a conversion between
 		** GlobusCredential to GSSCredential... However,
@@ -53,14 +52,12 @@ public class GSSAuth {
 	** GSSCredential Methods
 	*/
 	public GSSName getName()
-		throws GSSException
-	{
+	    throws GSSException {
 		return (this.gss.getName());
 	}
 
 	public int getRemainingLifetime()
-		throws GSSException
-	{
+	    throws GSSException {
 		return (this.gss.getRemainingLifetime());
 	}
 };

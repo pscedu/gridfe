@@ -8,13 +8,12 @@ import gridfe.gridint.auth.*;
 import oof.*;
 
 import java.io.*;
-import org.ietf.jgss.GSSException;
 import org.globus.gsi.GlobusCredentialException;
+import org.ietf.jgss.GSSException;
 
-public class certs
-{
+public class certs {
 	public static String main(Page p)
-		throws OOFException, IOException, GSSException, GlobusCredentialException
+		throws Exception
 	{
 		OOF oof = p.getOOF();
 		String s = "";

@@ -10,8 +10,7 @@ import org.globus.io.gass.server.*;
 import org.globus.io.streams.*;
 import org.ietf.jgss.*;
 
-public class GassInt extends RemoteGassServer
-{
+public class GassInt extends RemoteGassServer {
 	private GassInputStream fin;
 	private int port;
 	private String host;
@@ -19,8 +18,7 @@ public class GassInt extends RemoteGassServer
 	private GSSCredential gss;
 	private GassServer ga;
 
-	public GassInt(GSSCredential gss, String host, int port)
-	{
+	public GassInt(GSSCredential gss, String host, int port) {
 		/* call superclass constructor, secure_mode=true */
 		super(gss, true, port);
 
@@ -35,12 +33,11 @@ public class GassInt extends RemoteGassServer
 
 	/* Overload start */
 	public void start()
-		throws GassException, IOException
-	{
+	    throws GassException, IOException {
 /*
 		//This is additions after hacked CoG code, where the file RemoteGassServer.java
 		//was modified to allow additional customization. However, this still FUBAR.
-		
+
 		int success = 0;
 		int n = 0;
 
@@ -60,8 +57,7 @@ public class GassInt extends RemoteGassServer
 	/* Manually remote start a server - this fails for some reason though, more FUBAR */
 /*
 	public void start_remote()
-		throws GramException, GSSException
-	{
+	    throws GramException, GSSException {
 //		GridJob j = new GridJob("intel2.psc.edu");
 		GridJob j = new GridJob(this.host);
 */
@@ -86,8 +82,7 @@ public class GassInt extends RemoteGassServer
 
 	/* Open a file for reading */
 	public void open(String file)
-		throws GSSException, GassException, IOException
-	{
+	    throws GSSException, GassException, IOException {
 		/* SelfAuthorization uses GlobusCredentials for authentication */
 		SelfAuthorization auth = new SelfAuthorization();
 
@@ -98,8 +93,7 @@ public class GassInt extends RemoteGassServer
 
 	/* Read len bytes from the open stream */
 	public int read(StringBuffer buf, int len)
-		throws IOException
-	{
+	    throws IOException {
 		int read = 0;
 
 		/* Read from offset = 0, to len */
@@ -113,15 +107,13 @@ public class GassInt extends RemoteGassServer
 	}
 
 	/* Get the size of the file opened by the GassInputStream */
-	public long getSize()
-	{
+	public long getSize() {
 		return (this.fin.getSize());
 	}
 
 	/* Close the stream */
 	public void close()
-		throws IOException
-	{
+	    throws IOException {
 		if (this.fin != null) {
 			this.fin.close();
 			this.fin = null;

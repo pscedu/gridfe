@@ -64,10 +64,4 @@ public class JobList implements Serializable
 	{
 		return this.list.size();
 	}
-
-//	public Enumeration keys()
-//	{
-		/* Return the list of keys */
-//		return this.table.keys();
-//	}
 };

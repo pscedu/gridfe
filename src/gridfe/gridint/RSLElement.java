@@ -29,11 +29,11 @@ public class RSLElement implements Serializable
 	private String vParam, kParam;
 	private String jOut;
 
-	/*
+/*
 	public RSLElement()
 	{
 	}
-	*/
+*/
 
 	public void setRSL(String[] param, String[] value)
 	{

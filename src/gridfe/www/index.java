@@ -13,7 +13,8 @@ public class index
 		OOF oof = page.getOOF();
 		return "test";
 
-//		return	page.header("Error") +
+		return	page.header("Error") +
+		"";
 //				oof.p("You are already logged on.") +
 //				page.footer();
 	}

@@ -33,7 +33,7 @@ public class GSSAuth
 		** GlobusCredential to GSSCredential... However,
 		** this is broken in CoG 1.1 (and previous also
 		** I assume)... In order for this to work properly
-		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
+		** CoG jglobus was compiled from the "CoG 1.0 pre alpha"
 		** source code. (cvs.globus.org)
 		*/
 		this.gss = new GlobusGSSCredentialImpl(this.gc,

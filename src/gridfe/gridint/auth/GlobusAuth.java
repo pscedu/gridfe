@@ -35,7 +35,7 @@ public class GlobusAuth
 	/* Certificate Information Record */
 	public CertInfo getCertInfo()
 	{
-		CertInfo ci = 
+		CertInfo ci =
 		new CertInfo( this.gc.getSubject(),
 				this.gc.getProxyType(),
 				this.gc.getIssuer(),

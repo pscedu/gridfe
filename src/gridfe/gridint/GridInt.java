@@ -265,13 +265,6 @@ public class GridInt implements Serializable
 		return this.ga.getCertInfo();
 	}
 
-	/* This could actually be omitted, (explicit declaration) */
-	private void writeObject(ObjectOutputStream out)
-		throws IOException
-	{
-		out.defaultWriteObject();
-	}
-
 	/* Implement Serializable using revive() */
 	private void readObject(ObjectInputStream in)
 		throws IOException, ClassNotFoundException,

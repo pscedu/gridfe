@@ -23,8 +23,8 @@ public class JASP {
 		for (i = 0; i < t.length(); i++) {
 			/* Entity names. */
 			for (j = 0; j < entmap.length; j++)
-				if (entmap[j].raw == s.charAt(i)) {
-					t += entmap[j].esc;
+				if (entmap[j].getRaw() == s.charAt(i)) {
+					t += entmap[j].getEsc();
 					continue;
 				}
 			/*
@@ -52,11 +52,19 @@ public class JASP {
 };
 
 class entity {
-	public char raw;
-	public String esc;
+	private char raw;
+	private String esc;
 
 	public entity(char raw, String esc) {
 		this.raw = raw;
 		this.esc = esc;
+	}
+
+	public char getRaw() {
+		return this.raw;
+	}
+
+	public String getEsc() {
+		return this.esc;
 	}
 };

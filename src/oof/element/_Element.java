@@ -6,17 +6,33 @@ public class ELEMENT {
 	private LinkedList attrs;
 	private LinkedList children;
 
-	ELEMENT(Object[] attrs = null, String s = null) {
-		this.attrs    = new LinkedList();
-		this.children = new LinkedList(s);
-	}
-
-	ELEMENT(Object[] attrs = {}, ELEMENT e = null) {
-		this.attrs    = new LinkedList();
-		this.children = new LinkedList(e);
-	}
-
 	ELEMENT() {
+		this.initWork(Object[] {}, null);
+	}
+	
+	ELEMENT(Object[] attrs) {
+		this.initWork(attrs, null);
+	}
+
+	ELEMENT(String s) {
+		this.initWork(Object[] {}, s);
+	}
+
+	ELEMENT(ELEMENT e) {
+		this.initWork(Object[] {}, e);
+	}
+
+	ELEMENT(Object[] attrs, String s) {
+		this.initWork(attrs, s);
+	}
+
+	ELEMENT(Object[] attrs, ELEMENT e) {
+		this.initWork(attrs, e);
+	}
+
+	private void initWork(String name, Object[] attrs, Object value) {
+		this.attrs = new LinkedList(attrs);
+		this.children = value == null ? new LinkedList() : new LinkedList(value);
 	}
 
 	public void append(String s) {

@@ -18,7 +18,7 @@ public class certs {
 		String s = "";
 
 		CertInfo ci;
-		ci = gi.getCertInfo();
+		ci = p.getGridInt().getCertInfo();
 
 		long tmp;
 		long sec = ci.time;

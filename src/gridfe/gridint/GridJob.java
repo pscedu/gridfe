@@ -69,55 +69,37 @@ public class GridJob extends RSLElement implements Serializable
 		this.gi = null;
 	}
 
-	/*
-	** Determine if stdout, stderr, or both are
-	** being redirected to a Gass Server
-	*/
-	public int remote()
+	/* Check if the file location is remote or local */
+	public boolean remote(String file)
 	{
-		/*
-		** 'which' data to retrieve Remotely:
-		** 3 - Both
-		** 2 - Stderr
-		** 1 - Stdout
-		** 0 - Neither (Retrieve Both locally)
-		*/
-		int which = 0;
-
-		/* Job submitted to local machine */
-		boolean local = false;
+		/* Job submitted to remote machine */
+		boolean remote = false;
 
 		/* XXX - Check for host to be localhost */
 //		if(this.host.equals(BasicServices.getLocalhost()))
 //		if(this.host.equalsIgnoreCase("gridinfo.psc.edu"))
-		if(this.host.equalsIgnoreCase("mugatu.psc.edu"))
-			local = true;
+		if(!this.host.equalsIgnoreCase("mugatu.psc.edu"))
+		{
+			/*
+			** If the job is remote, the output
+			** is automatically remote whether it
+			** via a gass server or not
+			**
+			** XXX - if it is not local submitted it
+			** could be a job submitted to intel2 with output
+			** going to rachel... need a way to extract the
+			** proper host, etc...
+			*/
+			remote = true;
+		}
 
 		/* Check for starting 'http:' or 'https:' */
-		if(this.stdout != null)
-			if(this.stdout.startsWith("http:") ||
-			   this.stdout.startsWith("https:"))
-				which = 1;
-
-		if(this.stderr != null)
-			if(this.stderr.startsWith("http:") ||
-			   this.stderr.startsWith("https:"))
-				which += 2;
-
-		/*
-		** If the job is remote, the output
-		** is automatically remote whether it
-		** via a gass server or not
-		*/
-		/* XXX - if it is not local submitted it
-		** could be a job submitted to intel2 with output
-		** going to rachel... need a way to extract the
-		** proper host, etc...
-		*/
-		if(!local) 
-			which = 3;
+		if(file != null)
+			if(file.startsWith("http:/") ||
+			   file.startsWith("https/:"))
+				remote = true;
 		
-		return which;
+		return remote;
 	}
 
 	/* Convert GRAM stdout, and directory to a GASS filename */

@@ -596,6 +596,11 @@ static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	err = krb5_cc_initialize(kinst->context, kinst->cache, kinst->principal);
 	if(err)
 	{
+		/*
+		** In testing, This is thrown with the error -1765328188
+		** when there are already credentials created and mod_fum
+		** does not have the proper permissions to read them!
+		*/
 		mf_err("initialize cache failed", err);
 		goto RET;
 	}

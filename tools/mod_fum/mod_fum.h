@@ -31,10 +31,13 @@
 
 #define kKX509HostName "certificate"
 #define kKX509ServiceName "kx509"
+
+/* file names, directories... XXX put in a .conf file?? */
 #define kX509DefaultFile "/tmp/x509up_u"
 #define kKrb5DefaultFile "/tmp/krb5cc_"
-#define kCredentialFileName "krb5cc_"
+#define kCredentialFileName "x509u_u"
 #define kCredentialPath "/tmp"
+
 #define kX509FilePermissions 0600
 
 typedef struct

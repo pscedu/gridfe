@@ -1,6 +1,6 @@
 /* $Id$ */
 
-package grindint;
+package gridint;
 
 import org.ietf.jgss.*;
 import org.globus.gsi.*;

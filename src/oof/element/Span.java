@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class Span extends ELEMENT {
+public class Span extends ELEMENT {
+	public Span(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

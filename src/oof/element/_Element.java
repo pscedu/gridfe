@@ -11,60 +11,21 @@ public class ELEMENT {
 	private LinkedList children;
 	private FILTER filter;
 
-	public ELEMENT() {
-		this.attrs	= new LinkedList();
-		this.children	= new LinkedList();
-	}
-
-	public ELEMENT(Object[] attrs) {
+	public ELEMENT(Object[] attrs, Object[] os) {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		for (int i = 0; i < attrs.length; i++)
 			this.attrs.add(attrs[i]);
+		for (int i = 0; i < os.length; i++)
+			this.children.add(os[i]);
 	}
 
-	public ELEMENT(String s) {
-		this.attrs	= new LinkedList();
-		this.children	= new LinkedList();
-		this.children.add(s);
+	public void append(Object o) {
+		this.children.addLast(o);
 	}
 
-	public ELEMENT(ELEMENT e) {
-		this.attrs	= new LinkedList();
-		this.children	= new LinkedList();
-		this.children.add(e);
-	}
-
-	public ELEMENT(Object[] attrs, String s) {
-		this.attrs	= new LinkedList();
-		this.children	= new LinkedList();
-		for (int i = 0; i < attrs.length; i++)
-			this.attrs.add(attrs[i]);
-		this.children.add(s);
-	}
-
-	public ELEMENT(Object[] attrs, ELEMENT e) {
-		this.attrs	= new LinkedList();
-		this.children	= new LinkedList();
-		for (int i = 0; i < attrs.length; i++)
-			this.attrs.add(attrs[i]);
-		this.children.add(e);
-	}
-
-	public void append(String s) {
-		this.children.addLast((Object)s);
-	}
-
-	public void append(ELEMENT e) {
-		this.children.addLast((Object)e);
-	}
-
-	public void prepend(String s) {
-		this.children.addFirst((Object)s);
-	}
-
-	public void prepend(ELEMENT e) {
-		this.children.addFirst((Object)e);
+	public void prepend(Object o) {
+		this.children.addFirst(o);
 	}
 
 	public String toString() {

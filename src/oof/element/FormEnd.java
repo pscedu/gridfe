@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class FormEnd extends END {
+public class FormEnd extends END {
+	public FormEnd() {
+		super();
+	}
 };

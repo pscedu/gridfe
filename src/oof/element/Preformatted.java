@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class Preformatted extends ELEMENT {
+public class Preformatted extends ELEMENT {
+	public Preformatted(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class Input extends ELEMENT {
+public class Input extends ELEMENT {
+	public Input(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

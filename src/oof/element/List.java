@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class List extends ELEMENT {
+public class List extends ELEMENT {
+	public List(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

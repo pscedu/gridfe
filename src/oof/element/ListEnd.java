@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class ListEnd extends END {
+public class ListEnd extends END {
+	public ListEnd(Object[] attrs) {
+		super(attrs, new Object[] {});
+	}
 };

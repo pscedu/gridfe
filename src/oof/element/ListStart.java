@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class ListStart extends START {
+public class ListStart extends START {
+	public ListStart(Object[] attrs) {
+		super(attrs);
+	}
 };

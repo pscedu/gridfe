@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class FormStart extends START {
+public class FormStart extends START {
+	public FormStart(Object[] attrs) {
+		super(attrs);
+	}
 };

@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class Link extends ELEMENT {
+public class Link extends ELEMENT {
+	public Link(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

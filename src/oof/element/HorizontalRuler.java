@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class HorizontalRuler extends ELEMENT {
+public class HorizontalRuler extends ELEMENT {
+	public HorizontalRuler(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

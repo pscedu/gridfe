@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class TableEnd extends END {
+public class TableEnd extends END {
+	public TableEnd() {
+		super();
+	}
 };

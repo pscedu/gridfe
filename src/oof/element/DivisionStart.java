@@ -3,5 +3,7 @@ package oof.element;
 
 import oof.element.*;
 
-class DivisionStart extends START {
+public class DivisionStart extends START {
+	public DivisionStart()			{ super(new Object[] {}); }
+	public DivisionStart(Object[] attrs)	{ super(attrs); }
 };

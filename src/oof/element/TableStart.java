@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class TableStart extends START {
+public class TableStart extends START {
+	public TableStart(Object[] attrs) {
+		super(attrs);
+	}
 };

@@ -147,4 +147,12 @@ public class GridInt implements Serializable
 		in.defaultReadObject();
 		this.revive();
 	}
+
+
+
+	//DEBUG
+	public GSSCredential getCredential()
+	{
+		return this.gss.getGSSCredential();
+	}
 };

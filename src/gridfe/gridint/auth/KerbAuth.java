@@ -30,7 +30,7 @@ public class KerbAuth
 		 * Read the "krb5" configuration
 		 * entry from the JAAS file...
 		 */
-		krb5 = new LoginContext("krb5");	
+		krb5 = new LoginContext("krb5");
 	}
 
 	public void login()
@@ -47,6 +47,6 @@ public class KerbAuth
 	public void logout()
 		throws LoginException
 	{
-		krb5.logout();	
+		krb5.logout();
 	}
 };

@@ -116,7 +116,7 @@ public class GridInt implements Serializable
 		return this.gss;
 	}
 
-	/* 
+	/*
 	** TODO: - later there need to be lots more
 	** functions for obtaining certificate information
 	*/

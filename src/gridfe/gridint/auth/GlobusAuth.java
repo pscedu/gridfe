@@ -3,7 +3,7 @@
 /*
 ** GlobusAuth.java
 **
-** Obtains a GlobusCredential from 
+** Obtains a GlobusCredential from
 ** a file which is a valid X.509 Certificate.
 */
 package gridint.auth;
@@ -73,7 +73,7 @@ public class GlobusAuth
 	}
 
 	/*
-	** Implement the GlobusCredential methods we need 
+	** Implement the GlobusCredential methods we need
 	*/
 
 	public PrivateKey getPrivateKey()

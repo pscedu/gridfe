@@ -51,7 +51,7 @@ public class GridJob implements Serializable
 	{
 		this.rsl = new RSLElement(gp, gv, vp, vv);
 	}
-	
+
 	public void setRSL(String[] gp, String[] gv, String kp, String[] kk, String[] kv)
 	{
 		this.rsl = new RSLElement(gp, gv, kp, kk, kv);
@@ -72,16 +72,16 @@ public class GridJob implements Serializable
 	/* Internal methods to be called by GridInt ONLY! */
 	public void init(GSSCredential gss)
 	{
-		this.gi = new GramInt(gss);	
+		this.gi = new GramInt(gss);
 		this.gi.setHost(this.host);
 	}
 
 	public void run()
 		throws GramException, GSSException
 	{
-		this.gi.jobSubmit(this.rsl);	
+		this.gi.jobSubmit(this.rsl);
 		this.id = new String(this.gi.getIDAsString());
-		
+
 		/* DEBUG */
 		System.out.println("GridJob.run():" + this.id);
 	}

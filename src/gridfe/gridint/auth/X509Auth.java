@@ -40,9 +40,9 @@ public class X509Auth
 		iStream = new FileInputStream(certFile);
 
 		cf = CertificateFactory.getInstance("X.509");
-		
+
 		cert = (X509Certificate)(cf.generateCertificate(iStream));
-		
+
 		iStream.close();
 	}
 
@@ -55,7 +55,7 @@ public class X509Auth
 	}
 
 	/*
-	 * X509Certificate Wrappers 
+	 * X509Certificate Wrappers
 	 */
 
 	public void checkValidity()

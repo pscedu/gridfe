@@ -151,55 +151,15 @@ public class GridInt implements Serializable
 
 		/* Loop and grab data */
 		for(int i = 0; i < OI_MAX; i++)
-			data[i] += this.retrieve(job, file[i], 0);
+			data[i] += this.retrieve(job, file[i], 0, 0);
 
 
 		return data;
 	}
 //---------------------------------------------------------------------------------
-	
-	/* Grab the job's stdout in chucks of len (all if len<1) */
-	public String retrieveStdout(GridJob job, int len)
-		throws GassException, IOException
-	{
-		return this.retrieve(job, job.stdout, len);
-	}
-	
-	/* Grab the job's stderr in chucks of len (all if len<1) */
-	public String retrieveStderr(GridJob job, int len)
-		throws GassException, IOException
-	{
-		return this.retrieve(job, job.stderr, len);
-	}
-	
-	public String retrieve(GridJob job, String file, int len)
-		throws GassException, IOException
-	{
-		String data = "";
-
-		/* Remote Fetch */
-		if(job.remote(file))
-			data += "Remote Output not supported yet.";
-		else
-		{
-			/* Start Gass Server (0,0 = random port) */
-			this.startGass(0,0, job.getHost());
-
-			/* Read the data */
-			data += this.retrieveLocal(job, file, len);
-
-			/* Stop Gass Server */
-			this.stopGass();
-		}
-
-		return data;
-	}
-
-
-	/* Data retrieval Functions */
 
 	/* Start the Gass Server on a random port within our range */
-	public void startGass(int min, int max, String host)
+	private void startGass(int min, int max, String host)
 		throws GassException, IOException
 	{
 		Random r;
@@ -228,7 +188,7 @@ public class GridInt implements Serializable
 	}
 
 	/* Allow override of random port in range */
-	public void startGass(int port, String host)
+	private void startGass(int port, String host)
 		throws GassException, IOException
 	{
 		/* Create a GASS Server to connect to */
@@ -239,8 +199,50 @@ public class GridInt implements Serializable
 		this.gass.start();
 	}
 
+	// XXX
+	//function like above to get all data
+	//function to get next(len bytes)
+	//function to get (len bytes, offset bytes)
+	
+	/* Grab the job's stdout in chucks of len (all if len<1) */
+	public String retrieveStdout(GridJob job, int len, int off)
+		throws GassException, IOException
+	{
+		return this.retrieve(job, job.stdout, len, off);
+	}
+	
+	/* Grab the job's stderr in chucks of len (all if len<1) */
+	public String retrieveStderr(GridJob job, int len, int off)
+		throws GassException, IOException
+	{
+		return this.retrieve(job, job.stderr, len, off);
+	}
+	
+	private String retrieve(GridJob job, String file, int len, int off)
+		throws GassException, IOException
+	{
+		String data = "";
+
+		/* Remote Fetch */
+		if(job.remote(file))
+			data += "Remote Output not supported yet.";
+		else
+		{
+			/* Start Gass Server (0,0 = random port) */
+			this.startGass(0,0, job.getHost());
+
+			/* Read the data */
+			data += this.retrieveLocal(job, file, len, off);
+
+			/* Stop Gass Server */
+			this.stopGass();
+		}
+
+		return data;
+	}
+
 	/* Retrieve Local File (Chuck of 'len' bytes, 'len < 0' read all) */
-	public String retrieveLocal(GridJob job, String file, int len)
+	private String retrieveLocal(GridJob job, String file, int len, int off)
 	{
 		String data = "";
 
@@ -254,7 +256,7 @@ public class GridInt implements Serializable
 			if(len > 0)
 			{
 				StringBuffer str = new StringBuffer("");
-				this.gass.read(str, len);
+				this.gass.read(str, len, off);
 				data += str.toString();
 			}
 			else
@@ -273,17 +275,17 @@ public class GridInt implements Serializable
 	}
 
 	/* Retrieve Remote Files */
-	public String retrieveRemote(GridJob job, String file)
+	private String retrieveRemote(GridJob job, String file)
 	{
 		String data = "Remote file read not supported yet.";
 		return data;
 	}
 
 	/* Close the Gass Server */
-	public void stopGass()
+	private void stopGass()
 	{
 		/* Terminate the Gass Server */
-		gass.shutdown();
+		this.gass.shutdown();
 	}
 
 

@@ -106,7 +106,7 @@ public class GassInt extends RemoteGassServer
 	}
 
 	/* Read len bytes from the open stream */
-	public int read(StringBuffer buf, int len)
+	public int read(StringBuffer buf, int len, int offset)
 		throws IOException
 	{
 		int read = 0;
@@ -116,7 +116,7 @@ public class GassInt extends RemoteGassServer
 		{
 			/* Create a new buf that is proper size */
 			byte[] tmp = new byte[len - read];
-			read += this.fin.read(tmp, 0, len - read);
+			read += this.fin.read(tmp, offset, len - read);
 			buf.append(new String(tmp));
 		}
 
@@ -130,7 +130,7 @@ public class GassInt extends RemoteGassServer
 		int len = (int)(this.getSize());
 
 		StringBuffer buf = new StringBuffer("");
-		this.read(buf, len);
+		this.read(buf, len, 0);
 
 		return buf.toString();
 	}

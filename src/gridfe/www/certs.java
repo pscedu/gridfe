@@ -15,6 +15,7 @@ public class certs
 		OOF oof = p.getOOF();
 		String s = "";
 
+		s += p.header("Cert Page");
 		s += oof.p("Test Cert Page");
 
 		int uid = 6342;
@@ -49,6 +50,8 @@ public class certs
 		{
 			s += oof.p(e.getMessage());
 		}
+
+		s += p.footer();
 
 /*
 

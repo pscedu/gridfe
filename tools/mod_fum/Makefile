@@ -27,6 +27,3 @@ install:
 
 driver:
 	${CC} ${LIBS} -Wall -g -fPIC -ldl driver.c -o $@
-
-#module:
-#	${APXS} -I${KX509_PREFIX} ${APXSFLAGS} -c mod_fum.c ${LIBS}

@@ -62,8 +62,6 @@ public class GridFE extends HttpServlet {
 		this.req = req;
 		this.res = res;
 
-		String uri = req.getRequestURI();
-
 		/* XXX: wrong */
 		res.setContentType("text/html");
 		PrintWriter w = res.getWriter();
@@ -75,6 +73,8 @@ public class GridFE extends HttpServlet {
 			this.handleError(null, e + ": " + e.getMessage());
 			return;
 		}
+
+		String uri = req.getRequestURI();
 		
 		/* ``/'' is optional for index pages. */
 		if (uri.charAt(uri.length() - 1) == '/')
@@ -117,6 +117,8 @@ public class GridFE extends HttpServlet {
 		}
 
 		w.print(s);
+		if (handler == gridfe.www.notfound.class)
+			w.print("URL: " + uri);
 	}
 
 	private String handleError(Page p, String msg) {

@@ -86,7 +86,7 @@ public class Page {
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
-			this.error(e.getMessage());
+			this.error(e.getMessage() + ": " + req.getAttribute("authorization"));
 		}
 	}
 

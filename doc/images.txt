@@ -1,0 +1,22 @@
+$Id$
+
+The graphical layout of the pages consists of an image navigation menu.
+This menu is comprised of images which describe and link to the various
+other pages of GridFE.  There are general categories and sub-categories
+of pages to choose from.
+
+General category images are all the same except for the last one, which
+produces a shadow that extends below its normal height parameter.  Sub-
+category images are all the same except for the first one, which needs
+to contain the shadow overlay from the general category image above it.
+
+[ main ]
+[ jobs ]
+	[ submit ]	<- special
+	[ status ]
+	[ output ]
+[ rls ]
+	[ add ]		<- special
+	[ remove ]
+	[ search ]
+[ nodes ]		<- special

@@ -2,8 +2,7 @@
 
 package gridfe.gridint;
 
-import gridint.*;
-import gridint.auth.*;
+import gridfe.gridint.auth.*;
 import jasp.Uid;
 import java.io.*;
 import java.net.MalformedURLException;

@@ -1,13 +1,16 @@
 $Id$
 
-/doc			Documentation root.
-/gridfe			Backend code root.
-/gridfe/gridint		Grid Internals.
-/gridfe/grinint/auth	Grid Internal Authentication.
-/gridfe/www		Web-accessible content root.
-/lib/jasp		JASP (Java Application Suite for Programming) root.
-/lib			Library code.
-/lib/oof/element	OOF Elements root.
-/lib/oof/filter		OOF Filters root.
-/lib/oof		OOF (Object Output Formatting) root.
-/tools/mod_fum		Apache Module (kinit, kx509, kxlist -p)
+/doc				Documentation.
+/lib				Library routines.
+/lib/mk				make(1) routines.
+/src				Main source code.
+/src/gridfe			Main backend/GridFE code.
+/src/gridfe/gridint		Grid internals.
+/src/gridfe/grinint/auth	Grid authentication internals.
+/src/gridfe/www			Web-accessible content.
+/src/jasp			JASP (Java Application Suite for Programming).
+/src/oof/element		OOF elements.
+/src/oof/filter			OOF filters.
+/src/oof			OOF (Object Output Formatting).
+/tools/jdep			Java dependency builder.
+/tools/mod_fum			mod_fum KX509 Apache module.

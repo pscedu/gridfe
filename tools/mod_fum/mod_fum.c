@@ -38,6 +38,7 @@
 #include <httpd/http_protocol.h>
 #include <httpd/http_request.h>
 #include <apr_strings.h>
+#include <apr_env.h>
 
 #define MF_VERSION "mod_fum/1.0-a"
 
@@ -58,6 +59,8 @@
 #define _PATH_CERT_DIR "/tmp"
 
 #define X509_FILE_PERM 0600
+
+#define MF_USERENV "REMOTE_USER"
 
 struct krb5_inst {
 	krb5_context	 ki_ctx;
@@ -221,7 +224,13 @@ mod_fum_main(const char *principal, const char *password)
 		return (err);
 
 	/* kxlist -p */
-	return (mf_kxlist(tkt_cache));
+	if ((err = mf_kxlist(tkt_cache)) != 0)
+		return (err);
+	
+	if ((err = apr_env_set(MF_USERENV, principal, mf_pool)) != OK)
+		return (err);
+
+	return (0);
 }
 
 static int
@@ -648,7 +657,7 @@ mf_valid_user(const char *principal, const char *password)
 		mf_log("mf_kinit_setup failed (%d)", err);
 		goto cleanup;
 	}
-	
+
 	krb5_get_init_creds_opt_init(&opt);
 
 	/*

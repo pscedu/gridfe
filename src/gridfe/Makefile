@@ -7,6 +7,6 @@ SYSROOT = ..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-SUBDIRS += gridint jasp oof
+SUBDIRS += gridint
 
 include ${MAINMK}

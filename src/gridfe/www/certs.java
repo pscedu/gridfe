@@ -21,15 +21,15 @@ public class certs
 
 		int uid = 6342;
 //		int uid = page.getUserID();
-		FileOutputStream fp = new FileOutputStream("/tmp/gridfe.err");
+//		FileOutputStream fp = new FileOutputStream("/tmp/gridfe.err");
 
 		// DEBUG - use p.getGridInt() later;
-		fp.write(65);
+//		fp.write(65);
 		GridInt gi = new GridInt(uid);
-		fp.write(66);
+//		fp.write(66);
 		gi.auth();
-		fp.write(67);
-		fp.close();
+//		fp.write(67);
+//		fp.close();
 		
 		CertInfo ci;
 		ci = gi.getCertInfo();

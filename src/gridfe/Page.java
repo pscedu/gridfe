@@ -267,10 +267,9 @@ public class Page
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
 		   +				this.oof.header(new Object[] {
-								"value", title,
 								"size", "3",
 								"style", "margin-top:0px"
-							});
+							}, title);
 		return (s);
 	}
 

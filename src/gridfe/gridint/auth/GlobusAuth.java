@@ -32,13 +32,13 @@ public class GlobusAuth
 		this.file = this.def + uid.intValue();
 	}
 
-	/*
 	public GlobusAuth(int uid)
 	{
 		this.uid = new Uid(uid);
 		this.file = this.def + this.uid.intValue();
 	}
 
+	/*
 	public GlobusAuth(String uid)
 	{
 		this.uid = new Uid(uid);

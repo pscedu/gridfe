@@ -123,24 +123,26 @@ public class GridInt implements Serializable
 		Random r;
 		int port;
 
-		/* Seed = CertLife * Uid */
-		r = new Random(this.getCertInfo().time * this.uid.intValue());
-
-		/* XXX DEBUG: Default Pittsburgh Supercomputing Port Range */
-		if(min == 0 && max == 0)
-		{
-			min = 28000;
-			max = 28255;
-		}
-
 		/*
-		** Randomly Generate a Port between
-		** our MIN/MAX Port Boundary using
-		** LCM (Linear Congruent Method)
-		** XXX - configuration for this??
+		** If min/max are equal, use specific port 
+		** otherwise, random...
 		*/
-		port = r.nextInt((max - min)) + min + 1;
-		
+		if(min != max)
+		{
+			/* Seed = CertLife * Uid */
+			r = new Random(this.getCertInfo().time * this.uid.intValue());
+
+			/*
+			** Randomly Generate a Port between
+			** our MIN/MAX Port Boundary using
+			** LCM (Linear Congruent Method)
+			** XXX - configuration for this??
+			*/
+			port = r.nextInt((max - min)) + min + 1;
+		}
+		else
+			port = min;
+
 		/* Start with the random port */
 		this.startGass(port, host);
 	}
@@ -161,7 +163,14 @@ public class GridInt implements Serializable
 	}
 
 	/* Setup file retrieval */
-	public void startRetrieve(GridJob job, String file)
+	public void startRetrieve(GridJob job, String file, int port)
+		throws GassException, IOException, GSSException
+	{
+		/* Start with min/max == port */
+		this.startRetrieve(job, file, port, port);
+	}
+
+	public void startRetrieve(GridJob job, String file, int min, int max)
 		throws GassException, IOException, GSSException
 	{
 		String data = "";
@@ -175,7 +184,7 @@ public class GridInt implements Serializable
 		else
 		{
 			/* Start Gass Server (0,0 = random port) */
-			this.startGass(0, 0, job.getHost());
+			this.startGass(min, max, job.getHost());
 		}
 
 		/* Convert from GRAM -> GASS convention */

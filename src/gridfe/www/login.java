@@ -7,7 +7,8 @@ import oof.*;
 
 public class login
 {
-	public static String main(Page page) throws Exception
+	public static String main(Page page)
+		throws Exception
 	{
 		String s = "";
 		OOF oof = page.getOOF();

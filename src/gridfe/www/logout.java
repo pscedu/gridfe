@@ -8,7 +8,8 @@ import oof.*;
 
 public class logout
 {
-	public static String main(Page page) throws Exception
+	public static String main(Page page)
+		throws Exception
 	{
 		String s;
 		OOF oof = page.getOOF();

@@ -80,8 +80,8 @@ public class suite
 		String j3_out = "gram.out.date";
 //		String j3_out = "/tmp/gram.out.date";
 		String j3_err = "gram.err";
-//		String j3_host = "intel2.psc.edu";
-		String j3_host = "mugatu.psc.edu";
+		String j3_host = "intel2.psc.edu";
+//		String j3_host = "mugatu.psc.edu";
 		String j3_name = "Date";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
@@ -147,36 +147,38 @@ public class suite
 
 
 		/* Use a GassInt to grab job output */
-/*
-		GassInt gass = new GassInt(gi.getCredential(), j3_host, j3_port);
-		System.out.println("Starting Remote Gass Server");
-		gass.start();
-		//gass.start_remote();
-		System.out.println("Attempting to open file: "+j3_out);
-		gass.open(j3_out);
-		System.out.println("Size: "+gass.getSize());
-*/
 
-		/* Grab the job output */
-/*
-		System.out.println("Reading file...");
-		String data = gass.read();
-		System.out.println(data);
-
-		gass.close();
-		gass.shutdown();
-		System.out.println("Gass Server shutdown");
-*/
-
-		String[] data;
 		System.out.println("Retrieving job data...");
 //		j3 = gi.getJob(2);
 		j3 = gi.getJob(j3_name);
-//		System.out.println("J3: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
 		System.out.println(j3);
-		System.out.println("stdout file: "+j3.stdout);
-		System.out.println("stderr file: "+j3.stderr);
-		data = gi.getJobData(j3);
+
+		/* Data Retrieval (Read a few chunks, then the rest */
+		String[] data = {"", ""};
+		String[] file = {j3.stdout, j3.stderr};
+		for(int i = 0; i < 2; i++)
+		{
+			int tlen = 32;
+			int toff = 0;
+
+			try
+			{
+				gi.startRetrieve(j3, file[i]);
+
+				data[i] += gi.retrieve(tlen, toff);
+                        	toff += tlen;
+                        	data[i] += gi.retrieve(tlen, toff);
+                        	toff += tlen;
+                        	data[i] += gi.retrieve(0, toff);
+				
+				gi.stopRetrieve();
+			}
+			catch(Exception e)
+			{
+				data[i] += e.getMessage();
+			}
+		}
+
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);
 

@@ -2,23 +2,26 @@
 ** GlobusAuth.java
 **
 ** Obtains a GlobusCredential from 
-** a file which is a valid X.509 Certificate
+** a file which is a valid X.509 Certificate,
+** then creates a standard GSSCredential from
+** the GlobusCredential for use with all
+** globus api
 */
 package gridint.auth;
 
 import org.globus.gsi.*;
-//import org.globus.gsi.gssapi.*;
+import org.globus.gsi.gssapi.*;
 import java.security.PrivateKey;
-//import org.ietf.jgss.*;
-//import org.ietf.jgss.GSSException.*;
-//import org.ietf.jgss.GSSCredential.*;
+import org.ietf.jgss.*;
+import org.ietf.jgss.GSSException.*;
+import org.ietf.jgss.GSSCredential.*;
 
 public class GlobusAuth
 {
 	private GlobusCredential gc = null;
 	private String file;
 	private Uid uid;
-//	private GlobusGSSCredentialImpl gss = null;
+	private GSSCredential gss = null;
 
 	/*
 	** X.509 Standard for files /tmp/x509up_uXXX
@@ -44,11 +47,11 @@ public class GlobusAuth
 		this.file = file;
 	}
 
-	public void createCredential() throws GlobusCredentialException//, GSSException
+	public void createCredential() throws GlobusCredentialException, GSSException
 	{
 		this.gc = new GlobusCredential(file);
-//		this.gss = new GlobusGSSCredentialImpl(this.gc, 
-//				GSSCredential.INITIATE_AND_ACCEPT);
+		this.gss = (GSSCredential) new GlobusGSSCredentialImpl(this.gc, 
+				GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
 	/*

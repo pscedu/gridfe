@@ -1,30 +1,18 @@
+/* $Id$ */
+
 /*
-** mod_fum.c
 ** Free Apache Module to provide
 ** the functionality of kinit,
 ** kx509, and kxlist -p ...
 */
 
+#include <krb5.h>
+#include <err.h>
+
 #include"mod_fum.h"
 
-/* Standalone Test */
-#ifdef MF_STANDALONE
-int main(int argc, char *argv[])
-{
-	krb5_inst k5;
-	krb5_prefs kprefs;
-	char *pass;
-
-	if(argc < 1)
-		mf_err("too few arguments",1,TODO);
-
-	mf_kinit_set_defaults(&kprefs);
-	mf_kinit_set_uap(&kprefs, argv[1], argv[2]);
-	mf_kinit(&k5, &kprefs);
-
-	return 0;
-}
-#endif
+static void mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
+static void mf_kinit_cleanup(krb5_inst_ptr);
 
 /*
 ** Perform the functionality of kinit...
@@ -84,7 +72,7 @@ void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 /*
 ** Intial context setup
 */
-void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
+static void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err; 
 
@@ -95,9 +83,9 @@ void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 	
 	/*
 	** Read the default credential cache:
-	** equivalent to krb5__cc_resolve(k5->context,
-	**				getenv("KRB5CACHE"),
-	**				k5->cache);
+	** equivalent to
+	** krb5__cc_resolve(k5->context, getenv("KRB5CACHE"),
+	**			k5->cache);
 	*/
 	err = krb5_cc_default(k5->context, &k5->cache);
 	if(err)
@@ -121,10 +109,7 @@ void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 		mf_err("parse_name failed", err, TODO);
 }
 
-/*
-** Close and free memory
-*/
-void mf_kinit_cleanup(krb5_inst_ptr k5)
+static void mf_kinit_cleanup(krb5_inst_ptr k5)
 {
 	if(&k5->credentials)
 		krb5_free_cred_contents(k5->context, &k5->credentials);
@@ -135,5 +120,3 @@ void mf_kinit_cleanup(krb5_inst_ptr k5)
 	if(k5->context)
 		krb5_free_context(k5->context);
 }
-
-

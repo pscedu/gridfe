@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += FILTER.class xhtml.class
+CLASSES += Filter.class xhtml.class
 
 SYSROOT = ../../..
 

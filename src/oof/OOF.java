@@ -7,7 +7,7 @@ import oof.filter.*;
 import oof.element.*;
 
 public class OOF {
-	private FILTER filter;
+	private Filter filter;
 	private JASP jasp;
 
 	public static final Object LIST_UN = "1";
@@ -19,12 +19,12 @@ public class OOF {
 						 IllegalAccessException,
 						 InvocationTargetException {
 		this.jasp = j;
-		this.filter = (FILTER)Class.forName("oof.filter." + filter).
+		this.filter = (Filter)Class.forName("oof.filter." + filter).
 				getConstructor(new Class[] { JASP.class, OOF.class }).
 				newInstance(new Object[] { this.jasp, this });
 	}
 
-	public FILTER __getFilter() {
+	public Filter __getFilter() {
 		return this.filter;
 	}
 

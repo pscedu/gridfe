@@ -18,8 +18,8 @@ public class suite
 	public static void main(String[] args) throws Exception
 	{
 		/* GridInt Test Suite */
-		//GridInt gi = new GridInt(BasicServices.getUserID());
-		GridInt gi = new GridInt(6342);
+		GridInt gi = new GridInt(BasicServices.getUserID());
+		//GridInt gi = new GridInt(6342);
 		gi.auth();
 
 		CertInfo ci;
@@ -56,14 +56,16 @@ public class suite
 		/* Create a new job */
 		System.out.println("Creating New Job...");
 
-		GridJob j = new GridJob("mugatu.psc.edu");
+//		GridJob j = new GridJob("mugatu.psc.edu");
+		GridJob j = new GridJob("gridinfo.psc.edu");
 		j.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/sleep", "gram.out"},
 			new String("arguments"),
 //			new String[] {"10s"});
 			new String[] {"2s"});
 
-		GridJob j2 = new GridJob("mugatu.psc.edu");
+//		GridJob j2 = new GridJob("mugatu.psc.edu");
+		GridJob j2 = new GridJob("gridinfo.psc.edu");
 		j2.setRSL(new String[] {"executable"},
 			new String[] {"/bin/sleep"},
 			new String("arguments"),

@@ -186,7 +186,7 @@ public class Page
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
 		  + "<html lang=\"en-US\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/1999/xhtml\">"
 		  + 	"<head>"
-		  +	 		"<title>" + this.jasp.escapeHTML(title) + "</title>"
+		  +	 		"<title>GridFE - " + this.jasp.escapeHTML(title) + "</title>"
 		  +			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
 		  +			"<link rel=\"stylesheet\" type=\"text/css\" "
 		  +				"href=\"" + r + "/lib/main.css\" media=\"screen\">"
@@ -261,11 +261,11 @@ public class Page
 		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px; "
-		   +			  "text-align: center; padding-left: 100px;\">"
+		   +			  "text-align: center; padding-left: 113px;\">"
 		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
-		   +				"<br />";
+		   +				this.oof.header(title);
 		return (s);
 	}
 

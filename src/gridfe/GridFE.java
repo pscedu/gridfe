@@ -39,7 +39,8 @@ public class GridFE extends HttpServlet
 		new DelegationHandler("",		gridfe.www.index.class),
 		new DelegationHandler("/",		gridfe.www.index.class),
 		new DelegationHandler("/login",		gridfe.www.login.class),
-		new DelegationHandler("/logout",	gridfe.www.logout.class)
+		new DelegationHandler("/logout",	gridfe.www.logout.class),
+		new DelegationHandler("/certs",		gridfe.www.certs.class)
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)

@@ -29,17 +29,17 @@ public class certs
 		try
 		{
 			gi = new GridInt(uid);
-/*
 			ci = gi.getCertInfo();
 
 		long tmp;
 		long sec = ci.time;
-		long days = (sec / (tmp = 24*60*60));
+/*		long days = (sec / (tmp = 24*60*60));
 		sec -= days * tmp;
 		long hours = (sec / (tmp = 60*60));
 		sec -= hours * tmp;
 		long min = (sec / 60);
 		sec -= min * 60;
+
 
 		String lifetime;
 		lifetime = ci.time + " (" +

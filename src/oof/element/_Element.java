@@ -5,13 +5,13 @@ import java.util.*;
 import oof.*;
 import oof.filter.*;
 
-public class ELEMENT {
-	public String name;
+public abstract class ELEMENT {
 	public LinkedList attrs;
 	public LinkedList children;
-	public FILTER filter;
+	public OOF oof;
 
-	public ELEMENT(Object[] attrs, Object[] os) {
+	public ELEMENT(OOF oof, Object[] attrs, Object[] os) {
+		this.oof	= oof;
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		for (int i = 0; i < attrs.length; i++)
@@ -28,12 +28,14 @@ public class ELEMENT {
 		this.children.addFirst(o);
 	}
 
-	public String toString() {
-//		throw new OOFToStringException();
-		return "@@@@@ GARBAGE " + this.name + " @@@@@";
-	}
+	abstract public String toString();
 
-	public String build() {
-		return this.filter.build(this);
+	public String getAttribute(String key) {
+		Object e;
+		for (Iterator i = this.attrs.iterator();
+		     (e = i.next()) != null; )
+			if (((String)e).equals(key))
+				return (String)i.next();
+		return null;
 	}
 };

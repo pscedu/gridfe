@@ -175,7 +175,7 @@ public class GridInt implements Serializable
 	{
 		String data = "";
 
-		/* Remote Fetch */
+		/* XXX Remote Fetch */
 		if(job.remote(file))
 		{
 			throw new IOException("Remote Output not supported yet.");

@@ -190,8 +190,7 @@ public class Page
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=			"<div style=\"position: relative; top:-80px; left:0px; "
 			   +			     "z-index:10\" id=\"" + m.getName() + "\">"
-			   +				"<a href=\"" + r + m.getURL() + "\" "
-			   +				   "onmouseover=\"alert('hi')\">"
+			   +				"<a href=\"" + r + m.getURL() + "\">"
 			   +					"<img src=\"" + r + "/img/buttons/main.png\" "
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"

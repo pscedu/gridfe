@@ -88,7 +88,8 @@ static request_rec* mf_request(request_rec*);
 static apr_pool_t* mf_pool(apr_pool_t*);
 static void mod_fum_hooks(apr_pool_t*);
 static int mf_check_for_credentials(const char*);
-int mod_fum_auth(request_rec *);
+static int mf_valid_user(const char*, const char*);
+int mod_fum_auth(request_rec*);
 int do_kx509(int, char**);
 int mf_main(const char*, const char*);
 
@@ -132,47 +133,54 @@ int mod_fum_auth(request_rec *r)
 	err = ap_get_basic_auth_pw(r, &pass);
 	user = r->user;
 
-	if(err == OK)
+	if(err == OK && user && pass)
 	{
-		if(!user || !pass)
+		/* Check if previous credentials exist */
+		if(mf_check_for_credentials(user))
 		{
-			mf_err("err obtaining username/password NULL", 1);
-			err = HTTP_UNAUTHORIZED;
-		}
-		else
-		{
-			/* Check if previous credentials exist */
-			if(mf_check_for_credentials(user))
+			/*
+			** XXX - possibly think about having
+			** the apache htpasswd file take care of
+			** situations like this... if credentials
+			** are found, just pass decline back to
+			** allow BasicAuth to see if the user/pass
+			** is correct... (just a thought)
+			*/
+
+			/*
+			** If they exist, make sure the user/pass
+			** is correct... otherwise a correct username
+			** and wrong password will work!!!
+			*/
+			if(mf_valid_user(user, pass))
 			{
 				/*
-				** If they exist, are they still valid
-				** and is the user/pass valid also!!
-				** (make sure a correct username and wrong
-				** password doesn't work!!!)
+				** Finally check if the Credentials
+				** have expired or not. If so create
+				** new certs, if not, do nothing
 				*/
-
-				// XXX
+				// XXX Expired ???
 				if(0)
 				{
-					if(0)
-					{
-
-					}
+					/* Create new certs */
+					err = mf_main(user, pass);
 				}
-
-
-				mf_err("cached credentials found!!", 1);
 			}
 			else
 			{
-				/* Otherwise Create Certificate */
-				err = mf_main(user, pass);
-				mf_err("new credentials created!!", 1);
+				mf_err("wrong user/pass combination", 1);
+				err = HTTP_UNAUTHORIZED;
 			}
 		}
+		else
+			/* Create new certs */
+			err = mf_main(user, pass);
 	}
 	else
-		mf_err("ap_get_basic_auth failed", err);
+	{
+		mf_err("authentication form incomplete", err);
+		err = HTTP_UNAUTHORIZED;
+	}
 
 	return err;
 }
@@ -395,7 +403,7 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 	krb5_error_code err;
 	krb5_creds screds;
 
-	/* just to make sure... (had match problems before) */
+	/* just make sure!! (had match problems before) */
 	memset(&screds, '\0', sizeof(krb5_creds));
 
 	/* The primary principal will be for the client */
@@ -624,6 +632,9 @@ static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 {
 	krb5_error_code err; 
 
+	/* Important!! segfaults without this!! */
+	memset(&kinst->credentials, '\0', sizeof(krb5_creds));
+
 	/* Initialize Application Context */
 	err = krb5_init_context(&kinst->context);
 	if(!err)
@@ -649,6 +660,7 @@ static void mf_krb5_free(krb5_inst_ptr kinst)
 {
 	if(&kinst->credentials)
 		krb5_free_cred_contents(kinst->context, &kinst->credentials);
+	
 	if(kinst->cache)
 		krb5_cc_close(kinst->context, kinst->cache);
 }
@@ -691,9 +703,6 @@ static void mf_kinit_cleanup(krb5_inst_ptr kinst)
 	if(kinst->context)
 		krb5_free_context(kinst->context);
 }
-
-
-
 
 /*
 ** Check for previous credentials in /tmp
@@ -743,7 +752,75 @@ static int mf_check_for_credentials(const char *principal)
 	return found;
 }
 
+/*
+** Check if the user/pass is valid
+** (for now just simulate a kerberos authentication)
+**
+** XXX - There must be a better way to validate the
+** authenticity of the user...
+*/
+static int mf_valid_user(const char *principal, const char *password)
+{
+	char *uid;
+	int err;
+	krb5_inst kinst;
+	krb5_prefs kprefs;
+	krb5_get_init_creds_opt opt;
+	int valid = 0;
+	char tkt[] = "/tmp/mod-fum-tmp";
 
+	err = mf_krb5_init(&kinst, tkt);
+
+	if(err == OK)
+	{
+		mf_kinit_set_uap(&kprefs, principal, password);
+	
+		err = KrbToApache(mf_kinit_setup(&kinst, &kprefs));
+
+		if(err == OK)
+		{
+			krb5_get_init_creds_opt_init(&opt);
+
+			/* Try and get an intial ticket */
+			err = krb5_get_init_creds_password(kinst.context,
+							&kinst.credentials,
+							kinst.principal,
+							(char*)(kprefs.password),
+							krb5_prompter_posix,
+							NULL,
+							0,
+							NULL,
+							&opt);
+
+			/* If this succeeds, then the user/pass is correct */
+			if(err == OK)
+				valid = 1;
+
+			//DEBUG
+			else
+				mf_err("bad authentication", err);
+		}
+		else
+			mf_err("mf_kinit_setup failed", err);
+
+		//DEBUG
+		mf_err("blah", 1);
+		
+		mf_kinit_cleanup(&kinst);
+
+		//DEBUG
+		mf_err("blah2", 1);
+
+		mf_krb5_free(&kinst);
+		
+		//DEBUG
+		mf_err("blah3", 1);
+	}
+	else
+		mf_err("krb5_init failed", err);
+
+	return valid;
+}
 
 
 

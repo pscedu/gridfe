@@ -112,7 +112,7 @@ public class suite
 		gi = (GridInt)(in.readObject());
 
 		in.close();
-		gi.revive();
+		//gi.revive();
 
 		/* 
 		** Revival Test

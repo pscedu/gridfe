@@ -61,9 +61,11 @@ public class GridInt implements Serializable
 		return this.list.remove(job);
 	}
 
+	/* Required after Deserialization */
 	public void revive()
 		throws MalformedURLException, GSSException, GlobusCredentialException
 	{
+		/* must authenticate first! */
 		this.auth();
 
 		for(int i = 0; i < this.list.size(); i++)
@@ -122,5 +124,20 @@ public class GridInt implements Serializable
 	public GSSName getName() throws GSSException
 	{
 		return this.gss.getName();
+	}
+
+	/* Implement Serializable using revive() */
+	private void writeObject(ObjectOutputStream out)
+		throws IOException
+	{
+		out.defaultWriteObject();
+	}
+
+	private void readObject(ObjectInputStream in)
+		throws IOException, ClassNotFoundException,
+			GSSException, GlobusCredentialException
+	{
+		in.defaultReadObject();
+		this.revive();
 	}
 };

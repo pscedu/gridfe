@@ -1,8 +1,8 @@
 /* $Id$ */
 
 import gridfe.*;
-import gridint.*;
-import gridint.auth.*;
+import gridfe.gridint.*;
+import gridfe.gridint.auth.*;
 import jasp.*;
 import java.lang.reflect.*;
 import java.security.*;

@@ -1,8 +1,8 @@
 /* $Id$ */
 
 import gridfe.*;
-import gridint.*;
-import gridint.auth.*;
+import gridfe.gridint.*;
+import gridfe.gridint.auth.*;
 import jasp.*;
 import java.io.*;
 import java.lang.Integer;
@@ -136,4 +136,4 @@ public class suite
 		System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
 		//System.out.println("JC: "+j2.getStatus()+" : "+jc.getStatusAsString());
 	}
-}
+};

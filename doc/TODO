@@ -1,4 +1,9 @@
 $Id$
 
-Remove Ping requirement before job submission.
+1. Remove Ping requirement before job submission.
+2. kdestroy needs to be called so that the TGT is
+removed before the next authentication.. otherwise
+/tmp/krb5cc_$UID will remain and the new TGT will
+be name /tmp/krb5cc_$UID_RANDOMFUBAR and auth will
+fail
 

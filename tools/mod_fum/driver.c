@@ -6,7 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define _PATH_MOD_FUM "mod_fum.so"
+#include <httpd/httpd.h>
+
+#define _PATH_MOD_FUM "./mod_fum.so"
 
 static void usage(void);
 int mod_fum_main(const char *, const char *);
@@ -14,9 +16,9 @@ int mod_fum_main(const char *, const char *);
 int
 main(int argc, char *argv[])
 {
-	void *h;
 	void (*init)(const char *, const char *);
 	char *username, *password;
+	void *h;
 
 	password = NULL;
 	switch (argc) {

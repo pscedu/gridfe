@@ -82,10 +82,8 @@ public class GridFE extends HttpServlet
 				break;
 			}
 
-		if (handler == null) {
-			w.print(this.handleError(p, "Page not found: " + uri));
-			return;
-		}
+		if (handler == null)
+			handler = gridfe.www.notfound.class;
 
 		String s;
 

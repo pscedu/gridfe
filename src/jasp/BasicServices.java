@@ -12,7 +12,6 @@ public class BasicServices {
 
 		try {
 			username = System.getProperty("user.name");
-
 			/*
 			 * An equivalent to getpwent() might be
 			 * better here...
@@ -26,7 +25,7 @@ public class BasicServices {
 				fields = line.split(":");
 				if (fields.length > 0 &&
 				    fields[0].equals(username)) {
-					uid = Integer.getInteger(
+					uid = Integer.valueOf(
 						fields[2]).intValue();
 					break;
 				}

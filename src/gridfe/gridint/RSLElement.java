@@ -32,7 +32,7 @@ public class RSLElement implements Serializable
 	private transient StringBuffer data;
 
 	/* Stdout and Stderr default to null */
-	public transient String stdout = null;
+	public String stdout = null;
 	public transient String stderr = null;
 
 	/* Default directory to HOME */
@@ -106,9 +106,24 @@ public class RSLElement implements Serializable
 			*/
 			this.data.append(b+param[i]+m+q+value[i]+q+e);
 
+			//DEBUG
+			/*
+			System.out.println(this.data);
+			System.out.println(param[i]);
+			System.out.println(value[i]);
+			System.out.println(this.stdout);
+			*/
+
 			/* Save some parameters to retrieve job output/err */
 			if(param[i] == "stdout")
+			{
+				//DEBUG
+				//System.out.println("buildGenerics: wtf");
 				this.stdout = new String(value[i]);
+				//System.out.println("buildGenerics: "+this.stdout);
+				//System.out.println("buildGenerics: "+param[i]);
+				//System.out.println("buildGenerics: "+value[i]);
+			}
 			if(param[i] == "stderr")
 				this.stderr = new String(value[i]);
 			if(param[i] == "directory")
@@ -161,6 +176,27 @@ public class RSLElement implements Serializable
 		if(this.kParam != null)
 			this.buildKeyPairs(this.kParam, this.kKey, this.kValue);
 	}
+
+	/* Serializable Implementation */
+	private void writeObject(ObjectOutputStream out)
+		throws IOException
+	{
+		out.defaultWriteObject();
+	}
+
+	private void readObject(ObjectInputStream in)
+		throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		/* Rebuild RSLElement */
+		this.build();
+		
+		//DEBUG
+		System.out.println("Rebuilding RSL");
+		System.out.println(this.stdout);
+	}
+
 
 	public String toString()
 	{

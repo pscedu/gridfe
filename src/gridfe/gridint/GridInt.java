@@ -5,11 +5,13 @@ package gridfe.gridint;
 import gridfe.gridint.auth.*;
 import jasp.Uid;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.security.PrivateKey;
+import java.util.*;
+import java.net.*;
+import java.security.*;
 import org.globus.gram.*;
 import org.globus.gsi.*;
 import org.ietf.jgss.*;
+import org.globus.io.gass.client.*;
 
 public class GridInt implements Serializable
 {
@@ -50,7 +52,7 @@ public class GridInt implements Serializable
 		this.gss.createCredential();
 	}
 
-	/* XXX Cleanup and destroy credentials */
+	/* Cleanup and destroy credentials */
 	public void logout()
 	{
 		this.logout(null);
@@ -118,8 +120,88 @@ public class GridInt implements Serializable
 	** read the output file (from the RSLElement)
 	** and return the data...
 	*/
-	public void getJobOutput(GridJob job)
+	public String[] getJobData(GridJob job)
 	{
+		GassInt gass; 
+		Random r;
+		int port;
+		String data[] = {"No Output Available!", "No Error Output!"};
+
+		/* Is the job output local or remote? */
+		//if(job.remote())
+		if(false)
+		{
+			/* 
+			** Currently we cannot get remote output due to weird
+			** stdout/stderr problems with setting up a remote GASS
+			** Server
+			*/
+			data[0] = "Remote stdout retrieval not supported yet!";
+			data[1] = "Remote stderr retrieval not supported yet!";
+		}
+		else
+		{
+			int active = 0;
+
+			/* Seed = CertLife * Uid */
+			r = new Random(
+				this.getCertInfo().time * this.uid.intValue() );
+
+			/*
+			** Randomly Generate a Port between
+			** our MIN/MAX Port Boundary
+			** XXX - configuration for this??
+			*/
+			final int MIN = 28000;
+			final int MAX = 28255 + 1;
+			port = r.nextInt((MAX-MIN)) + MIN;
+
+			/* Create a GASS Server to connect to */
+			gass = new GassInt(this.gss.getGSSCredential(),
+						job.getHost(), port);
+
+			/* Read stdout/stderr and then shutdown */
+			try
+			{
+				gass.start();
+				active = 1;
+				//XXX - check job.directory...
+				gass.open(job.stdout);
+				data[0] = gass.read();
+				gass.close();
+
+				if(job.stderr != null)
+				{
+					gass.open(job.stderr);
+					data[1] = gass.read();
+					gass.close();
+				}
+			}
+			catch(Exception e)
+			{
+				data[1] += " Exception: "+e.getMessage();
+			}
+
+			/* Make sure we terminate the gass server */
+			if(active == 1)
+			{
+				try
+				{
+					gass.shutdown();
+				}
+				catch(Exception e)
+				{}
+			}
+		}
+
+		return data;
+	}
+
+	/* Get a Job from the list */
+	//DEBUG
+	public GridJob getJob(int index)
+	{
+		return this.list.get(index);
 	}
 
 	/*

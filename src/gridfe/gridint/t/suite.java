@@ -62,9 +62,9 @@ public class suite
 		GridJob j3 = new GridJob(j3_host);
 		j3.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/date", j3_out});
-		System.out.println(j3.toString());
 
 		/* Submit the job to GRAM */
+		System.out.println("RSL: " + j3);
 		System.out.println("Submiting Job...");
 		gi.jobSubmit(j);
 		gi.jobSubmit(j2);
@@ -88,6 +88,7 @@ public class suite
 		gi = null;
 		j = null;
 		j2 = null;
+		j3 = null;
 
 		/* Test Deserialization */
 		System.out.println("Deserializing Job...");
@@ -111,6 +112,7 @@ public class suite
 		System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
 
 		/* Use a GassInt to grab job output */
+		/*
 		GassInt gass = new GassInt(gi.getCredential(), j3_host, j3_port);
 		System.out.println("Starting Remote Gass Server");
 		gass.start();
@@ -118,8 +120,10 @@ public class suite
 		System.out.println("Attempting to open file: "+j3_out);
 		gass.open(j3_out);
 		System.out.println("Size: "+gass.getSize());
+		*/
 
 		/* Grab the job output */
+		/*
 		System.out.println("Reading file...");
 		String data = gass.read();
 		System.out.println(data);
@@ -127,11 +131,24 @@ public class suite
 		gass.close();
 		gass.shutdown();
 		System.out.println("Gass Server shutdown");
+		*/
+
+		String[] data;
+		System.out.println("Retrieving job data...");
+		j3 = gi.getJob(0);
+		System.out.println("J3: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
+		System.out.println(j3);
+		System.out.println(j3.stdout);
+		System.out.println(j3.stderr);
+		data = gi.getJobData(j3);
+		System.out.println("stderr: "+data[1]);
+		System.out.println("stdout: "+data[0]);
 
 
 
 		/* Logout - remove credentials */
-		gi.logout();
+		//gi.logout();
+		//gi.logout("job.revive");
 	
 		/* - this shows that the gass server does terminate properly...
 		if(gass.shutdown())

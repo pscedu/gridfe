@@ -92,7 +92,7 @@ public class GridJob extends RSLElement implements Serializable
 		this.gi.setID(this.id);
 	}
 
-	/* Serializable Implementation (Default for now) */
+	/* Serializable Implementation */
 	private void writeObject(ObjectOutputStream out)
 		throws IOException
 	{
@@ -103,5 +103,10 @@ public class GridJob extends RSLElement implements Serializable
 		throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
+
+		//DEBUG
+		System.out.println("GridJob - readObject: "+this);
+		this.build();
+		System.out.println("GridJob - readObject: "+this.stdout);
 	}
 };

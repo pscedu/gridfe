@@ -28,6 +28,7 @@ public class GassInt extends RemoteGassServer
 		this.gss = gss;
 		this.options = GassServer.CLIENT_SHUTDOWN_ENABLE | 
 				RemoteGassServer.TILDE_EXPAND_ENABLE |
+				RemoteGassServer.USER_EXPAND_ENABLE |
 				GassServer.READ_ENABLE;
 	}
 
@@ -101,15 +102,24 @@ public class GassInt extends RemoteGassServer
 							this.port, file);
 	}
 
-	/*
-	** XXX - extend HttpInputStream to allow this (double extends??):
-	** Inherited Methods (needed from HttpInputStream)
-	** getSize() read() close()
-	*/
-	public int read(byte[] buf, int offset, int len)
+	/* Read len bytes from the open stream */
+	public int read(StringBuffer buf, int len)
 		throws IOException
 	{
-		return this.fin.read(buf, offset, len);
+		int read = 0; 
+		
+		/* Read from offset = 0, to len */
+		while(read < len)
+		{
+			/* Create a new buf that is proper size */
+			byte[] tmp = new byte[len - read];
+
+			read += this.fin.read(tmp, 0, len - read);
+
+			buf.append(new String(tmp));
+		}
+
+		return read;
 	}
 
 	/* Read the entire file into a String */
@@ -117,24 +127,20 @@ public class GassInt extends RemoteGassServer
 		throws IOException
 	{
 		int len = (int)(this.getSize());
-		byte[] buf = new byte[len];
-		
-		/* Read from offset=0, up to len */
-		int read = this.fin.read(buf, 0, len);
 
-		/* convert to string */
-		String str = new String(buf);
+		StringBuffer buf = new StringBuffer("");
+		this.read(buf, len);
 
-		return str;
+		return new String(buf.toString());
 	}
 
-	//DEBUG
-	//int getSize() // wow... documentation error
+	/* Get the size of the file opened by the GassInputStream */
 	public long getSize()
 	{
 		return this.fin.getSize();
 	}
 
+	/* Close the stream */
 	public void close()
 		throws IOException
 	{

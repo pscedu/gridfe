@@ -1,11 +1,5 @@
 /* $Id$ */
-/*
-** file: GridInt.java
-** purpose: Wrapper around authentication to kerberos
-**		and grid computers...
-*/
 
-//package gridint.auth;
 package grindint;
 
 import org.ietf.jgss.*;
@@ -24,29 +18,15 @@ public class GridInt
 		this.uid = new Uid(uid);
 	}
 
-	/*
-	** Authenticate to the Grid
-	*/
 	public void authenticate() throws GSSException, GlobusCredentialException
 	{
-	//	try
-	//	{
-			this.ga = new GlobusAuth(this.uid);
-			this.ga.createCredential();
+		this.ga = new GlobusAuth(this.uid);
+		this.ga.createCredential();
 
-			this.gss = new GSSAuth(ga);
-			this.gss.createCredential();
-	//	}
-	//	catch(GSSException e)
-	//	catch(GlobusCredentialException)
-	//	{
-			//ADD Auth failed... try other means of auth?
-	//	}
+		this.gss = new GSSAuth(ga);
+		this.gss.createCredential();
 	}
 
-	/*
-	** Interface Private Classes
-	*/
 	public GlobusAuth getGlobusAuth()
 	{
 		return this.ga;
@@ -57,17 +37,8 @@ public class GridInt
 		return this.gss;
 	}
 
-	/*
-	** Methods
-	*/
-
-	/*
-	** Get the Remaining lifetime of the Certificate
-	*/
 	public int getRemainingLifetime() throws GSSException
 	{
 		return this.gss.getRemainingLifetime();
 	}
 }
-
-

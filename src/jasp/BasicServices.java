@@ -4,11 +4,9 @@ package jasp;
 
 import java.io.*;
 
-public class BasicServices
-{
+public class BasicServices {
 	/* It is sad that there is no way to do this in J2SE. */
-	public static int getUserID()
-	{
+	public static int getUserID() {
 		int uid = -1;
 		String username;
 
@@ -22,37 +20,35 @@ public class BasicServices
 			String[] fields;
 			File f = new File("/etc/passwd");
 			BufferedReader r = new BufferedReader(new
-						FileReader(f));
+			    FileReader(f));
 			while ((line = r.readLine()) != null) {
 				fields = line.split(":");
 				if (fields.length > 0 &&
 				    fields[0].equals(username)) {
 					uid = Integer.valueOf(
-						fields[2]).intValue();
+					    fields[2]).intValue();
 					break;
 				}
 			}
 			r.close();
 		} catch (Exception e) {
-			return -1;
+			return (-1);
 		}
-
-		return uid;
+		return (uid);
 	}
 
-	public static String lcfirst(String s)
-	{
-		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	public static String lcfirst(String s) {
+		return (s.substring(0, 1).toUpperCase() +
+			s.substring(1));
 	}
 
-	public static String stripSpace(String s)
-	{
+	public static String stripSpace(String s) {
 		if (s == null)
 			return (null);
 		String t = "";
 		for (int i = 0; i < s.length(); i++)
 			if (s.charAt(i) != ' ')
 				t += s.charAt(i);
-		return t;
+		return (t);
 	}
 };

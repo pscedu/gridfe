@@ -7,8 +7,7 @@ import oof.*;
 
 public class index {
 	public static String main(Page p)
-		throws Exception
-	{
+	  throws Exception {
 		OOF oof = p.getOOF();
 		String s = "";
 

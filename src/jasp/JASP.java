@@ -2,10 +2,8 @@
 
 package jasp;
 
-public class JASP
-{
-	private entity[] entmap = new entity[]
-	{
+public class JASP {
+	private entity[] entmap = new entity[] {
 		new entity('"', "quot"),
 //		new entity('\'', "apos"),
 		new entity('&', "amp"),
@@ -47,34 +45,29 @@ public class JASP
 			 */
 			t += "&#" + ((int)s.charAt(i)) + ";";
 		}
-		return t;
+		return (t);
 	}
 
-	public String unescapeHTML(String s)
-	{
+	public String unescapeHTML(String s) {
 		String t = new String(s);
 		return t;
 	}
 };
 
-class entity
-{
+class entity {
 	private char raw;
 	private String esc;
 
-	public entity(char raw, String esc)
-	{
+	public entity(char raw, String esc) {
 		this.raw = raw;
 		this.esc = esc;
 	}
 
-	public char getRaw()
-	{
+	public char getRaw() {
 		return this.raw;
 	}
 
-	public String getEsc()
-	{
+	public String getEsc() {
 		return this.esc;
 	}
 };

@@ -5,11 +5,9 @@ package gridfe.www.jobs;
 import gridfe.*;
 import oof.*;
 
-public class output
-{
+public class output {
 	public static String main(Page page)
-		throws Exception
-	{
+	  throws Exception {
 		OOF oof = page.getOOF();
 
 		return	page.header("Job Output") +

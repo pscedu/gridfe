@@ -5,11 +5,9 @@ package gridfe.www.jobs;
 import gridfe.*;
 import oof.*;
 
-public class submit
-{
+public class submit {
 	public static String main(Page p)
-		throws Exception
-	{
+	  throws Exception {
 		OOF oof = p.getOOF();
 		String s = "";
 
@@ -63,7 +61,6 @@ public class submit
 				}
 			 )
 		   + p.footer();
-
 		return (s);
 	}
 };

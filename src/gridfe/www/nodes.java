@@ -5,11 +5,9 @@ package gridfe.www;
 import gridfe.*;
 import oof.*;
 
-public class nodes
-{
+public class nodes {
 	public static String main(Page p)
-		throws Exception
-	{
+	  throws Exception {
 		OOF oof = p.getOOF();
 		String s = "";
 

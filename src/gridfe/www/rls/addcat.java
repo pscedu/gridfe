@@ -5,11 +5,9 @@ package gridfe.www.rls;
 import gridfe.*;
 import oof.*;
 
-public class addcat
-{
+public class addcat {
 	public static String main(Page page)
-		throws Exception
-	{
+	  throws Exception {
 		OOF oof = page.getOOF();
 
 		return	page.header("Test") +

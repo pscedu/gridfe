@@ -13,8 +13,7 @@ import org.ietf.jgss.GSSException;
 
 public class certs {
 	public static String main(Page p)
-		throws Exception
-	{
+	  throws Exception {
 		OOF oof = p.getOOF();
 		String s = "";
 

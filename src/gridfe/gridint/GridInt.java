@@ -3,19 +3,19 @@
 package gridfe.gridint;
 
 import gridfe.gridint.auth.*;
-import jasp.Uid;
+import jasp.*;
 import java.io.*;
-import java.util.*;
 import java.net.*;
 import java.security.*;
+import java.util.*;
 import org.globus.gram.*;
 import org.globus.gsi.*;
-import org.ietf.jgss.*;
 import org.globus.io.gass.client.*;
+import org.ietf.jgss.*;
 
 public class GridInt implements Serializable
 {
-	/* 
+	/*
 	** TODO: Serialize GSSAuth - so credentials can
 	** be read back in easliy without messing with KDC
 	** & mod_KCT, etc...
@@ -66,7 +66,7 @@ public class GridInt implements Serializable
 		** 3) GridInt serialize file
 		*/
 		CertFile cf = new CertFile(this.uid);
-		String[] list = new String[] 
+		String[] list = new String[]
 		{
 			cf.getX509(),
 			cf.getKrbTkt(),
@@ -78,7 +78,7 @@ public class GridInt implements Serializable
 		for(int i = 0; i < ln; i++)
 		{
 			fp = new File(list[i]);
-			
+
 			if(fp.exists())
 				fp.delete();
 		}
@@ -128,7 +128,7 @@ public class GridInt implements Serializable
 		//if(job.remote())
 		if(false && (job.stdout != null || job.stderr != null))
 		{
-			/* 
+			/*
 			** Currently we cannot get remote output due to weird
 			** stdout/stderr problems with setting up a remote GASS
 			** Server
@@ -147,7 +147,7 @@ public class GridInt implements Serializable
 
 	private void getLocalJobData(GridJob job, String[] data)
 	{
-		GassInt gass; 
+		GassInt gass;
 		Random r;
 		int port;
 		int active = 0;
@@ -179,7 +179,7 @@ public class GridInt implements Serializable
 		** If directory does not start with '/' then it
 		** needs to default to "~".
 		**
-		** ----------------------------------------------------- 
+		** -----------------------------------------------------
 		**
 		** Unfortunately GRAM assumes directories start from
 		** ~/ and if ~/dir is specified GRAM cannot expand the ~
@@ -196,9 +196,9 @@ public class GridInt implements Serializable
 			directory = "~/" + job.directory;
 		else
 			directory = job.directory;
-		
+
 		//XXX - this needs to be cleaner somehow!!!
-		if(job.stdout != null && job.stdout.charAt(0) != '/' && 
+		if(job.stdout != null && job.stdout.charAt(0) != '/' &&
 			job.stdout.charAt(0) != '~')
 				stdout = directory + "/" + job.stdout;
 		else

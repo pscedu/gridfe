@@ -7,9 +7,9 @@
 
 package gridint.auth;
 
+import java.util.Set;
 import javax.security.auth.*;
 import javax.security.auth.login.*;
-import java.util.Set;
 
 /*
  * KerbInt - handle the Kerberos authentication
@@ -23,7 +23,8 @@ public class KerbAuth
 	protected Object prcred;
 	private LoginContext krb5;
 
-	public KerbAuth() throws LoginException
+	public KerbAuth()
+		throws LoginException
 	{
 		/*
 		 * Read the "krb5" configuration
@@ -32,7 +33,8 @@ public class KerbAuth
 		krb5 = new LoginContext("krb5");	
 	}
 
-	public void login() throws LoginException
+	public void login()
+		throws LoginException
 	{
 		krb5.login();
 		subject = krb5.getSubject();
@@ -42,11 +44,9 @@ public class KerbAuth
 		prcred = subject.getPrivateCredentials();
 	}
 
-	public void logout() throws LoginException
+	public void logout()
+		throws LoginException
 	{
 		krb5.logout();	
 	}
-
-
 };
-

@@ -7,9 +7,9 @@
 package gridint;
 
 import gridint.*;
+import java.net.MalformedURLException;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
-import java.net.MalformedURLException;
 
 public class GramInt
 {
@@ -21,7 +21,6 @@ public class GramInt
 
 	/* Randomized Job Output filename */
 	private String jOut;
-
 
 	public GramInt(GSSCredential gss)
 	{
@@ -54,7 +53,8 @@ public class GramInt
 	/*
 	** globus-job-submit & globus-job-run
 	*/
-	public void jobSubmit(String host, RSLElement rsl) throws GramException, GSSException
+	public void jobSubmit(String host, RSLElement rsl)
+		throws GramException, GSSException
 	{
 		this.batch = true;
 		this.rsl = rsl;
@@ -62,20 +62,23 @@ public class GramInt
 		this.gramRequest(this.host, this.rsl);
 	}
 
-	public void jobSubmit(RSLElement rsl) throws GramException, GSSException
+	public void jobSubmit(RSLElement rsl)
+		throws GramException, GSSException
 	{
 		this.batch = true;
 		this.rsl = rsl;
 		this.gramRequest(this.host, this.rsl);
 	}
 
-	public void jobSubmit() throws GramException, GSSException
+	public void jobSubmit()
+		throws GramException, GSSException
 	{
 		this.batch = true;
 		this.gramRequest(this.host, this.rsl);
 	}
-	
-	private void gramRequest(String host, RSLElement rsl) throws GramException, GSSException
+
+	private void gramRequest(String host, RSLElement rsl)
+		throws GramException, GSSException
 	{
 		//DEBUG
 		if(host == null)
@@ -90,16 +93,17 @@ public class GramInt
 	}
 
 	/* globus-job-status */
-	public int getStatus() throws GSSException
+	public int getStatus()
+		throws GSSException
 	{
 		/*
-		** TODO: Find a good way to tell if the 
+		** TODO: Find a good way to tell if the
 		** job has a status of FAIL or DONE after
 		** the jobmanager has termianted and the
 		** GramException (below) is thrown...
 		*/
 		int status = -2;
-		
+
 		try
 		{
 			Gram.jobStatus(this.job);
@@ -114,13 +118,13 @@ public class GramInt
 			*/
 			if(e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER)
 				status = -1;
-			
 		}
 
 		return status;
 	}
 
-	public String getStatusAsString() throws GSSException
+	public String getStatusAsString()
+		throws GSSException
 	{
 		String status;
 		status = new String("UNKNOWN");
@@ -141,7 +145,8 @@ public class GramInt
 	}
 
 	/* globus-job-cancel */
-	public void cancel() throws GramException, GSSException
+	public void cancel()
+		throws GramException, GSSException
 	{
 		this.job.cancel();
 	}
@@ -151,9 +156,10 @@ public class GramInt
 		return this.job.getIDAsString();
 	}
 
-	public void setID(String id) throws MalformedURLException
+	public void setID(String id)
+		throws MalformedURLException
 	{
-		System.out.println("GramInt: "+id);
+		System.out.println("GramInt: " + id);
 		this.job.setID(id);
 	}
 

@@ -33,7 +33,8 @@ public class X509Auth
 	 * is usually in /tmp/x509up_u++++
 	 * where ++++ is the user's UID
 	 */
-	public void instantiate() throws CertificateException, IOException
+	public void instantiate()
+		throws CertificateException, IOException
 	{
 		InputStream iStream;
 		iStream = new FileInputStream(certFile);
@@ -45,8 +46,8 @@ public class X509Auth
 		iStream.close();
 	}
 
-	//public X509Certificate getCertificate() throws Certificate Exception
 	public X509Certificate getCertificate()
+	//throws Certificate Exception
 	{
 		/* Check validity first... */
 		//this.checkValidity();
@@ -57,10 +58,9 @@ public class X509Auth
 	 * X509Certificate Wrappers 
 	 */
 
-	public void checkValidity() throws CertificateException
+	public void checkValidity()
+		throws CertificateException
 	{
 		cert.checkValidity();
 	}
-
 };
-

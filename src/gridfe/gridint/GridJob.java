@@ -57,7 +57,8 @@ public class GridJob implements Serializable
 		this.rsl = new RSLElement(gp, gv, kp, kk, kv);
 	}
 
-	public void setRSL(String[] gp, String[] gv, String vp, String[] vv, String kp, String[] kk, String[] kv)
+	public void setRSL(String[] gp, String[] gv, String vp, String[] vv, String kp,
+			   String[] kk, String[] kv)
 	{
 		this.rsl = new RSLElement(gp, gv, vp, vv, kp, kk, kv);
 	}
@@ -75,16 +76,18 @@ public class GridJob implements Serializable
 		this.gi.setHost(this.host);
 	}
 
-	public void run() throws GramException, GSSException
+	public void run()
+		throws GramException, GSSException
 	{
 		this.gi.jobSubmit(this.rsl);	
 		this.id = new String(this.gi.getIDAsString());
 		
 		/* DEBUG */
-		System.out.println("GridJob.run():"+this.id);
+		System.out.println("GridJob.run():" + this.id);
 	}
 
-	public void cancel() throws GramException, GSSException
+	public void cancel()
+		throws GramException, GSSException
 	{
 		this.gi.cancel();
 
@@ -105,12 +108,14 @@ public class GridJob implements Serializable
 	}
 
 	/* GramInt Wrappers */
-	public int getStatus() throws GSSException
+	public int getStatus()
+		throws GSSException
 	{
 		return this.gi.getStatus();
 	}
 
-	public String getStatusAsString() throws GSSException
+	public String getStatusAsString()
+		throws GSSException
 	{
 		return this.gi.getStatusAsString();
 	}
@@ -121,8 +126,9 @@ public class GridJob implements Serializable
 	}
 
 	/* DEBUG */
-	/*
-	public void setID(String id) throws MalformedURLException
+/*
+	public void setID(String id)
+		throws MalformedURLException
 	{
 		System.out.println("GridJob: "+id);
 		if(this.gi == null)
@@ -130,7 +136,7 @@ public class GridJob implements Serializable
 		this.gi.setID(new String(id));
 		//this.gi.getJob().setID(id);
 	}
-	*/
+*/
 
 	/*
 	** Revive allows a GridJob (and hence a GramJob) to be
@@ -138,7 +144,8 @@ public class GridJob implements Serializable
 	*/
 
 	/* This revive to be called manually for testing or even cloning jobs */
-	public void revive(String host, String id, GSSCredential gss, RSLElement rsl) throws MalformedURLException
+	public void revive(String host, String id, GSSCredential gss, RSLElement rsl)
+		throws MalformedURLException
 	{
 		this.host = host;
 		this.rsl = rsl;
@@ -147,7 +154,8 @@ public class GridJob implements Serializable
 	}
 
 	/* This revive should be called after a deserialization */
-	public void revive(GSSCredential gss) throws MalformedURLException
+	public void revive(GSSCredential gss)
+		throws MalformedURLException
 	{
 		/* Revive GramInt and it's private data */
 		this.gi = new GramInt(gss, this.host, this.rsl);
@@ -156,7 +164,8 @@ public class GridJob implements Serializable
 	}
 
 	/* Serializable Implementation (Default for now) */
-	private void writeObject(ObjectOutputStream out) throws IOException
+	private void writeObject(ObjectOutputStream out)
+		throws IOException
 	{
 		out.defaultWriteObject();
 	}
@@ -166,6 +175,4 @@ public class GridJob implements Serializable
 	{
 		in.defaultReadObject();
 	}
-
-
 }

@@ -1,19 +1,19 @@
 /* $Id$ */
 
 /*
-** Takes a GlobusCredential and 
-** then creates a standard GSSCredential 
-** for use with all globus api
+** Takes a GlobusCredential and
+** then creates a standard GSSCredential
+** for use with all Globus API
 */
 package gridint.auth;
 
+import java.security.PrivateKey;
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl.*;
-import java.security.PrivateKey;
 import org.ietf.jgss.*;
-import org.ietf.jgss.GSSException.*;
 import org.ietf.jgss.GSSCredential.*;
+import org.ietf.jgss.GSSException.*;
 
 public class GSSAuth
 {
@@ -30,7 +30,8 @@ public class GSSAuth
 		this.gc = gc;
 	}
 
-	public void createCredential() throws GSSException
+	public void createCredential()
+		throws GSSException
 	{
 		/*
 		** The following class does a conversion between
@@ -40,7 +41,7 @@ public class GSSAuth
 		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
 		** source code. (cvs.globus.org)
 		*/
-		this.gss = new GlobusGSSCredentialImpl(this.gc, 
+		this.gss = new GlobusGSSCredentialImpl(this.gc,
 				GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
@@ -62,12 +63,14 @@ public class GSSAuth
 	** GSSCredential Methods
 	*/
 
-	public GSSName getName() throws GSSException
+	public GSSName getName()
+		throws GSSException
 	{
 		return this.gss.getName();
 	}
 
-	public int getRemainingLifetime() throws GSSException
+	public int getRemainingLifetime()
+		throws GSSException
 	{
 		return this.gss.getRemainingLifetime();
 	}

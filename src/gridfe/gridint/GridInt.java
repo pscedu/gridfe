@@ -2,15 +2,15 @@
 
 package gridint;
 
-import gridint.auth.*;
 import gridint.*;
+import gridint.auth.*;
 import jasp.Uid;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.security.PrivateKey;
 import org.globus.gram.*;
 import org.globus.gsi.*;
 import org.ietf.jgss.*;
-import java.io.*;
-import java.net.MalformedURLException;
 
 public class GridInt implements Serializable
 {
@@ -31,7 +31,8 @@ public class GridInt implements Serializable
 		this.list = new GridJobList();
 	}
 
-	public void auth() throws GSSException, GlobusCredentialException
+	public void auth()
+		throws GSSException, GlobusCredentialException
 	{
 		this.ga = new GlobusAuth(this.uid);
 		this.ga.createCredential();
@@ -40,20 +41,23 @@ public class GridInt implements Serializable
 		this.gss.createCredential();
 	}
 
-	public void jobSubmit(GridJob job) throws GramException, GSSException
+	public void jobSubmit(GridJob job)
+		throws GramException, GSSException
 	{
 		job.init(this.gss.getGSSCredential());
 		job.run();
 		this.list.push(job);
 	}
 
-	public boolean jobCancel(GridJob job) throws GramException, GSSException
+	public boolean jobCancel(GridJob job)
+		throws GramException, GSSException
 	{
 		job.cancel();
 		return this.list.remove(job);
 	}
 
-	public void revive() throws MalformedURLException, GSSException, GlobusCredentialException
+	public void revive()
+		throws MalformedURLException, GSSException, GlobusCredentialException
 	{
 		this.auth();
 
@@ -79,24 +83,26 @@ public class GridInt implements Serializable
 	** be implemented when the UI is finalized
 	*/
 	/* currently get's the most recent job status */
-	public String getJobStatusAsString() throws GSSException
+	public String getJobStatusAsString()
+		throws GSSException
 	{
 		return this.list.get(0).getStatusAsString();
 	}
-	public String getJobStatusAsString(int x) throws GSSException
+	public String getJobStatusAsString(int x)
+		throws GSSException
 	{
 		return this.list.get(x).getStatusAsString();
 	}
-	public int getJobStatus() throws GSSException
+	public int getJobStatus()
+		throws GSSException
 	{
 		return this.list.get(0).getStatus();
 	}
-	public int getJobStatus(int x) throws GSSException
+	public int getJobStatus(int x)
+		throws GSSException
 	{
 		return this.list.get(x).getStatus();
 	}
-
-	
 
 	/* DEBUG */
 	public GlobusAuth getGlobusAuth()
@@ -114,8 +120,9 @@ public class GridInt implements Serializable
 	** TODO: - later there need to be lots more
 	** functions for obtaining certificate information
 	*/
-	public int getRemainingLifetime() throws GSSException
+	public int getRemainingLifetime()
+		throws GSSException
 	{
 		return this.gss.getRemainingLifetime();
 	}
-}
+};

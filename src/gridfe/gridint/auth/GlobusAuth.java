@@ -8,11 +8,11 @@
 */
 package gridint.auth;
 
+import jasp.Uid;
+import java.security.PrivateKey;
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
-import java.security.PrivateKey;
 import org.ietf.jgss.*;
-import jasp.Uid;
 
 public class GlobusAuth
 {
@@ -26,7 +26,6 @@ public class GlobusAuth
 	*/
 	private final String def = "/tmp/x509up_u";
 
-
 	public GlobusAuth(Uid uid)
 	{
 		this.file = this.def + uid.intValue();
@@ -38,13 +37,13 @@ public class GlobusAuth
 		this.file = this.def + this.uid.intValue();
 	}
 
-	/*
+/*
 	public GlobusAuth(String uid)
 	{
 		this.uid = new Uid(uid);
 		this.file = this.def + this.uid.intValue();
 	}
-	*/
+*/
 
 	/* Overide Default X.509 Certificate File*/
 	public void setFile(String file)
@@ -52,7 +51,8 @@ public class GlobusAuth
 		this.file = file;
 	}
 
-	public void createCredential() throws GlobusCredentialException//, GSSException
+	public void createCredential()
+		throws GlobusCredentialException//, GSSException
 	{
 		this.gc = new GlobusCredential(file);
 	}

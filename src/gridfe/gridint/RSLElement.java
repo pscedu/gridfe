@@ -50,7 +50,8 @@ public class RSLElement implements Serializable
 		this.setKeyPairs(kp, kk, kv);
 	}
 
-	public RSLElement(String[] gp, String[] gv, String vp, String[] vv, String kp, String[] kk, String[] kv)
+	public RSLElement(String[] gp, String[] gv, String vp, String[] vv, String kp,
+			  String[] kk, String[] kv)
 	{
 		this.setGenerics(gp, gv);
 		this.setVarArgs(vp, vv);
@@ -198,4 +199,4 @@ public class RSLElement implements Serializable
 
 		return this.data.toString();
 	}
-}
+};

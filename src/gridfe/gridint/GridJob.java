@@ -7,10 +7,11 @@
 package gridint;
 
 import gridint.*;
-import org.ietf.jgss.*;
-import org.globus.gram.*;
-import java.net.MalformedURLException;
 import java.io.*;
+import java.net.MalformedURLException;
+import org.globus.gram.*;
+import org.ietf.jgss.*;
+
 public class GridJob implements Serializable
 {
 	private String host;

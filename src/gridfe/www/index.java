@@ -7,18 +7,16 @@ import oof.*;
 
 public class index
 {
-	public static String main(Page page)
+	public static String main(Page p)
 		throws Exception
 	{
-		OOF oof = page.getOOF();
+		OOF oof = p.getOOF();
+		String s = "";
 
-		return	page.header("Welcome") +
-				oof.p("Welcome to the portal.") +
-				oof.p("Welcome to the portal.") +
-				oof.p("Welcome to the portal.") +
-				oof.p("Welcome to the portal.") +
-				oof.p("Welcome to the portal.") +
-				page.footer();
+		s += p.header("Welcome")
+		   + oof.p("Welcome to the portal.")
+		   + p.footer();
+		return (s);
 	}
 };
 

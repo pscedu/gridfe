@@ -1,0 +1,4 @@
+/* $Id$ */
+public class JASP {
+	
+};

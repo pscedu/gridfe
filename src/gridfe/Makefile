@@ -6,7 +6,7 @@ include ${SYSROOT}/lib/mk/defs.mk
 
 CLASSES += Page.class GridFE.class
 PRIVCLASSES += DelegationHandler.class NavigationMenu.class
-SUBDIRS += gridint
+SUBDIRS += gridint www
 TARGET = ${CLASSES}
 
 include ${MAINMK}

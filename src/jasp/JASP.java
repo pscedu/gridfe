@@ -11,6 +11,9 @@ public class JASP {
 		"abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 		"0123456789,./?;:[]{}\\|`~!@#$%^*()_+-=";
+	
+	JASP() {
+	}
 		
 	public String escapeHTML(String s) {
 		int i, j;

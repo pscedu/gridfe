@@ -32,11 +32,11 @@ public class RSLElement implements Serializable
 	private transient StringBuffer data;
 
 	/* Stdout and Stderr default to null */
-	public String stdout = null;
+	public transient String stdout = null;
 	public transient String stderr = null;
 
 	/* Default directory to HOME */
-	public transient String directory = "~";
+	public transient String directory = null;
 
 	/*
 	** Build RSL Strings that have args, env variables, and
@@ -91,43 +91,15 @@ public class RSLElement implements Serializable
 	{
 		for(int i = 0; i < param.length; i++)
 		{
-			/*
-			** XXX later will may want to intercept options
-			** like stdout, stderr, directory, etc... so 
-			** that we can do internal work first, then
-			** change to what the user specified.
-			** Example:
-			** stdout was set to have output go to a different
-			** computer via a GAAS server. first we intercept
-			** stdout and have the data saved locally, we can then
-			** open the file later to show job output through web,
-			** and finally use GridFTP to send the file where they
-			** wanted it... (something to this effect)
-			*/
 			this.data.append(b+param[i]+m+q+value[i]+q+e);
 
-			//DEBUG
-			/*
-			System.out.println(this.data);
-			System.out.println(param[i]);
-			System.out.println(value[i]);
-			System.out.println(this.stdout);
-			*/
-
 			/* Save some parameters to retrieve job output/err */
-			if(param[i] == "stdout")
-			{
-				//DEBUG
-				//System.out.println("buildGenerics: wtf");
-				this.stdout = new String(value[i]);
-				//System.out.println("buildGenerics: "+this.stdout);
-				//System.out.println("buildGenerics: "+param[i]);
-				//System.out.println("buildGenerics: "+value[i]);
-			}
-			if(param[i] == "stderr")
-				this.stderr = new String(value[i]);
-			if(param[i] == "directory")
-				this.directory = new String(value[i]);
+			if(param[i].equals("stdout"))
+				this.stdout = value[i];
+			if(param[i].equals("stderr"))
+				this.stderr = value[i];
+			if(param[i].equals("directory"))
+				this.directory = value[i];
 		}
 	}
 
@@ -191,12 +163,7 @@ public class RSLElement implements Serializable
 		
 		/* Rebuild RSLElement */
 		this.build();
-		
-		//DEBUG
-		System.out.println("Rebuilding RSL");
-		System.out.println(this.stdout);
 	}
-
 
 	public String toString()
 	{

@@ -5,6 +5,10 @@ import oof.*;
 public class Page {
 	private OOF  oof;
 	private JASP jasp;
+	private int classCount;
+
+	/* CSS class desc */
+	final static Object CCDESC = (Object)"desc";
 
 	Page() {
 		/* XXX: load jasp prefs from resource. */
@@ -15,6 +19,8 @@ public class Page {
 		} catch (Exception e) {
 			this.error(e.toString());
 		}
+		
+		this.classCount = 1;
 	}
 
 	public String header(String title) {
@@ -49,5 +55,17 @@ public class Page {
 	
 	public void error(Exception e) {
 		this.error(e.toString() + ": " + e.getMessage());
+	}
+
+	public OOF getOOF() {
+		return this.oof;
+	}
+
+	public JASP getJASP() {
+		return this.jasp;
+	}
+
+	public String genClass() {
+		return this.classCount++ % 2 == 0 ? "data1" : "data2";
 	}
 };

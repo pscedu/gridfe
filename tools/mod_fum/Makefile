@@ -6,7 +6,7 @@ include ${SYSROOT}/lib/mk/defs.mk
 
 TARGET = mod_fum.so
 OBJS = mod_fum.o
-CFLAGS += -Wall -rdynamic -shared -g -I${KX509_PREFIX}
+CFLAGS += -Wall -rdynamic -shared -g -I${KX509_PREFIX} -I/usr/include/httpd -I"/usr/include/apr-0"
 LIBS = -lcrypto -lkrb5 -lkx509 -L${KX509_PREFIX}
 
 TESTS += driver

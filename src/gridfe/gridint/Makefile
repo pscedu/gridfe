@@ -1,6 +1,7 @@
 # $Id$
 
-CLASSES += GridJobList.class GridJob.class GramInt.class GridInt.class RSLElement.class
+CLASSES += GridJobList.class GridJob.class GramInt.class GridInt.class
+CLASSES += RSLElement.class
 
 SYSROOT = ../..
 

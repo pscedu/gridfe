@@ -7,15 +7,62 @@ import oof.*;
 
 public class submit
 {
-	public static String main(Page page)
+	public static String main(Page p)
 		throws Exception
 	{
-		OOF oof = page.getOOF();
+		OOF oof = p.getOOF();
 		String s = "";
 
-		s += page.header("Submit Job")
-		   + oof.p("Submit job test page.")
-		   + page.footer();
+		s += p.header("Submit Job")
+		   + oof.form(
+				new Object[] {},
+				new Object[] {
+					oof.table(
+						new Object[] {},
+						new Object[][][] {
+							new Object[][] {
+								new Object[] {
+									"class", p.CCDESC,
+									"value", "Label:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", oof.input(new Object[] {
+												"type", "text",
+												"name", "label"
+											}) }
+							},
+							new Object[][] {
+								new Object[] {
+									"class", p.CCDESC,
+									"value", "Host:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", oof.input(new Object[] {
+												"type", "text",
+												"name", "host"
+											})
+								}
+							},
+							new Object[][] {
+								new Object[] {
+									"class", p.CCDESC,
+									"value", "Command:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", oof.input(new Object[] {
+												"type", "textarea",
+												"name", "command"
+											})
+								}
+							}
+						}
+					)
+				}
+			 )
+		   + p.footer();
 
 		return (s);
 	}

@@ -29,6 +29,7 @@ public class certs
 		try
 		{
 			gi = new GridInt(uid);
+			gi.auth();
 			ci = gi.getCertInfo();
 
 		long tmp;
@@ -48,6 +49,13 @@ public class certs
 				   min + " mins)";
 */
 		}
+/*
+		catch(java.lang.reflect.InvocationTargetException t)
+		{
+			s += oof.p("Invocation Target Exception (wtf?): " +
+						t.getTargetException().getMessage());
+		}
+*/
 		catch(Exception e)
 		{
 			s += oof.p("Exception Caught!");

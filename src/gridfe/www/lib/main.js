@@ -12,12 +12,12 @@ function moveMenu() {
 		if (o != null && o.style != null) {
 			y = objGetTop(o) + MENU_INIT_SHIFT
 			objSetTop(o, y)
-			if (y < 0)
-				window.setTimeout('moveMenu()', MENU_INIT_INTV)
 			if (y > -80)
 				objSetVisibility(o, CSS_VISIBILITY_VISIBLE)
 		}
 	}
+	if (y < 0)
+		window.setTimeout('moveMenu()', MENU_INIT_INTV)
 }
 
 window.onload = function() {

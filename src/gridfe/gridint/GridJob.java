@@ -26,6 +26,11 @@ public class GridJob extends RSLElement implements Serializable
 		this.host = new String(host);
 	}
 
+	public String getHost()
+	{
+		return this.host;
+	}
+
 	/* User specified Job names, for retrieval */
 	public void setName(String name)
 	{
@@ -65,9 +70,28 @@ public class GridJob extends RSLElement implements Serializable
 		this.gi = null;
 	}
 
-	public String getHost()
+	/*
+	** Determine if stdout, stderr, or both are
+	** being redirected to a Gass Server
+	*/
+	public int remote()
 	{
-		return this.host;
+		/*
+		** 'which' data to retrieve Remotely:
+		** 3 - Both
+		** 2 - Stderr
+		** 1 - Stdout
+		** 0 - Neither (Retrieve Both locally)
+		*/
+		int which = 0;
+
+		/* Check for starting 'http:' or 'https:' */
+		if(this.stdout != null && this.stdout.startsWith("http:"))
+			which = 1;
+		if(this.stderr != null && this.stderr.startsWith("http:"))
+			which += 2;	
+		
+		return which;
 	}
 
 	/* GramInt Wrappers */

@@ -1,6 +1,6 @@
 /* $Id$ */
 
-package gridint.auth;
+package gridfe.gridint.auth;
 
 import java.io.*;
 import java.security.cert.*;

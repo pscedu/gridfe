@@ -1,10 +1,6 @@
 /* $Id$ */
-/*
-** GridJob - Handles creating and maintaining of
-** a grid job and the gram internals
-*/
 
-package gridint;
+package gridfe.gridint;
 
 import gridint.*;
 import java.io.*;
@@ -172,4 +168,4 @@ public class GridJob implements Serializable
 	{
 		in.defaultReadObject();
 	}
-}
+};

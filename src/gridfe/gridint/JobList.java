@@ -1,12 +1,6 @@
 /* $Id$ */
-/*
-** GridJobList -
-** Wrapper over a GridJob manager.
-** Something to maintain past & present
-** submitted GridJobs
-*/
 
-package gridint;
+package gridfe.gridint;
 
 import gridint.*;
 import java.io.*;
@@ -60,4 +54,4 @@ public class GridJobList implements Serializable
 	{
 		this.list.clear();
 	}
-}
+};

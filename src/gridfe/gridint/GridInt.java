@@ -1,6 +1,6 @@
 /* $Id$ */
 
-package gridint;
+package gridfe.gridint;
 
 import gridint.*;
 import gridint.auth.*;

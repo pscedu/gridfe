@@ -1,17 +1,17 @@
 /* $Id$ */
-/* Authentication test suite. */
 
-import gridint.auth.*;
+import gridfe.*;
 import gridint.*;
-import javax.security.auth.Subject;
-import java.util.*;
-import java.security.*;
-import javax.security.auth.kerberos.KerberosKey;
-import java.lang.reflect.*;
-import java.lang.Integer;
+import gridint.auth.*;
 import jasp.*;
 import java.io.*;
+import java.lang.Integer;
 import java.lang.ref.*;
+import java.lang.reflect.*;
+import java.security.*;
+import java.util.*;
+import javax.security.auth.kerberos.KerberosKey;
+import javax.security.auth.Subject;
 
 public class suite
 {

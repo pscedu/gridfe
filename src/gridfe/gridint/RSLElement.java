@@ -1,9 +1,6 @@
 /* $Id$ */
 
-/*
-** RSL (Resource Specification Language) Element
-*/
-package gridint;
+package gridfe.gridint;
 
 import java.io.*;
 
@@ -18,7 +15,10 @@ public class RSLElement implements Serializable
 
 	/*
 	** Prepend Args
-	** Specification: (Multi+, Conjunct&, Disjunct|)
+	** Specification:
+	**	multi		+
+	**	conjunct	&
+	**	disjunct	|
 	*/
 	private String pre = "&";
 
@@ -96,7 +96,7 @@ public class RSLElement implements Serializable
 	** this filename can be overriden as can be
 	** seen below ...
 	*/
-	/*
+/*
 	public void setStdout(String file)
 	{
 		this.jOut = new String(file);
@@ -107,19 +107,19 @@ public class RSLElement implements Serializable
 		// TODO: rand function for filename
 		this.jOut = new String("/home/rbudden/rand.tmp");
 	}
-	*/
+*/
 
 	public String getStdout()
 	{
 		return this.jOut;
 	}
 
-	/*
+/*
 	public void buildStdout()
 	{
 		this.buildGenerics( new String[] {"stdout"}, new String[] {this.jOut});
 	}
-	*/
+*/
 
 	/* Generic build for "(param=value)" */
 	public void buildGenerics(String[] param, String[] value)
@@ -184,12 +184,14 @@ public class RSLElement implements Serializable
 			this.buildKeyPairs(this.kParam, this.kKey, this.kValue);
 
 		/* Unless the stdout has manually been overriden */
-		//if(this.jOut == null)
-		//{
-			/* Setup the random filename */
-		//	this.setStdout();
-		//	this.buildStdout();
-		//}
+/*
+		if(this.jOut == null)
+		{
+			// Setup the random filename
+			this.setStdout();
+			this.buildStdout();
+		}
+*/
 	}
 
 	public String toString()

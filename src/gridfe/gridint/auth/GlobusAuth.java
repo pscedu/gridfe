@@ -1,12 +1,6 @@
 /* $Id$ */
 
-/*
-** GlobusAuth.java
-**
-** Obtains a GlobusCredential from
-** a file which is a valid X.509 Certificate.
-*/
-package gridint.auth;
+package gridfe.gridint.auth;
 
 import jasp.Uid;
 import java.security.PrivateKey;

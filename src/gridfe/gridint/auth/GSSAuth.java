@@ -1,11 +1,6 @@
 /* $Id$ */
 
-/*
-** Takes a GlobusCredential and
-** then creates a standard GSSCredential
-** for use with all Globus API
-*/
-package gridint.auth;
+package gridfe.gridint.auth;
 
 import java.security.PrivateKey;
 import org.globus.gsi.*;

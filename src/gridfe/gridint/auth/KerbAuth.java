@@ -1,11 +1,6 @@
 /* $Id$ */
-/*
- * file: GridInt.java
- * purpose: Wrapper around authentication to kerberos
- *		and grid computers...
- */
 
-package gridint.auth;
+package gridfe.gridint.auth;
 
 import java.util.Set;
 import javax.security.auth.*;

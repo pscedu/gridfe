@@ -1,10 +1,6 @@
 /* $Id$ */
 
-/*
-** GramInt.java - GRAM Internals
-*/
-
-package gridint;
+package gridfe.gridint;
 
 import gridint.*;
 import java.net.MalformedURLException;
@@ -184,4 +180,4 @@ public class GramInt
 	{
 		return this.job;
 	}
-}
+};

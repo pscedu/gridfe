@@ -1,14 +1,14 @@
 /* $Id$ */
-/* Authentication test suite. */
 
-import gridint.auth.*;
+import gridfe.*;
 import gridint.*;
-import javax.security.auth.Subject;
-import java.util.*;
-import java.security.*;
-import javax.security.auth.kerberos.*;
-import java.lang.reflect.*;
+import gridint.auth.*;
 import jasp.*;
+import java.lang.reflect.*;
+import java.security.*;
+import java.util.*;
+import javax.security.auth.kerberos.*;
+import javax.security.auth.Subject;
 
 public class suite
 {
@@ -105,4 +105,4 @@ public class suite
 		System.out.print(krb.getCertificate());
 */
 	}
-}
+};;

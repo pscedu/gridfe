@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += Uid.class GlobusAuth.class GSSAuth.class
+CLASSES += GlobusAuth.class GSSAuth.class
 
 SYSROOT = ../../..
 

@@ -12,7 +12,7 @@ import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
 import java.security.PrivateKey;
 import org.ietf.jgss.*;
-import gridint.auth.Uid;
+import jasp.Uid;
 
 public class GlobusAuth
 {

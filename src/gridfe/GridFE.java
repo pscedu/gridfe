@@ -85,7 +85,8 @@ public class GridFE extends HttpServlet
 
 		Class handler = null;
 		for (int i = 0; i < this.dtab.length; i++)
-			if (uri.startsWith(this.dtab[i].getBase())) {
+			if (uri.startsWith(p.getServRoot() +
+			    this.dtab[i].getBase())) {
 				handler = this.dtab[i].getHandler();
 				break;
 			}

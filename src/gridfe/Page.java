@@ -322,6 +322,11 @@ public class Page
 	{
 		return (this.gi);
 	}
+
+	public String getServRoot()
+	{
+		return (this.servroot);
+	}
 };
 
 /* vim: set ts=4: */

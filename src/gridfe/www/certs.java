@@ -50,7 +50,7 @@ public class certs
 		}
 		catch(Exception e)
 		{
-			s += oof.p("Exception Caught:"+e.getMessage());
+			s += oof.p("Exception Caught!");
 		}
 
 		s += p.footer();

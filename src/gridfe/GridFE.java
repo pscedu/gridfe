@@ -61,7 +61,6 @@ public class GridFE extends HttpServlet
 		this.req = req;
 		this.res = res;
 
-		Class handler = null;
 		String uri = req.getRequestURI();
 
 		/* XXX: wrong */
@@ -76,6 +75,7 @@ public class GridFE extends HttpServlet
 			return;
 		}
 
+		Class handler = null;
 		for (int i = 0; i < this.dtab.length; i++)
 			if (uri.startsWith(this.dtab[i].getBase())) {
 				handler = this.dtab[i].getHandler();
@@ -90,6 +90,9 @@ public class GridFE extends HttpServlet
 		String s;
 
 		try {
+			Method m = handler.getMethod("main",
+				new Class[] { Page.class });
+			w.print("Found m: " + m);
 			s = (String)handler.getMethod("main",
 				new Class[] { Page.class }).invoke(null, new Object[] {p});
 		} catch (Exception e) {

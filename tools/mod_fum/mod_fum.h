@@ -33,9 +33,9 @@
 #define kKX509ServiceName "kx509"
 
 /* file names, directories... XXX put in a .conf file?? */
-#define kX509DefaultFile "/tmp/x509up_u"
-#define kKrb5DefaultFile "/tmp/krb5cc_"
-#define kCredentialFileName "x509up_u"
+#define kX509DefaultFile "/tmp/x509up_fum_u"
+#define kKrb5DefaultFile "/tmp/krb5cc_fum_"
+#define kCredentialFileName "x509up_fum_u"
 #define kCredentialPath "/tmp"
 
 #define kX509FilePermissions 0600

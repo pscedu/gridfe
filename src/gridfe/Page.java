@@ -99,7 +99,6 @@ public class Page
 		Menu m;
 		Iterator i, j;
 
-/*
 		for (i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			t += " [ '" + m.getName() + "', ";
@@ -122,7 +121,7 @@ public class Page
 			if (i.hasNext())
 				t += ",";
 		}
-*/
+
 		t += "];";
 		return t;
 	}

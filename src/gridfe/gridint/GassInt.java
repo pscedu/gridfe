@@ -5,6 +5,7 @@ import org.globus.gsi.gssapi.auth.*;
 import org.globus.io.gass.server.*;
 import org.globus.io.gass.client.*;
 import org.globus.io.streams.*;
+import org.globus.gram.*;
 import org.ietf.jgss.*;
 import java.io.*;
 
@@ -17,6 +18,7 @@ public class GassInt extends RemoteGassServer
 	private int options;
 	//private boolean secure;
 	private GSSCredential gss;
+	private GassServer ga;
 
 	public GassInt(GSSCredential gss, String host, int port)
 	{
@@ -32,10 +34,53 @@ public class GassInt extends RemoteGassServer
 
 	/* Overload start */
 	public void start()
-		throws GassException
+		throws GassException, IOException
 	{
+		/*
+		int success = 0;
+		int n = 0;
+
+		super.RBudden_set_env(new String[] {"GLOBUS_TCP_PORT_RANGE", "GLOBUS_UDP_PORT_RANGE"},
+					new String[] {"\"28000 28255\"", "\"28000 28255\""});
+		super.RBudden_set_port(0);
+		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
+		*/
+
 		super.setOptions(this.options);
+
 		super.start(host);
+		/*
+		while(success == 0 && n++ < 10)
+		{
+			try
+			{
+				System.out.println("Trying...");
+				super.start(host);
+				success = 1;
+				System.out.println("Success!!");
+			}
+			catch(GassException e)
+			{
+				System.out.println("Failed...");
+				success = 0;
+			}
+		}
+		*/
+	}
+
+	/* Manually remote start a server - this fails for some reason though */
+	public void start_remote()
+		throws GramException, GSSException
+	{
+		GridJob j = new GridJob("intel2.psc.edu");
+		j.setRSL(new String[] {"executable", "stdout", "stderr"},
+		new String[] {"$GLOBUS_LOCATION/bin/globus-gass-server",
+		"/tmp/gram.stdout", "/tmp/gram.stderr"},
+		new String("arguments"),
+		//new String[] {"-p", Integer.toString(this.port),"-c", "-r", "&"});
+		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
+		j.init(this.gss);
+		j.run();
 	}
 
 	/* 

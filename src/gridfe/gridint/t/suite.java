@@ -161,8 +161,8 @@ public class suite
 			int tlen = 32;
 			int toff = 0;
 
-//			try
-//			{
+			try
+			{
 				gi.startRetrieve(j3, file[i]);
 
 				data[i] += gi.retrieve(tlen, toff);
@@ -172,24 +172,24 @@ public class suite
                         	data[i] += gi.retrieve(0, toff);
 				
 				gi.stopRetrieve();
-//			}
-//			catch(Exception e)
-//			{
-//				data[i] += e.getMessage();
-//			}
+			}
+			catch(Exception e)
+			{
+				data[i] += e.getMessage();
+			}
 		}
 
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);
 
 		/* Get the job list and len */
-		String[][] jobs = gi.getJobListString();
-
-		System.out.println("# of Jobs: "+jobs.length);
-		for(int i = 0; i < jobs.length; i++)
+		JobList jl = gi.getJobList();
+		for(int i = 0; i < jl.size(); i++)
 		{
-			System.out.println("Name: " + jobs[i][gi.kJobName] + "\tStatus: " + 
-				jobs[i][gi.kJobStatus] + "\tRSL: " + jobs[i][gi.kJobRSL]);
+			GridJob job = jl.get(i);
+			System.out.print("Name: "+job.getName());
+			System.out.print("\tStatus: "+job.getStatusAsString());
+			System.out.println("\tRSL: "+job);
 		}
 
 		/* Logout - remove credentials */

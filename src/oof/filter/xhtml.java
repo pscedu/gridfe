@@ -143,11 +143,21 @@ public class xhtml extends FILTER {
 	}
 
 	public String build(ListStart e) {
-		return this.build("", (START)e);
+		String tag;
+		if (e.type.equals(this.oof.LIST_OD))
+			tag = "ol";
+		else
+			tag = "ul";
+		return this.build(tag, (START)e);
 	}
 
 	public String build(ListEnd e) {
-		return this.build("", (END)e);
+		String tag;
+		if (e.type.equals(this.oof.LIST_OD))
+			tag = "ol";
+		else
+			tag = "ul";
+		return this.build(tag, (END)e);
 	}
 
 	public String build(FormStart e) {

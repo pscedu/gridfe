@@ -12,24 +12,19 @@ import gridfe.gridint.*;
 public class GlobusAuth
 {
 	private GlobusCredential gc = null;
-	private String file;
 	private Uid uid;
+	private CertFile file;
 
-	/*
-	** X.509 Standard for files /tmp/x509up_u!!!
-	** where !!! is the userid
-	*/
-	private final String def = "/tmp/x509up_u";
 	public GlobusAuth(Uid uid)
 	{
-		this.file = this.def + uid.intValue();
+		this.file = new CertFile(uid);
 	}
 
 	/* Grab the credential from the file */
 	public void createCredential()
 		throws GlobusCredentialException
 	{
-		this.gc = new GlobusCredential(file);
+		this.gc = new GlobusCredential(this.file.toString());
 	}
 
 	public GlobusCredential getCredential()

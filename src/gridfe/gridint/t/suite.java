@@ -78,10 +78,10 @@ public class suite
 
 		/* job to test output permission */
 		String j3_out = "gram.out.date";
-		//String j3_out = "/tmp/gram.out.date";
+//		String j3_out = "/tmp/gram.out.date";
 		String j3_err = "gram.err";
-		String j3_host = "intel2.psc.edu";
-		//String j3_host = "mugatu.psc.edu";
+//		String j3_host = "intel2.psc.edu";
+		String j3_host = "mugatu.psc.edu";
 		String j3_name = "Date";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
@@ -174,8 +174,8 @@ public class suite
 		j3 = gi.getJob(j3_name);
 //		System.out.println("J3: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
 		System.out.println(j3);
-		System.out.println(j3.stdout);
-		System.out.println(j3.stderr);
+		System.out.println("stdout file: "+j3.stdout);
+		System.out.println("stderr file: "+j3.stderr);
 		data = gi.getJobData(j3);
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);

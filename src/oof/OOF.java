@@ -10,9 +10,18 @@ public class OOF {
 	private FILTER filter;
 	private JASP jasp;
 
-	public OOF(JASP j, String filter) throws Exception {
+	public static final Object LIST_UN = new Integer(1);
+	public static final Object LIST_OD = new Integer(2);
+
+	public OOF(JASP j, String filter) throws ClassNotFoundException,
+						 NoSuchMethodException,
+						 InstantiationException,
+						 IllegalAccessException,
+						 InvocationTargetException {
 		this.jasp = j;
-		this.filter = Class.forName("oof.filter." + filter).newInstance(this);
+		this.filter = (FILTER)Class.forName("oof.filter." + filter).
+				getConstructor(new Class[] { OOF.class }).
+				newInstance(new Object[] { this });
 	}
 
 	/* Core Elements. */
@@ -59,12 +68,12 @@ public class OOF {
 		return new Email(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT email(String addr) {
-		ELEMENT e = new Email(new Object[] {addr}, new Object[] {});
+		Email e = new Email(new Object[] {addr}, new Object[] {});
 		e.addr = addr;
 		return e;
 	}
 	public ELEMENT email(String title, String addr) {
-		ELEMENT e = new Email(new Object[] {title}, new Object[] {});
+		Email e = new Email(new Object[] {title}, new Object[] {});
 		e.addr = addr;
 		return e;
 	}
@@ -183,13 +192,13 @@ public class OOF {
 	public ELEMENT list() {
 		return new List(new Object[] {}, new Object[] {});
 	}
-	public ELEMENT list(int type) {
+	public ELEMENT list(Object type) {
 		return new List(new Object[] { "type", type }, new Object[] {});
 	}
 	public ELEMENT list(Object[] os) {
 		return new List(new Object[] {}, os);
 	}
-	public ELEMENT list(int type, Object[] os) {
+	public ELEMENT list(Object type, Object[] os) {
 		return new List(new Object[] { "type", type }, os);
 	}
 
@@ -268,13 +277,41 @@ public class OOF {
 	}
 
 	public ELEMENT table() {
-		return new Table();
+		return new Table(new Object[] {}, new Object[][][] {});
+	}
+	public ELEMENT table(Object[] attrs, Object[] rows) {
+		Object[][][] osss = new Object[rows.length][1][1];
+		for (int i = 0; i < rows.length; i++)
+			osss[i][0][0] = rows[i];
+		return new Table(attrs, osss);
+	}
+	public ELEMENT table(Object[] rows) {
+		Object[][][] osss = new Object[rows.length][1][1];
+		for (int i = 0; i < rows.length; i++)
+			osss[i][0][0] = rows[i];
+		return new Table(new Object[] {}, osss);
+	}
+	public ELEMENT table(Object[] attrs, Object[][] oss) {
+		/* This is wrong. */
+		Object[][][] osss = new Object[oss.length][1][1];
+		for (int i = 0; i < oss.length; i++)
+			for (int j = 0; j < oss[i].length; j++)
+				osss[i][j][0] = oss[i][j];
+		return new Table(attrs, osss);
+	}
+	public ELEMENT table(Object[][] oss) {
+		/* This is wrong. */
+		Object[][][] osss = new Object[oss.length][1][1];
+		for (int i = 0; i < oss.length; i++)
+			for (int j = 0; j < oss[i].length; j++)
+				osss[i][j][0] = oss[i][j];
+		return new Table(new Object[] {}, osss);
 	}
 	public ELEMENT table(Object[][][] osss) {
-		return new Table();
+		return new Table(new Object[] {}, osss);
 	}
 	public ELEMENT table(Object[] attrs, Object[][][] osss) {
-		return new Table();
+		return new Table(attrs, osss);
 	}
 
 	public ELEMENT table_row(Object o) {
@@ -284,7 +321,7 @@ public class OOF {
 		Object[][] oss = new Object[os.length][1];
 		for (int i = 0; i < os.length; i++)
 			oss[i][0] = os[i];
-		return new TableRow(os);
+		return new TableRow(oss);
 	}
 	public ELEMENT table_row(Object[][] oss) {
 		return new TableRow(oss);
@@ -316,21 +353,21 @@ public class OOF {
 	public ELEMENT list_start() {
 		return new ListStart(new Object[] {});
 	}
-	public ELEMENT list_start(int type) {
+	public ELEMENT list_start(Object type) {
 		return new ListStart(new Object[] { "type", type });
 	}
 	
 	public ELEMENT list_end() {
 		return new ListEnd(new Object[] {});
 	}
-	public ELEMENT list_end(int type) {
+	public ELEMENT list_end(Object type) {
 		return new ListEnd(new Object[] { "type", type });
 	}
 	
 	public ELEMENT table_start() {
 		return new TableStart(new Object[] {});
 	}
-	public ELEMENT table_start(new Object[] attrs) {
+	public ELEMENT table_start(Object[] attrs) {
 		return new TableStart(attrs);
 	}
 	

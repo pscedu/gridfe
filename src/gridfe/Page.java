@@ -228,7 +228,7 @@ public class Page
 			   +				"</a>"
 			   +			"</div>"
 			   +			"<div onmouseout=\"menuHide(this.previousSibling)\" "
-			   +			     "onmouseover=\"alert('hi'); menuShow(this.previousSibling)\">";
+			   +			     "onmouseover=\"menuShow(this.previousSibling)\">";
 			if (m.getItems() != null) {
 				/* Sub-menu */
 				for (Iterator j = m.getItems().iterator();

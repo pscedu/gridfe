@@ -32,6 +32,9 @@ class DelegationHandler
 
 public class GridFE extends HttpServlet
 {
+	private HttpServletRequest req;
+	private HttpServletResponse res;
+
 	final DelegationHandler[] dtab = new DelegationHandler[] {
 		new DelegationHandler("/login",  gridfe.www.login.class),
 		new DelegationHandler("/logout", gridfe.www.logout.class)
@@ -53,13 +56,23 @@ public class GridFE extends HttpServlet
 	private void workHorse(HttpServletRequest req, HttpServletResponse res)
 		throws IOException, ServletException
 	{
+		this.req = req;
+		this.res = res;
+
 		Class handler = null;
 		String uri = req.getRequestURI();
-		Page p = new Page(req, res);
 
 		/* XXX: wrong */
 		res.setContentType("text/html");
 		PrintWriter w = res.getWriter();
+
+		Page p;
+		try {
+			p = new Page(req, res);
+		} catch (Exception e) {
+			this.handleError(null, e + ": " + e.getMessage());
+			return;
+		}
 
 		for (int i = 0; i < this.dtab.length; i++)
 			if (uri.startsWith(this.dtab[i].getBase())) {

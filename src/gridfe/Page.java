@@ -56,6 +56,8 @@ public class Page
 
 	/* CSS class desc. */
 	public final static Object CCDESC = (Object)"desc";
+	public final static Object CCHDR = (Object)"hdr";
+	public final static Object CCSUBHDR = (Object)"subhdr";
 	public final static int MENU_ITEM_HEIGHT = 35;
 
 	Page(HttpServletRequest req, HttpServletResponse res)

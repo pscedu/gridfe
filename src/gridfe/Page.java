@@ -175,10 +175,10 @@ public class Page
 		this.addMenu("Certificate Management", "/certs", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
-				"Add Catalogue",		"/rls/addcat",
-				"Remove Catalogue",		"/rls/rmcat",
-				"Search Catalogues",	"/rls/search",
-				"Add Resource",			"/rls/addres"
+				"Add Catalog",		"/rls/addcat",
+				"Remove Catalog",	"/rls/rmcat",
+				"Search Catalogs",	"/rls/search",
+				"Add Resource",		"/rls/addres"
 			});
 		this.addMenu("Node Availability", "/nodes", null);
 
@@ -227,7 +227,8 @@ public class Page
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"
 			   +			"</div>"
-			   +			"<div onmouseout=\"menuHide(this)\">";
+			   +			"<div onmouseout=\"menuHide(this.previousSibling)\" "
+			   +			     "onmouseover=\"menuShow(this.previousSibling)\">";
 			if (m.getItems() != null) {
 				/* Sub-menu */
 				for (Iterator j = m.getItems().iterator();

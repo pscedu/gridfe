@@ -9,13 +9,13 @@ import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
 
-class NavigationMenu
+class Menu
 {
 	private String name;
 	private String url;
 	private LinkedList items;
 
-	public NavigationMenu(String name, String url, Object[] items)
+	public Menu(String name, String url, Object[] items)
 	{
 		this.name = name;
 		this.url = url;
@@ -74,7 +74,7 @@ public class Page
 
 	private void addMenu(String name, String url, Object[] items)
 	{
-		this.menus.add(new NavigationMenu(name, url, items));
+		this.menus.add(new Menu(name, url, items));
 	}
 
 	private LinkedList getMenus()
@@ -95,12 +95,12 @@ public class Page
 	public String buildMenu()
 	{
 		String name, url, p, t = "var menus = [";
-		NavigationMenu m;
+		Menu m;
 		Iterator i, j;
 
 /*
 		for (i = this.getMenus().iterator();
-		     i.hasNext() && (m = (NavigationMenu)i.next()) != null; ) {
+		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			t += " [ '" + m.getName() + "', ";
 			if (m.getItems() != null) {
 				t += "menu" + m.getName();
@@ -136,55 +136,55 @@ public class Page
 				"Output", "/jobs/output"
 			});
 		this.addMenu("Certificate Management", "/certs", null);
-		this.addMenu("Grid FTP", "/ftp", null);
+//		this.addMenu("Grid FTP", "/ftp", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
-				"Add Catalogue",	"/rls/add-catalogue",
-				"Remove Catalogue",	"/rls/remove-catalogue",
+				"Add Catalogue",		"/rls/addcat",
+				"Remove Catalogue",		"/rls/rmcat",
 				"Search Catalogues",	"/rls/search",
-				"Add Resource",		"/rls/add-resource"
+				"Add Resource",			"/rls/addres"
 			});
 		this.addMenu("Node Availibility", "/nodes", null);
 
 		String r = this.root;
 
-		String s = new String("");
-		s += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
-		   + "<html lang=\"en-US\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/1999/xhtml\">"
-		   + 	"<head>"
-		   +	 	"<title>" + this.jasp.escapeHTML(title) + "</title>"
-		   +		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
-		   +		"<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/main.css\" media=\"screen\">"
-		   +		"<script type=\"text/javascript\" src=\"" + r + "/lib/Global.js\"></script>"
-		   +		this.addScript(
-		   			"include('" + r + "/lib/Browser.js');" +
-		   			"include('" + r + "/lib/util.js');")
-//		   +		this.addScript(this.buildMenu())
-		   +		this.addScript(
-		   			// This must be loaded last.
-		   			"include('" + r + "/lib/main.js');")
-		   +	"</head>"
-		   +	"<body>"
-		   +		"<div class=\"bg\" style=\"width: 826px;\">"
-		   +			"<div class=\"bg\" style=\"width: 200px; float: left; text-align:center;\">"
-		   +				"<br />"
-		   				// PSC logo
-		   +				"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
-		   +					"<a href=\"http://www.psc.edu/\">"
-		   +						"<img src=\"img/psc.png\" "
-		   +						     "alt=\"[Pittsburgh Supercomputing Center]\" "
-		   +						     "border=\"0\" />"
-		   +					"</a>"
-		   +					"<br /><br />"
-		   +				"</div>";
+		String s;
+		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
+		  + "<html lang=\"en-US\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/1999/xhtml\">"
+		  + 	"<head>"
+		  +	 		"<title>" + this.jasp.escapeHTML(title) + "</title>"
+		  +			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
+		  +			"<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/main.css\" media=\"screen\">"
+		  +			"<script type=\"text/javascript\" src=\"" + r + "/lib/Global.js\"></script>"
+		  +			this.addScript(
+		   				"include('" + r + "/lib/Browser.js');" +
+		   				"include('" + r + "/lib/util.js');")
+//		  +			this.addScript(this.buildMenu())
+		  +			this.addScript(
+		   				// This must be loaded last.
+		   				"include('" + r + "/lib/main.js');")
+		  +		"</head>"
+		  +		"<body>"
+		  +			"<div class=\"bg\" style=\"width: 826px;\">"
+		  +				"<div class=\"bg\" style=\"width: 200px; float: left; text-align:center;\">"
+		  +					"<br />"
+		   					// PSC logo
+		  +					"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
+		  +						"<a href=\"http://www.psc.edu/\">"
+		  +							"<img src=\"img/psc.png\" "
+		  +							     "alt=\"[Pittsburgh Supercomputing Center]\" "
+		  +							     "border=\"0\" />"
+		  +						"</a>"
+		  +						"<br /><br />"
+		  +					"</div>";
 
 		return (s);
 /*
 		// Menu
-		NavigationMenu m;
+		Menu m;
 		String name, url;
-		for (Iterator i = this.getNavigationMenus().iterator();
-		     i.hasNext() && (m = (NavigationMenu)i.next()) != null; ) {
+		for (Iterator i = this.getMenus().iterator();
+		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=			"<div style=\"position: relative; top:-80px; left:0px; "
 			   +			     "z-index:10\" id=\"" + m.getName() + "\">"
 			   +				"<a href=\"" + r + m.getURL() + "\" "
@@ -272,3 +272,5 @@ public class Page
 		return this.gi;
 	}
 };
+
+/* vim: set ts=4: */

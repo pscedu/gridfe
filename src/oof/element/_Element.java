@@ -1,7 +1,7 @@
 /* $Id$ */
 package oof.element;
 
-public class BASE {
+public class ELEMENT {
 	private Container[] children;
 	private int len, pos;
 	private String name;

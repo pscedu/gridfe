@@ -1,5 +1,7 @@
 /* $Id$ */
 package oof.element;
 
-class Paragraph extends BASE {
+import oof.element.*;
+
+class Paragraph extends ELEMENT {
 };

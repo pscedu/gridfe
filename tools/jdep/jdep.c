@@ -16,6 +16,9 @@
 #include "q.h"
 #include "xalloc.h"
 
+#define LINE_MAXCOL 72
+#define TAB_WIDTH 8
+
 static void dumpfiles(const char *);
 static void jdep(char *);
 static void listdeps(char *);
@@ -113,8 +116,11 @@ procpkgs(char *fil)
 	struct stat st;
 
 	cp = getenv("CLASSPATH");
-	if (cp == NULL)
-		cp = "";
+	cp = strdup(cp == NULL ? "" : cp);
+	if (cp == NULL) {
+		warn("strdup");
+		return;
+	}
 	pos = max = 0;
 	paths = xmalloc(sizeof(*paths));
 	*paths = cp;
@@ -169,31 +175,35 @@ find:
 		free(pkg);
 	}
 	free(paths);
+	free(cp);
 
-	listdeps(fil);
+	if (procq != NULL)
+		listdeps(fil);
 }
 
 static void
 listdeps(char *fil)
 {
-	char *pkg;
 	struct workq *q;
+	char *pkg;
+	int n;
 
-	if (procq != NULL)
-		printf("%.*s.class: \\\n", strstr(fil, ".java") - fil,
-		       fil);
+	n = printf("%.*s.class: ", strstr(fil, ".java") - fil, fil);
 	while ((pkg = popq(&procq)) != NULL) {
+		/* Skip duplicates. */
 		for (q = procq; q != NULL; q = q->next)
 			if (strcmp(q->buf, pkg) == 0)
-				/*
-				 * Skip it; it will be processed
-				 * subsequently.
-				 */
 				goto next;
-		printf("\t%s%s\n", pkg, procq == NULL ? "" : " \\");
+		if ((n += strlen(pkg)) > LINE_MAXCOL) {
+			(void)printf(" \\\n\t");
+			n = strlen(pkg) + TAB_WIDTH;
+		} else
+			n += printf(" ");
+		(void)printf("%s", pkg);
 next:
 		free(pkg);
 	}
+	(void)printf("\n");
 }
 
 static void
@@ -233,7 +243,6 @@ dumpfiles(const char *dir)
 			snprintf(p, siz, "%s%s", dir, e->d_name);
 			pushq(&sawq, p);
 		}
-
 	}
 #if 0
 	if (error)

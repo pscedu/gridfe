@@ -9,7 +9,7 @@ import oof.element.*;
  * contain a value.
  */
 public class Break extends ELEMENT {
-	public Break(OOF oof, Object[] attrs) {
+	public Break(OOF oof, Object[] attrs) throws OOFBadElementFormException {
 		super(oof, attrs, new Object[] {});
 	}
 

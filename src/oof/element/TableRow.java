@@ -6,7 +6,7 @@ import oof.element.*;
 
 public class TableRow extends ELEMENT {
 	private Object[][] cells;
-	public TableRow(OOF oof, Object[][] oss) {
+	public TableRow(OOF oof, Object[][] oss) throws OOFBadElementFormException {
 		super(oof, new Object[] {}, new Object[] {});
 		this.cells = oss;
 	}

@@ -6,7 +6,7 @@ import oof.element.*;
 
 public class Email extends ELEMENT {
 	public String addr;
-	public Email(OOF oof, Object[] attrs, Object[] os) {
+	public Email(OOF oof, Object[] attrs, Object[] os) throws OOFBadElementFormException {
 		super(oof, attrs, os);
 	}
 

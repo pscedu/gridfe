@@ -5,7 +5,7 @@ import oof.*;
 import oof.element.*;
 
 public class ListStart extends START {
-	public ListStart(OOF oof, Object[] attrs) {
+	public ListStart(OOF oof, Object[] attrs) throws OOFBadElementFormException {
 		super(oof, attrs);
 	}
 

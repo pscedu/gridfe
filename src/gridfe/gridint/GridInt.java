@@ -20,6 +20,10 @@ public class GridInt implements Serializable
 	private Uid uid;
 	private JobList list;
 
+	public static final int kJobName = 0;
+	public static final int kJobStatus = 1;
+	public static final int kJobRSL = 2;
+
 	public static final int OI_STDOUT = 0;
 	public static final int OI_STDERR = 1;
 	public static final int OI_MAX = 2;
@@ -292,7 +296,7 @@ public class GridInt implements Serializable
 	}
 
 	/* Get the data from the job list for html output */
-	public String[][] getJobList()
+	public String[][] getJobListString()
 		throws GSSException
 	{
 		/*
@@ -305,14 +309,20 @@ public class GridInt implements Serializable
 		int len = this.list.size();
 		String[][] jobs = new String[3][len];
 
+		/* NOTE: this is reverse order than submitted! */
 		for(int i = 0; i < len; i++)
 		{
-			jobs[0][i] = this.list.get(i).getName();
-			jobs[1][i] = this.list.get(i).getStatusAsString();
-			jobs[2][i] = this.list.get(i).toString();
+			jobs[kJobName][i] = this.list.get(i).getName();
+			jobs[kJobStatus][i] = this.list.get(i).getStatusAsString();
+			jobs[kJobRSL][i] = this.list.get(i).toString();
 		}
 
 		return jobs;
+	}
+
+	public JobList getJobList()
+	{
+		return this.list;
 	}
 
 	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

@@ -155,12 +155,12 @@ public class suite
 		System.out.println("stdout: "+data[0]);
 
 		/* Get the job list and len */
-		String[][] jobs = gi.getJobList();
+		String[][] jobs = gi.getJobListString();
 
 		for(int i = 0; i < jobs.length; i++)
 		{
-			System.out.println("Name: " + jobs[0][i] + "\tStatus: " + jobs[1][i] +
-					   "\tRSL: " + jobs[2][i]);
+			System.out.println("Name: " + jobs[gi.kJobName][i] + "\tStatus: " + 
+				jobs[gi.kJobStatus][i] + "\tRSL: " + jobs[gi.kJobRSL][i]);
 		}
 
 		/* Logout - remove credentials */

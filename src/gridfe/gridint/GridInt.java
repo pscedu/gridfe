@@ -7,6 +7,7 @@ import org.globus.gsi.*;
 import java.security.PrivateKey;
 import gridint.auth.*;
 import org.globus.gram.*;
+import jasp.Uid;
 
 public class GridInt
 {

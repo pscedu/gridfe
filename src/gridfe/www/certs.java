@@ -19,7 +19,10 @@ public class certs
 //		int uid = page.getUserID();
 		CertInfo ci;
 
-		ci = p.getGridInt().getCertInfo();
+//		ci = p.getGridInt().getCertInfo();
+
+		GridInt gi = new GridInt(uid);
+		ci = gi.getCertInfo();
 
 		long tmp;
 		long sec = ci.time;

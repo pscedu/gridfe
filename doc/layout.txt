@@ -1,6 +1,8 @@
 $Id$
 
 /lib			Backend code root.
+/lib/gridint		Grid Internals.
+/lib/grinint/auth	Grid Internal Authentication.
 /lib/oof		OOF (Object Output Formatting) root.
 /lib/oof/element	OOF Elements root.
 /lib/oof/filter		OOF Filters root.

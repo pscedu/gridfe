@@ -81,7 +81,7 @@ public class GridFE extends HttpServlet
 			}
 
 		if (handler == null) {
-			w.print(this.handleError(p, "Page not found"));
+			w.print(this.handleError(p, "Page not found: " + uri));
 			return;
 		}
 
@@ -108,6 +108,7 @@ public class GridFE extends HttpServlet
 		} catch (Exception e) {
 			/* This is bad. */
 			s = "Fatal error: " + e + ": " + e.getMessage();
+			s += "\nOriginally: " + msg;
 		}
 
 		return s;

@@ -4,7 +4,7 @@ import jasp.*;
 import oof.*;
 
 public class suite {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		JASP j = new JASP();
 		OOF o = new OOF(j, "xhtml");
 
@@ -33,16 +33,16 @@ public class suite {
 		System.out.println("emph: " + o.emph(new Object[] { "some ", "more ", "text" }));
 
 		System.out.println("fieldset: " + o.fieldset(new Object[] {
-							"field1: ", oof.input(),
-							"field2: ", oof.input()}));
+							"field1: ", o.input(),
+							"field2: ", o.input()}));
 
 		System.out.println("form: " + o.form(new Object[] { "method", "post", "action", "url" },
 						     new Object[] {
-							"field1: ", oof.input(),
-							"field2: ", oof.input()}));
+							"field1: ", o.input(),
+							"field2: ", o.input()}));
 		System.out.println("form: " + o.form(new Object[] {
-							"field1: ", oof.input(),
-							"field2: ", oof.input()}));
+							"field1: ", o.input(),
+							"field2: ", o.input()}));
 
 		System.out.println("form_start: " + o.form_start(new Object[] { "method", "get" }));
 		System.out.println("form_start: " + o.form_start());
@@ -50,8 +50,8 @@ public class suite {
 		System.out.println("form_end: " + o.form_end());
 
 		System.out.println("header: " + o.header("bleh"));
-		System.out.println("header: " + o.header("bleh", 2));
-		System.out.println("header: " + o.header(new Object[] { "size", 2 }, "bleh"));
+		System.out.println("header: " + o.header("bleh", "2"));
+		System.out.println("header: " + o.header(new Object[] { "size", "2" }, "bleh"));
 
 		System.out.println("hr: " + o.hr());
 		System.out.println("hr: " + o.hr(new Object[] { "noborder", "yes" }));
@@ -65,11 +65,11 @@ public class suite {
 
 		System.out.println("link: " + o.link("foo", "url"));
 
-		System.out.println("list: " + o.list(oof.LIST_UN, new Object[] { "i1", "i2", "i3" }));
-		System.out.println("list: " + o.list(oof.LIST_OD, new Object[] { "a", "b", "c" }));
+		System.out.println("list: " + o.list(o.LIST_UN, new Object[] { "i1", "i2", "i3" }));
+		System.out.println("list: " + o.list(o.LIST_OD, new Object[] { "a", "b", "c" }));
 
-		System.out.println("list_start: " + o.list_start(oof.LIST_UN));
-		System.out.println("list_end: " + o.list_end(oof.LIST_OD));
+		System.out.println("list_start: " + o.list_start(o.LIST_UN));
+		System.out.println("list_end: " + o.list_end(o.LIST_OD));
 
 		System.out.println("list_item: " + o.list_item("sup"));
 
@@ -91,14 +91,14 @@ public class suite {
 		System.out.println("table: " + o.table(new Object[][] {
 							new Object[] { "r1c1", "r1c2" },
 							new Object[] { "r2c1", "r2c2" }}));
-		System.out.println("table: " + o.table(new Object[] { "border", 2, "cols",
+		System.out.println("table: " + o.table(new Object[] { "border", "2", "cols",
 							new Object[][] {
-								new Object[] { "width", 1 },
-								new Object[] { "width", 3 }}},
+								new Object[] { "width", "1" },
+								new Object[] { "width", "3" }}},
 							new Object[][] {
 								new Object[] { "r1c1", "r1c2" },
 								new Object[] { "r2c1", "r2c2" }}));
-		System.out.println("table_start: " + o.table_start(new Object[] { "width", 500 }));
+		System.out.println("table_start: " + o.table_start(new Object[] { "width", "500" }));
 		System.out.println("table_end: " + o.table_end());
 		System.out.println("table_row: " + o.table_row(new Object[][] {
 								new Object[] { "r1c1", "r1c2" },

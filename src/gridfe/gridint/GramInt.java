@@ -27,6 +27,16 @@ public class GramInt
 		this.host = host;
 	}
 
+	public void setHost(String host)
+	{
+		this.host = host;
+	}
+
+	public void setRsl(String rsl)
+	{
+		this.rsl = rsl;
+	}
+
 	/*
 	** globus-job-submit & globus-job-run
 	*/
@@ -36,23 +46,43 @@ public class GramInt
 		this.gramRequest(host, rsl);
 	}
 
+	public void gramJobSubmit(String rsl) throws GramException, GSSException
+	{
+		this.batch = true;
+		this.gramRequest(this.host, rsl);
+	}
+
+	public void gramJobSubmit() throws GramException, GSSException
+	{
+		this.batch = true;
+		this.gramRequest(this.host, this.rsl);
+	}
+
 	public void gramJobRun(String host, String rsl) throws GramException, GSSException
 	{
 		this.batch = false;
 		this.gramRequest(host, rsl);
 	}
+	
+	public void gramJobRun(String rsl) throws GramException, GSSException
+	{
+		this.batch = false;
+		this.gramRequest(this.host, rsl);
+	}
+	public void gramJobRun() throws GramException, GSSException
+	{
+		this.batch = false;
+		this.gramRequest(this.host, this.rsl);
+	}
 
 	private void gramRequest(String host, String rsl) throws GramException, GSSException
 	{
-		this.host = host;
-		this.rsl = rsl;
-
 		/* Make sure the host is there */
-		Gram.ping(this.host);
+		Gram.ping(host);
 
 		/* Create and process Job */
-		this.job = new GramJob(this.gss, this.rsl);
-		this.job.request(this.host, this.batch);
+		this.job = new GramJob(this.gss, rsl);
+		this.job.request(host, this.batch);
 
 		/*
 		** Add callback listener for status change

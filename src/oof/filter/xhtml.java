@@ -17,7 +17,7 @@ public class xhtml implements Filter
 		this.oof  = oof;
 	}
 
-	private String build(String name, ELEMENT e)
+	private String build(String name, Element e)
 	{
 		String t = this.build(name, (Startable)e);
 		String v = e.getValue();
@@ -37,10 +37,12 @@ public class xhtml implements Filter
 
 		t += "<" + name;
 		for (Iterator i = s.getAttributes().iterator(); i.hasNext(); ) {
-			t += " " + i.next().toString() + "=\"" +
-			     i.next().toString() + "\"";
+			t += " ";
+			t += i.next().toString() + "=\"";
+			t += i.next().toString() + "\"";
 		}
 		t += ">";
+
 		return t;
 	}
 
@@ -51,69 +53,69 @@ public class xhtml implements Filter
 
 	public String build(Break e)
 	{
-		return this.build("br", (ELEMENT)e);
+		return this.build("br", (Element)e);
 	}
 
 	public String build(Code e)
 	{
-		return this.build("code", (ELEMENT)e);
+		return this.build("code", (Element)e);
 	}
 
 	public String build(Division e)
 	{
-		return this.build("div", (ELEMENT)e);
+		return this.build("div", (Element)e);
 	}
 
 	public String build(Email e)
 	{
 		/* XXX: modify clone */
 		e.addAttribute("href", "mailto:" + e.addr);
-		return this.build("a", (ELEMENT)e);
+		return this.build("a", (Element)e);
 	}
 
 	public String build(Emphasis e)
 	{
-		return this.build("em", (ELEMENT)e);
+		return this.build("em", (Element)e);
 	}
 
 	public String build(Fieldset e)
 	{
-		return this.build("fieldset", (ELEMENT)e);
+		return this.build("fieldset", (Element)e);
 	}
 
 	public String build(Form e)
 	{
-		return this.build("form", (ELEMENT)e);
+		return this.build("form", (Element)e);
 	}
 
 	public String build(Header e)
 	{
-		return this.build("h" + e.size, (ELEMENT)e);
+		return this.build("h" + e.size, (Element)e);
 	}
 
 	public String build(HorizontalRuler e)
 	{
-		return this.build("hr", (ELEMENT)e);
+		return this.build("hr", (Element)e);
 	}
 
 	public String build(Image e)
 	{
-		return this.build("img", (ELEMENT)e);
+		return this.build("img", (Element)e);
 	}
 
 	public String build(Input e)
 	{
-		return this.build("input", (ELEMENT)e);
+		return this.build("input", (Element)e);
 	}
 
 	public String build(Link e)
 	{
-		return this.build("a", (ELEMENT)e);
+		return this.build("a", (Element)e);
 	}
 
 	public String build(ListItem e)
 	{
-		return this.build("li", (ELEMENT)e);
+		return this.build("li", (Element)e);
 	}
 
 	public String build(List e)
@@ -123,47 +125,58 @@ public class xhtml implements Filter
 			tag = "ol";
 		else
 			tag = "ul";
-		return this.build(tag, (ELEMENT)e);
+		return this.build(tag, (Element)e);
 	}
 
 	public String build(Paragraph e)
 	{
-		return this.build("p", (ELEMENT)e);
+		return this.build("p", (Element)e);
 	}
 
 	public String build(Preformatted e)
 	{
-		return this.build("pre", (ELEMENT)e);
+		return this.build("pre", (Element)e);
 	}
 
 	public String build(Span e)
 	{
-		return this.build("span", (ELEMENT)e);
+		return this.build("span", (Element)e);
 	}
 
 	public String build(Strong e)
 	{
-		return this.build("strong", (ELEMENT)e);
+		return this.build("strong", (Element)e);
 	}
 
 	public String build(Table e)
 	{
-		String t = "";
 		/* XXX: modify clone */
-
-		t += this.build("table", (Startable)e);
-
-		for (int i = 0; i < e.rows.length; i++)
-			t += this.build(e.rows[i]);
-
-		t += this.build("table", (Endable)e);
-
-		return t;
+		Object dcols = e.removeAttribute("cols");
+		if (dcols != null) {
+			Object[][] cols = (Object[][])dcols;
+			String s = "";
+			s += "<colgroup>";
+			for (int i = 0; i < cols.length; i++) {
+				s += "<col";
+				for (int j = 0; j < cols[i].length; j += 2)
+					/* XXX: escapeHTML */
+					s += " " + cols[i][j] + "=\"" + cols[i][j + 1] + "\"";
+				s += " />";
+			}
+			s += "</colgroup>";
+			e.prepend(s);
+		}
+		return this.build("table", (Element)e);
 	}
 
 	public String build(TableRow e)
 	{
-		return this.build("tr", (ELEMENT)e);
+		return this.build("tr", (Element)e);
+	}
+
+	public String build(TableCell e)
+	{
+		return this.build("td", (Element)e);
 	}
 
 	public String build(DivisionStart e)

@@ -11,9 +11,12 @@ public class CertInfo
 	public String sub;
 	public String issuer;
 	public String ident;
+	public String xfile;
+	public String kfile;
 	
 	CertInfo(String sub, int type, String issuer, 
-		int key, String ident, long time)
+		int key, String ident, long time,
+		String xfile, String kfile)
 	{
 		this.sub = sub; 
 		this.type = type;
@@ -21,5 +24,7 @@ public class CertInfo
 		this.key = key;
 		this.ident = ident;
 		this.time = time;
+		this.xfile = xfile;
+		this.kfile = kfile;
 	}
 }

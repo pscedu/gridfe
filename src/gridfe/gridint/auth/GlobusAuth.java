@@ -41,7 +41,9 @@ public class GlobusAuth
 				this.gc.getIssuer(),
 				this.gc.getStrength(),
 				this.gc.getIdentity(),
-				this.gc.getTimeLeft() );
+				this.gc.getTimeLeft(),
+				this.file.getX509(),
+				this.file.getKrbTkt());
 		return ci;
 	}
 };

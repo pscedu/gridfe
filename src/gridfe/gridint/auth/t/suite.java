@@ -27,6 +27,8 @@ public class suite
 		System.out.println("Remaining Lifetime: "+ci.time);
 		System.out.println("Subject: "+ci.sub);
 		System.out.println("Issuer: "+ci.issuer);
+		System.out.println("X.509 Certificate: "+ci.xfile);
+		System.out.println("Kerberos Ticket: "+ci.kfile);
 
 		/* GlobusAuth Test Suite */
 /*

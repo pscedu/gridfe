@@ -210,7 +210,9 @@ public class Page
 		for (Iterator i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=			"<div style=\"position: relative; top:-80px; left:0px; "
-			   +			     "z-index:10\" id=\"" + divName(m.getName()) + "\">"
+											/* Netscape 4 will not like this. */
+			   +			     "z-index:10; visibility: hidden; \" "
+			   +			     "id=\"" + divName(m.getName()) + "\">"
 			   +				"<a href=\"" + r + m.getURL() + "\">"
 			   +					"<img src=\"" + r + "/img/buttons/"
 			   +						imageName(m.getName()) + ".png\" "

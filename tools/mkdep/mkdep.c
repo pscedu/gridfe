@@ -21,62 +21,141 @@
 
 #define _PATH_USR_INCLUDE "/usr/include"
 
+#define IT_REL 1	/* #include "foo" */
+#define IT_ABS 2	/* #include <foo> */
+
 struct pathqe {
 	const char	*pq_path;
 	struct pathqe	*pq_next;
 };
 
+struct incqe {
+	const char	*iq_file;
+	struct incqe	*iq_next;
+	int		 iq_type;
+};
+
 static		int   exists(const char *);
+static		int   shift(FILE *, off_t);
+static		void  freeiq(struct incqe *);
+static		void  freepq(struct pathqe *);
+static		void  getincs(const char *, struct incqe **);
 static		void  mkdep(FILE *, const char *, struct pathqe *);
-static		void  freeq(struct pathqe *);
-static		void  push(struct pathqe **, const char *);
-static		void  shift(FILE *, off_t);
-static const	char *find(const char *, struct pathqe *);
+static		void  pushiq(struct incqe **, const char *, int);
+static		void  pushpq(struct pathqe **, const char *);
+static		void  split(const char *, int *, char ***);
 static __dead	void  usage(void);
+static const	char *find(const char *, struct pathqe *);
 
 int
 main(int argc, char *argv[])
 {
 	struct pathqe *pathqh = NULL;
-	extern char *optarg;
-	extern int optind;
-	extern int opterr;
-	off_t off;
+	char *cflags;
 	FILE *fp;
 	int c;
 
 	opterr = 0;
-	push(&pathqh, _PATH_USR_INCLUDE);
-	while ((c = getopt(argc, argv, "I:")) != -1) {
+	pushpq(&pathqh, _PATH_USR_INCLUDE);
+	while ((c = getopt(argc, argv, "I:")) != -1)
 		switch (c) {
 		case 'I':
-			push(&pathqh, optarg);
-			break;
-		default:
-			/*
-			 * Ignore.
-			 * We cannot possibly handle every option
-			 * that can go to cc.
-			 */
+			pushpq(&pathqh, optarg);
 			break;
 		}
-	}
 	argv += optind;
-
 	if (*argv == NULL)
 		usage();
+	/* Read CFLAGS from environment. */
+	if ((cflags = getenv("CFLAGS")) != NULL) {
+		char **cf_argv, **p;
+		int cf_argc;
+
+		split(cflags, &cf_argc, &cf_argv);
+		optind = 0; /* XXX */
+		while ((c = getopt(cf_argc, cf_argv, "I:")) != -1)
+			switch (c) {
+			case 'I':
+				pushpq(&pathqh, optarg);
+				break;
+			}
+		for (p = cf_argv; *p != NULL; p++)
+			free(*p);
+		free(cf_argv);
+	}
 
 	if ((fp = fopen(".depend", "rw")) == NULL)
 		err(EX_NOINPUT, "open .depend"); /* XXX */
 	while (*argv != NULL)
-		mkdep(fp, *argv, pathqh);
-	freeq(pathqh);
+		mkdep(fp, *argv++, pathqh);
+	freepq(pathqh);
 	(void)fclose(fp);
 	exit(EXIT_SUCCESS);
 }
 
+#define ALLOCINT 20
+
 static void
-push(struct pathqe **pqh, const char *s)
+split(const char *s, int *argcp, char ***argvp)
+{
+	size_t max, pos;
+	const char *p;
+	char **argv;
+
+	*argcp = 1; /* Trailing NULL.  Will be deducted later. */
+	for (p = s; *p != '\0'; p++) {
+		if (isspace(*p)) {
+			while (isspace(*++p))
+				;
+			p--;
+			++*argcp;
+		}
+	}
+	if ((*argvp = calloc(*argcp, sizeof(**argvp))) == NULL)
+		return;
+	argv = *argvp;
+	max = 0;
+	pos = 0;
+	for (p = s; *p != '\0'; p++) {
+		if (isspace(*p)) {
+			while (isspace(*++p))
+				;
+			p--;
+			if (pos >= max) {
+				max += ALLOCINT;
+				if ((*argv = realloc(*argv, max *
+				     sizeof(**argv))) == NULL)
+					err(EX_OSERR, "realloc");
+			}
+			(*argv)[pos] = '\0';
+			*++argv = NULL;
+			max = 0;
+			pos = 0;
+		} else {
+			if (pos >= max) {
+				max += ALLOCINT;
+				if ((*argv = realloc(*argv, max *
+				     sizeof(**argv))) == NULL)
+					err(EX_OSERR, "realloc");
+			}
+			(*argv)[pos++] = *p;
+		}
+	}
+	if (pos >= max) {
+		max += ALLOCINT;
+		if ((*argv = realloc(*argv, max * sizeof(**argv))) ==
+		    NULL)
+			err(EX_OSERR, "realloc");
+	}
+	(*argv)[pos] = '\0';
+	*++argv = NULL;
+
+	/* argc needs not count trailing NULL. */
+	--*argcp;
+}
+
+static void
+pushpq(struct pathqe **pqh, const char *s)
 {
 	struct pathqe *pq;
 
@@ -88,7 +167,20 @@ push(struct pathqe **pqh, const char *s)
 }
 
 static void
-freeq(struct pathqe *pq)
+pushiq(struct incqe **iqh, const char *s, int type)
+{
+	struct incqe *iq;
+
+	if ((iq = malloc(sizeof(*iq))) == NULL)
+		err(EX_OSERR, "malloc");
+	iq->iq_file = s;
+	iq->iq_next = *iqh;
+	iq->iq_type = type;
+	*iqh = iq;
+}
+
+static void
+freepq(struct pathqe *pq)
 {
 	struct pathqe *next;
 
@@ -98,32 +190,56 @@ freeq(struct pathqe *pq)
 	}
 }
 
+static void
+freeiq(struct incqe *iq)
+{
+	struct incqe *next;
+
+	for (; iq != NULL; iq = next) {
+		next = iq->iq_next;
+		free(iq);
+	}
+}
+
+/*
+ * Since .depend entries are being removed, the contents that appear
+ * after a removed entry will need to be shifted forward to fill the
+ * gap created by the removal.
+ */
 static int
 shift(FILE *fp, off_t dif)
 {
 	char buf[BUFSIZ];
+	off_t oldpos;
 	ssize_t siz;
 
-	do {
+	/*
+	 * XXX: pread would be much nicer here but we can't mix stdio
+	 * and raw.
+	 */
+	for (;;) {
+		oldpos = ftell(fp);
 		if (fseek(fp, dif, SEEK_CUR) == -1)
 			return (1);
-		siz = fread(buf, 1, MIN(sizeof(buf), off), fp);
-		if (siz > 0) {
-			if (fseek(fp, -1 * (dif + siz), SEEK_CUR) == -1)
-				return (1);
-			fwrite(buf, 1, siz, fp);
-			if (fseek(fp, siz, SEEK_CUR) == -1)
-				return (1);
-		}
-	} while (siz > 0);
+		siz = fread(buf, 1, sizeof(buf), fp);
+		if (siz <= 0)
+			break;
+		if (fseek(fp, oldpos, SEEK_SET) == -1)
+			return (1);
+		siz = fwrite(buf, 1, siz, fp);
+	}
 	return (0);
 }
 
-getincs()
+static void
+getincs(const char *s, struct incqe **iqp)
 {
+	char *p, *t, buf[BUFSIZ];
+	FILE *fp;
+
 	if ((fp = fopen(s, "r")) == NULL) {
 		warn("open %s", s);
-		return (0);
+		return;
 	}
 	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		p = buf;
@@ -139,37 +255,48 @@ getincs()
 		while (isspace(*p))
 			p++;
 		switch (*p) {
-			case '<':
-				if ((t = strchr(++p, '>')) == NULL)
-					continue;
-				*t = '\0';
-				push(&incqh, p);
-				break;
-			case '"':
-				if ((t = strchr(++p, '"')) == NULL)
-					continue;
-				*t = '\0';
-				push(&incqh, p);
-				break;
-			default:
+		case '<':
+			if ((t = strchr(++p, '>')) == NULL)
 				continue;
-				/* NOTREACHED */
+			*t = '\0';
+			pushiq(iqp, p, IT_ABS);
+			break;
+		case '"':
+			if ((t = strchr(++p, '"')) == NULL)
+				continue;
+			*t = '\0';
+			pushiq(iqp, p, IT_REL);
+			break;
+		default:
+			continue;
+			/* NOTREACHED */
 		}
 	}
-	incqh = NULL;
 	(void)fclose(fp);
 }
 
-stripmke()
+static void
+stripmke(const char *s, FILE *fp)
 {
+	off_t start, end;
+	char buf[BUFSIZ];
+	int c, gap, esc;
+	size_t len;
+
+	buf[0] = '\0';
+
 	/* Look for entry in .depend. */
-	fseek(depfp, 0, SEEK_SET);
-	len = strlen(s);
-	while (fgets(buf, sizeof(buf), depfp) != NULL) {
-		if (strncmp(buf, s, len - 1) == 0 &&
-		    buf[len - 1] == 'o' && buf[len] == ':') {
-			int esc = 0;
-			for (; (c = fgetc(depfp)) != EOF; gap++) {
+	fseek(fp, 0, SEEK_SET);
+	len = strlen(s) - 1; /* .c to .o */
+	/* XXX: this is horrid but the data should always be at the
+	 * beginning of the line anyway.
+	 */
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		if (strncmp(buf, s, len) == 0 &&
+		    buf[len] == 'o' && buf[len + 1] == ':') {
+			esc = 0;
+			start = ftell(fp) - strlen(buf);
+			for (; (c = fgetc(fp)) != EOF; gap++) {
 				switch (c) {
 				case '\\':
 					esc = !esc;
@@ -183,43 +310,38 @@ stripmke()
 					break;
 				}
 			}
+			break;
 		}
 	}
 end:
-	;
+	end = ftell(fp) - strlen(buf);
+	shift(fp, end - start);
 }
 
 static void
-mkdep(FILE *depfp, const char *s, struct pathqe *incpqh)
+mkdep(FILE *depfp, const char *fil, struct pathqe *pqh)
 {
-	struct pathqe *incqh, *incq;
-	char buf[BUFSIZ], *p, *t;
-	off_t shift, pos;
-	size_t len;
-	char *path;
-	FILE *fp;
-	int gap;
+	struct incqe *iqh, *iq;
+	const char *path;
 
-	getincs(&incqh, s);
-
-	if (incqh == NULL)
-		return (0);
-
-
-	pos = ftell(depfp);
-	fseek(depfp, 0, SEEK_END);
-	for (incq = incqh; incq != NULL; inqc = inqc->pq_next) {
+	getincs(fil, &iqh);
+	if (iqh == NULL)
+		return;
+	stripmke(fil, depfp);
+	if (fseek(depfp, 0, SEEK_END) == -1)
+		/* XXX */;
+	(void)fprintf(depfp, "%s:", fil);
+	for (iq = iqh; iq != NULL; iq = iq->iq_next) {
 		/* Find full path. */
-		if ((path = find(s, incpqh)) != NULL) {
-			printf(depfp, "\t%s", path);
+		if (iq->iq_type == IT_REL)
+			(void)fprintf(depfp, " \\\n\t%s", iq->iq_file);
+		else {
+			if ((path = find(fil, pqh)) != NULL)
+				(void)fprintf(depfp, " \\\n\t%s", path);
 		}
 	}
-	(void)printf(depfp, "\n");
-	freeq(incqh);
-
-	fseek(depfp, pos, SEEK_SET);
-	shift(fp, off);
-	return (shift);
+	(void)fprintf(depfp, "\n");
+	freeiq(iqh);
 }
 
 static const char *

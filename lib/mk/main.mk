@@ -2,8 +2,6 @@
 
 .SUFFIXES: .class .java
 
-TARGET = ${CLASSES}
-
 all: ${TARGET}
 	@# XXX: make recursion factorable
 	@for i in ${SUBDIRS}; do						\
@@ -58,9 +56,14 @@ test: all ${TESTS}
 			echo "<=== ${DIRPREFIX}" | sed 's!/$$!!';		\
 		fi;								\
 	done
-	@for i in ${TESTS:.class=}; do						\
-		echo "${JAVA} ${JFLAGS} $$i";					\
-		${JAVA} ${JFLAGS} $$i || exit 1;				\
+	@for i in ${TESTS}; do							\
+		if [ X"$${i%.class}" = X"$$i" ]; then				\
+			echo "./$$i";						\
+			env ${TESTENV} ./$$i;					\
+		else 								\
+			echo "${JAVA} ${JFLAGS} $$i";				\
+			${JAVA} ${JFLAGS} $$i || exit 1;			\
+		fi;								\
 	done
 
 clean:

@@ -65,8 +65,10 @@ public class Page {
 		this.classCount = 1;
 
 		try {
-			// this.gi = new GridInt(0/* XXX: get kerb uid */);
-			/* XXX: load oof prefs from resource. */
+			UserMap m = new UserMap();
+			this.gi = new GridInt(BasicServices.getUserID(
+			    m.kerberosToSystem(req.getRemoteUser())));
+			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
 			this.error(e.toString());

@@ -14,12 +14,15 @@ store the most recent CCName in this env. if this is done we may
 not have to worry about calling kdestroy to destroy older tickets.
 ------------------------------------------------------------------
 
-4. For gram jobs, there is already a way implemented to save the
+4. POSSIBLY A BIG PROBLEM HERE!!!!!
+For gram jobs, there is already a way implemented to save the
 stdout paramter of the RSL string, but there also needs to be a way
 to save the current directory... this is important so that output
 files can be opened and read in... oooo, but wait, will this
 present a permissions problem with reading job data??? somehow we
-need to make sure that read permission is enabled to at least
+need to make sure that read permission is enabled on the output files,
+unless the files will be saved as apache, in which case we need to chmod
+and possibly chown to set the proper user settings (on exit)...
 
 5. Add configuration to apache to not permit SSLv2... should be
 the command "SSLProtocol all -SSLv2" but figure out where it goes

@@ -20,8 +20,8 @@ public class OOF {
 						 InvocationTargetException {
 		this.jasp = j;
 		this.filter = (FILTER)Class.forName("oof.filter." + filter).
-				getConstructor(new Class[] { OOF.class }).
-				newInstance(new Object[] { this });
+				getConstructor(new Class[] { JASP.class, OOF.class }).
+				newInstance(new Object[] { this.jasp, this });
 	}
 
 	/* Core Elements. */

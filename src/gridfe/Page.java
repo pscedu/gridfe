@@ -43,26 +43,30 @@ class Menu
 
 public class Page
 {
-	private OOF  oof;
-	private JASP jasp;
-	private GridInt gi;
-	private int classCount;
 	private HttpServletRequest req;
 	private HttpServletResponse res;
 	private LinkedList menus;
-	private String root;
+	private String servroot;
+	private String webroot;
+	private String sysroot;
+	private int classCount;
+	private GridInt gi;
+	private JASP jasp;
+	private OOF oof;
 
 	/* CSS class desc */
 	public final static Object CCDESC = (Object)"desc";
 
 	Page(HttpServletRequest req, HttpServletResponse res)
 	{
-		this.classCount = 1;
 		this.req = req;
 		this.res = res;
-		this.root = "/gridfe";
 		this.jasp = new JASP();
 		this.menus = new LinkedList();
+		this.webroot = "/gridfe";
+		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
+		this.servroot = "/gridfe/gridfe";
+		this.classCount = 1;
 
 		try {
 			// this.gi = new GridInt(0/* XXX: get kerb uid */);
@@ -172,7 +176,7 @@ public class Page
 		   					// PSC logo
 		  +					"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
 		  +						"<a href=\"http://www.psc.edu/\">"
-		  +							"<img src=\"img/psc.png\" "
+		  +							"<img src=\"" + r + "/img/psc.png\" "
 		  +							     "alt=\"[Pittsburgh Supercomputing Center]\" "
 		  +							     "border=\"0\" />"
 		  +						"</a>"

@@ -1,5 +1,7 @@
 /* $Id$ */
 
+package gridfe;
+
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -31,29 +33,33 @@ class DelegationHandler
 public class GridFE extends HttpServlet
 {
 	final DelegationHandler[] dtab = new DelegationHandler[] {
-		new DelegationHandler("/login", login.class),
-		new DelegationHandler("/logout", logout.class)
+		new DelegationHandler("/login",  gridfe.www.login.class),
+		new DelegationHandler("/logout", gridfe.www.logout.class)
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 		throws IOException, ServletException
 	{
-		System.out.print(this.workHorse(req, res));
+		this.workHorse(req, res);
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
 		throws IOException, ServletException
 	{
 		this.workHorse(req, res);
-		System.out.print(this.workHorse(req, res));
 	}
 
 	/* XXX: remove exceptions to always output a gridfe page. */
-	private String workHorse(HttpServletRequest req, HttpServletResponse res)
+	private void workHorse(HttpServletRequest req, HttpServletResponse res)
+		throws IOException, ServletException
 	{
 		Class handler = null;
 		String uri = req.getRequestURI();
 		Page p = new Page(req, res);
+
+		/* XXX: wrong */
+		res.setContentType("text/html");
+		PrintWriter w = res.getWriter();
 
 		for (int i = 0; i < this.dtab.length; i++)
 			if (uri.startsWith(this.dtab[i].getBase())) {
@@ -61,8 +67,10 @@ public class GridFE extends HttpServlet
 				break;
 			}
 
-		if (handler == null)
-			return this.handleError(p, "Page not found");
+		if (handler == null) {
+			w.print(this.handleError(p, "Page not found"));
+			return;
+		}
 
 		String s;
 
@@ -73,7 +81,7 @@ public class GridFE extends HttpServlet
 			s = this.handleError(p, e + ": " + e.getMessage());
 		}
 
-		return s;
+		w.print(s);
 	}
 
 	private String handleError(Page p, String msg)

@@ -23,15 +23,16 @@ public class certs
 
 		// DEBUG - use p.getGridInt() later;
 		//GridInt gi = new GridInt(uid);
-		try
-		{
-			GlobusAuth ga = new GlobusAuth(new Uid(uid));
-			ga.createCredential();
-		}
-		catch(Exception e)
-		{
+//		try
+//		{
+//			GlobusAuth ga = new GlobusAuth(new Uid(uid));
+//			ga.createCredential();
+			Uid u = new Uid(uid);
+//		}
+//		catch(Exception e)
+//		{
 			s += oof.p("who wants a body massage");
-		}
+//		}
 
 		s += p.header("gijoe") + "badabadba!" + p.footer();
 /*

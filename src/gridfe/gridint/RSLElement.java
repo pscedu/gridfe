@@ -14,27 +14,34 @@ public class RSLElement implements Serializable
 	private final static String q = "\"";
 
 	/*
-	** Prepend Args
+	** Request Type
 	** Specification:
 	**	multi		+
 	**	conjunct	&
 	**	disjunct	|
 	*/
-	private String pre = "&";
+	private String req = "&";
 
-	/* transient buffer, this can be rebuilt */
+	private String[] gParam, gValue;
+	private String[] vValue, kValue, kKey;
+	private String vParam, kParam;
+
+	/*
+	** transient date will be reconstructed 
+	*/
 	private transient StringBuffer data;
 
-	private String[] gParam, gValue, vValue, kValue, kKey;
-	private String vParam, kParam;
-	private String jOut;
+	/* Stdout and Stderr default to null */
+	public transient String stdout = null;
+	public transient String stderr = null;
 
-/*
-	public RSLElement()
-	{
-	}
-*/
+	/* Default directory to HOME */
+	public transient String directory = "~";
 
+	/*
+	** Build RSL Strings that have args, env variables, and
+	** standard parameters.
+	*/
 	public void setRSL(String[] param, String[] value)
 	{
 		this.gParam = (String[])param.clone();
@@ -72,16 +79,11 @@ public class RSLElement implements Serializable
 
 	/*
 	** Change whether it's Multi, Conjunct, or Disjunct
-	** (default is conjunct)
+	** (default is conjunct, see request type above...)
 	*/
-	public void changeSpec(String s)
+	public void setRequestType(String s)
 	{
-		this.pre = new String(s);
-	}
-
-	public String getStdout()
-	{
-		return this.jOut;
+		this.req = new String(s);
 	}
 
 	/* Generic build for "(param=value)" */
@@ -104,9 +106,13 @@ public class RSLElement implements Serializable
 			*/
 			this.data.append(b+param[i]+m+q+value[i]+q+e);
 
-			/* Save stdout to retrieve job output */
+			/* Save some parameters to retrieve job output/err */
 			if(param[i] == "stdout")
-				this.jOut = new String(value[i]);
+				this.stdout = new String(value[i]);
+			if(param[i] == "stderr")
+				this.stderr = new String(value[i]);
+			if(param[i] == "directory")
+				this.directory = new String(value[i]);
 		}
 	}
 
@@ -134,18 +140,18 @@ public class RSLElement implements Serializable
 	*/
 	private void buildKeyPairs(String param, String[] key, String[] value)
 	{
+		this.data.append(b+param+m);
+
 		/* Quote all args to be safe! */
 		for(int i = 0; i < key.length; i++)
-		{
-			this.data.append(b+param+m);
 			this.data.append(b+key[i]+s+q+value[i]+q+e);
-			this.data.append(e);
-		}
+
+		this.data.append(e);
 	}
 
 	public void build()
 	{
-		this.data = new StringBuffer(pre);
+		this.data = new StringBuffer(this.req);
 
 		/* Build those that are not empty */
 		if(this.gParam != null)

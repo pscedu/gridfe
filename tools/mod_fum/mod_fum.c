@@ -15,10 +15,6 @@
 XXX Things todo still:
 	1) ap_uname2id(char*) - use this to obtain user id?
 
-	2) handle errors appropriately, allow gridfe page to explain what
-		went wrong... return error codes, can't just use exit();
-	
-
 	X) mf_get_uid_from_ticket_cache really isn't needed... we could
 		save the uid from what we got from passwd, but for now
 		just keep this in case code gets switched later, we don't
@@ -30,12 +26,11 @@ XXX Developement Notes:
 		the x.509 certificates in /tmp. possibly try and find
 		a way to have the kdc give us a uid for users that do
 		not have local accounts...
-		
-	2) since mod_fum runs under apache the env X509_USER_PROXY cannot
-		be read, therefore X.509 Certificates will be created at
-		the default location (/tmp/x509u_u####). Users who require
-		$X509_USER_PROXY to be set must do this manually if they
-		plan on loging into the machine remotely (via ssh, etc...)
+	
+	2) A problem exists with X.509 certificates. The certificates are
+		created with the permissions of apache/gridfe. Therefore if
+		the user logs in, he will not have permissions to create a (or
+		use the existing) valid proxy!
 
 	3) Apache 2.X series support only! (1.X could be added, but is
 		currently not needed for this project) Version 1.X changed
@@ -320,6 +315,7 @@ static int mf_kxlist(const char *tkt_cache)
 			}
 
 			err = mf_kxlist_crypto(&kinst, name);
+
 			mf_krb5_free(&kinst);
 		}
 	}
@@ -434,8 +430,7 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 		goto RET;
 	}
 	
-	krb5_free_principal(kinst->context, screds.server);
-	krb5_free_principal(kinst->context, screds.client);
+	krb5_free_cred_contents(kinst->context, &screds);
 
 	RET:
 	return KrbToApache(err);
@@ -582,7 +577,8 @@ static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 		mf_err("get initial credentials failed", err);
 		goto RET;
 	}
-		
+
+	kinst->initialized = 1;
 
 	/* Initialize the cache file */
 	err = krb5_cc_initialize(kinst->context, kinst->cache, kinst->principal);
@@ -628,6 +624,8 @@ static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 	/* Important!! segfaults without this!! */
 	memset(&kinst->credentials, '\0', sizeof(krb5_creds));
 
+	kinst->initialized = 0;
+
 	/* Initialize Application Context */
 	err = krb5_init_context(&kinst->context);
 	if(!err)
@@ -651,7 +649,7 @@ static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 
 static void mf_krb5_free(krb5_inst_ptr kinst)
 {
-	if(&kinst->credentials)
+	if(kinst->initialized)
 		krb5_free_cred_contents(kinst->context, &kinst->credentials);
 	
 	if(kinst->cache)
@@ -787,6 +785,8 @@ static int mf_valid_credentials(char *principal)
 			/* Compare with our time now */
 			if(time(NULL) < end)
 				valid = 1;
+
+			mf_krb5_free(&kinst);
 		}
 	}
 	else
@@ -812,10 +812,10 @@ static int mf_valid_user(const char *principal, const char *password)
 	krb5_inst kinst;
 	krb5_prefs kprefs;
 	krb5_get_init_creds_opt opt;
-	int valid = 0;
 	char tkt[] = "/tmp/mod-fum-tmp";
 
 	err = mf_krb5_init(&kinst, tkt);
+	kinst.initialized = 0;
 
 	if(err == OK)
 	{
@@ -840,7 +840,7 @@ static int mf_valid_user(const char *principal, const char *password)
 
 			/* If this succeeds, then the user/pass is correct */
 			if(err == OK)
-				valid = 1;
+				kinst.initialized = 1;
 			else
 				mf_err("bad authentication", err);
 		}
@@ -853,7 +853,7 @@ static int mf_valid_user(const char *principal, const char *password)
 	else
 		mf_err("krb5_init failed", err);
 
-	return valid;
+	return kinst.initialized;
 }
 
 

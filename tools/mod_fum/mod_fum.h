@@ -43,6 +43,7 @@ typedef struct
 	krb5_ccache cache;
 	krb5_principal principal;
 	krb5_creds credentials;
+	int initialized;
 	
 }krb5_inst, *krb5_inst_ptr;
 

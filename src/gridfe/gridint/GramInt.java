@@ -10,7 +10,8 @@ import org.ietf.jgss.*;
 public class GramInt
 {
 	private String host;
-	private RSLElement rsl;
+	//private RSLElement rsl;
+	String rsl;
 	private GramJob job = null;
 	private boolean batch = false;
 	private GSSCredential gss;
@@ -27,7 +28,7 @@ public class GramInt
 		this.host = host;
 	}
 
-	public GramInt(GSSCredential gss, String host, RSLElement rsl)
+	public GramInt(GSSCredential gss, String host, String rsl)
 	{
 		this.gss = gss;
 		this.host = host;
@@ -39,13 +40,13 @@ public class GramInt
 		this.host = host;
 	}
 
-	public void setRsl(RSLElement rsl)
+	public void setRsl(String rsl)
 	{
 		this.rsl = rsl;
 	}
 
 	/* globus-job-submit */
-	public void jobSubmit(String host, RSLElement rsl)
+	public void jobSubmit(String host, String rsl)
 		throws GramException, GSSException
 	{
 		this.batch = true;
@@ -54,12 +55,19 @@ public class GramInt
 		this.gramRequest(this.host, this.rsl);
 	}
 
-	public void jobSubmit(RSLElement rsl)
+	public void jobSubmit(String rsl)
 		throws GramException, GSSException
 	{
 		this.batch = true;
 		this.rsl = rsl;
 		this.gramRequest(this.host, this.rsl);
+	}
+
+	public void jobSubmit(GridJob job) 
+		throws GramException, GSSException
+	{
+		this.batch = true;
+		this.gramRequest(this.host, job.toString());
 	}
 
 	public void jobSubmit()
@@ -70,7 +78,7 @@ public class GramInt
 	}
 
 	/* submit a request to the GRAM server */
-	private void gramRequest(String host, RSLElement rsl)
+	private void gramRequest(String host, String rsl)
 		throws GramException, GSSException
 	{
 		/* Make sure the host is there */
@@ -84,13 +92,13 @@ public class GramInt
 	/* Used to internally to rebuild a Gram Job */
 	public void createJob()
 	{
-		this.job = new GramJob(this.gss, this.rsl.toString());
+		this.job = new GramJob(this.gss, this.rsl);
 	}
 
 	/* Used internally to build a gramRequest */
-	private GramJob createJob(RSLElement rsl)
+	private GramJob createJob(String rsl)
 	{
-		this.job = new GramJob(this.gss, rsl.toString());
+		this.job = new GramJob(this.gss, rsl);
 		return this.job;
 	}
 
@@ -166,14 +174,16 @@ public class GramInt
 	}
 
 	/* filename of the job output */
-	public String getStdout()
-	{
+//	public String getStdout()
+//	{
 		/* Attempt a build */
+/*
 		if(this.rsl.getStdout() == null)
 			this.rsl.build();
 
 		return this.rsl.getStdout();
 	}
+*/
 
 	public GramJob getJob()
 	{

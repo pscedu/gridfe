@@ -33,29 +33,39 @@ public class RSLElement implements Serializable
 	{
 	}
 
-	public RSLElement(String[] param, String[] value)
+	public void setRSL(String[] param, String[] value)
 	{
-		this.setGenerics(param, value);
+		this.gParam = (String[])param.clone();
+		this.gValue = (String[])value.clone();
 	}
 
-	public RSLElement(String[] gp, String[] gv, String vp, String[] vv)
+	/* this one is internal only! */
+	private void setRSL(String param, String[] key, String[] value)
 	{
-		this.setGenerics(gp, gv);
-		this.setVarArgs(vp, vv);
+		this.kParam = new String(param);
+		this.kKey = (String[])key.clone();
+		this.kValue = (String[])value.clone();
 	}
 
-	public RSLElement(String[] gp, String[] gv, String kp, String[] kk, String[] kv)
+	public void setRSL(String[] gp, String[] gv, String vp, String[] vv)
 	{
-		this.setGenerics(gp, gv);
-		this.setKeyPairs(kp, kk, kv);
+		this.setRSL(gp, gv);
+		this.vParam = new String(vp);
+		this.vValue = (String[])vv.clone();
 	}
 
-	public RSLElement(String[] gp, String[] gv, String vp, String[] vv, String kp,
-			  String[] kk, String[] kv)
+	public void setRSL(String[] gp, String[] gv, String kp, String[] kk,
+				String[] kv)
 	{
-		this.setGenerics(gp, gv);
-		this.setVarArgs(vp, vv);
-		this.setKeyPairs(kp, kk, kv);
+		this.setRSL(gp, gv);
+		this.setRSL(kp, kk, kv);
+	}
+
+	public void setRSL(String[] gp, String[] gv, String vp, String[] vv,
+				String kp, String[] kk, String[] kv)
+	{
+		this.setRSL(gp, gv, vp, vv);
+		this.setRSL(kp, kk, kv);
 	}
 
 	/*
@@ -65,25 +75,6 @@ public class RSLElement implements Serializable
 	public void changeSpec(String s)
 	{
 		this.pre = new String(s);
-	}
-
-	public void setGenerics(String[] param, String[] value)
-	{
-		this.gParam = (String[])param.clone();
-		this.gValue = (String[])value.clone();
-	}
-
-	public void setVarArgs(String param, String[] value)
-	{
-		this.vParam = new String(param);
-		this.vValue = (String[])value.clone();
-	}
-
-	public void setKeyPairs(String param, String[] key, String[] value)
-	{
-		this.kParam = new String(param);
-		this.kKey = (String[])key.clone();
-		this.kValue = (String[])value.clone();
 	}
 
 	/*
@@ -108,27 +99,30 @@ public class RSLElement implements Serializable
 		this.jOut = new String("/home/rbudden/rand.tmp");
 	}
 */
-
 	public String getStdout()
 	{
 		return this.jOut;
 	}
 
-/*
-	public void buildStdout()
-	{
-		this.buildGenerics( new String[] {"stdout"}, new String[] {this.jOut});
-	}
-*/
 
 	/* Generic build for "(param=value)" */
-	public void buildGenerics(String[] param, String[] value)
+	private void buildGenerics(String[] param, String[] value)
 	{
-		//for(int i = 0; i < param.length; i++)
-		//	this.data.append(b+param[i]+m+q+value[i]+q+e);
-
 		for(int i = 0; i < param.length; i++)
 		{
+			/*
+			** XXX later will may want to intercept options
+			** like stdout, stderr, directory, etc... so 
+			** that we can do internal work first, then
+			** change to what the user specified.
+			** Example:
+			** stdout was set to have output go to a different
+			** computer via a GAAS server. first we intercept
+			** stdout and have the data saved locally, we can then
+			** open the file later to show job output through web,
+			** and finally use GridFTP to send the file where they
+			** wanted it... (something to this effect)
+			*/
 			this.data.append(b+param[i]+m+q+value[i]+q+e);
 
 			/* Save stdout to retrieve job output */
@@ -141,7 +135,7 @@ public class RSLElement implements Serializable
 	** Build in the form of '(param="arg1" "arg2")'
 	** Example: (arguments="arg1" "arg number 2");
 	*/
-	public void buildVarArgs(String param, String[] value)
+	private void buildVarArgs(String param, String[] value)
 	{
 		int i;
 		this.data.append(b+param+m);
@@ -159,13 +153,12 @@ public class RSLElement implements Serializable
 	** Build in the form of "(param=(key1 value1)(key2 value2))"
 	** Example: (environment=(MANPATH /usr/man)(EDITOR vi));
 	*/
-	public void buildKeyPairs(String param, String[] key, String[] value)
+	private void buildKeyPairs(String param, String[] key, String[] value)
 	{
 		this.data.append(b+param+m);
 
 		/* Quote all args to be safe! */
 		for(int i = 0; i < key.length; i++)
-			//this.data.append(b+q+key[i]+q+s+q+value[i]+q+e);
 			this.data.append(b+key[i]+s+q+value[i]+q+e);
 
 		this.data.append(e);
@@ -182,20 +175,11 @@ public class RSLElement implements Serializable
 			this.buildVarArgs(this.vParam, this.vValue);
 		if(this.kParam != null)
 			this.buildKeyPairs(this.kParam, this.kKey, this.kValue);
-
-		/* Unless the stdout has manually been overriden */
-/*
-		if(this.jOut == null)
-		{
-			// Setup the random filename
-			this.setStdout();
-			this.buildStdout();
-		}
-*/
 	}
 
 	public String toString()
 	{
+		/* make sure it's been built first! */
 		if(this.data == null)
 			this.build();
 

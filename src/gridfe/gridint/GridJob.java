@@ -8,10 +8,11 @@ import java.net.MalformedURLException;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
-public class GridJob implements Serializable
+public class GridJob extends RSLElement implements Serializable
 {
 	private String host;
-	private RSLElement rsl;
+	//private RSLElement rsl;
+	private String rsl;
 	private transient GramInt gi;
 	private String id;
 
@@ -26,7 +27,7 @@ public class GridJob implements Serializable
 		this.host = new String(host);
 	}
 
-	public GridJob(String host, RSLElement rsl)
+	public GridJob(String host, String rsl)
 	{
 		this.rsl = rsl;
 		this.host = new String(host);
@@ -38,6 +39,8 @@ public class GridJob implements Serializable
 	}
 
 	/* RSLElement Wrappers */
+	/* Inherit those from RSLElement.java */
+	/*
 	public void setRSL(String[] p, String[] v)
 	{
 		this.rsl = new RSLElement(p, v);
@@ -58,25 +61,29 @@ public class GridJob implements Serializable
 	{
 		this.rsl = new RSLElement(gp, gv, vp, vv, kp, kk, kv);
 	}
+	*/
 
+	/*
 	public void setRSL(RSLElement rsl)
 	{
 		this.rsl = rsl;
 	}
+	*/
 
 
 	/* Internal methods to be called by GridInt ONLY! */
 	public void init(GSSCredential gss)
 	{
-		this.gi = new GramInt(gss);
-		this.gi.setHost(this.host);
+		this.gi = new GramInt(gss, this.host);
+		//this.gi.setHost(this.host);
 	}
 
 	/* Submit the job and save the id string */
 	public void run()
 		throws GramException, GSSException
 	{
-		this.gi.jobSubmit(this.rsl);
+		//this.gi.jobSubmit(this.rsl);
+		this.gi.jobSubmit(this);
 		this.id = new String(this.gi.getIDAsString());
 	}
 
@@ -92,10 +99,12 @@ public class GridJob implements Serializable
 
 
 	/* Obtain Private Data Methods */
+	/*
 	public RSLElement getRSL()
 	{
 		return this.rsl;
 	}
+	*/
 
 	public String getHost()
 	{
@@ -139,7 +148,7 @@ public class GridJob implements Serializable
 	*/
 
 	/* This revive to be called manually for testing or even cloning jobs */
-	public void revive(String host, String id, GSSCredential gss, RSLElement rsl)
+	public void revive(String host, String id, GSSCredential gss, String rsl)
 		throws MalformedURLException
 	{
 		this.host = host;

@@ -11,12 +11,10 @@ import java.io.*;
 
 public class GassInt extends RemoteGassServer
 {
-	//private RemoteGassServer server;
 	private GassInputStream fin;
 	private int port;
 	private String host;
 	private int options;
-	//private boolean secure;
 	private GSSCredential gss;
 	private GassServer ga;
 
@@ -29,6 +27,7 @@ public class GassInt extends RemoteGassServer
 		this.host = host;
 		this.gss = gss;
 		this.options = GassServer.CLIENT_SHUTDOWN_ENABLE | 
+				RemoteGassServer.TILDE_EXPAND_ENABLE |
 				GassServer.READ_ENABLE;
 	}
 
@@ -69,6 +68,7 @@ public class GassInt extends RemoteGassServer
 	}
 
 	/* Manually remote start a server - this fails for some reason though */
+	/*
 	public void start_remote()
 		throws GramException, GSSException
 	{
@@ -82,6 +82,7 @@ public class GassInt extends RemoteGassServer
 		j.init(this.gss);
 		j.run();
 	}
+	*/
 
 	/* 
 	** Inherited Methods (needed from RemoteGassServer):

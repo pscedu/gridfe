@@ -123,80 +123,6 @@ public class GridInt implements Serializable
 		}
 	}
 
-//--------------------------------This needs changed--------------------------------
-
-	/* Get the job output (stdout/stderr) */
-	public String[] getJobData(GridJob job)
-		throws GSSException, GassException, IOException
-	{
-		String data[];
-		String file[];
-		int remote;
-
-		/*
-		 * XXX: wrap into constants; let the layer
-		 * above us provide an error message.
-		 */
-		data = new String[OI_MAX];
-//		data[OI_STDOUT] = "Error: standard output improperly specified.";
-//		data[OI_STDERR] = "Error: standard error improperly specified.";
-		data[OI_STDOUT] = "";
-		data[OI_STDERR] = "";
-
-		/* Grab Job Outputs Locally or Remotely */
-		file = new String[OI_MAX];
-		file[OI_STDOUT] = job.stdout;
-		file[OI_STDERR] = job.stderr;
-
-
-		/* Loop and grab all data from all files */
-		for(int i = 0; i < OI_MAX; i++)
-		{
-			int toff = 0;
-			int tlen = 64;
-
-			this.startRetrieve(job, file[i]); 
-			data[i] += this.retrieve(tlen, toff);
-			toff += tlen;
-//			data[i] += "\n\n";
-			System.out.println("1:\n"+data[i]);
-			data[i] += this.retrieve(tlen, toff);
-//			data[i] += "\n\n";
-			toff += tlen;
-			System.out.println("2:\n"+data[i]);
-			data[i] += this.retrieve(0, toff);
-			System.out.println("3:\n"+data[i]);
-			
-//			data[i] += this.retrieve(0, 0);
-			this.stopRetrieve();
-
-			/* Test multiple reads */
-/*			int tlen = 128;
-			int toff = 0;
-			for(;;)
-			{
-				try
-				{
-					data[i] += this.retrieve(job, file[i], tlen, toff);
-					toff += tlen;
-					System.out.println("tlen: "+tlen);
-					System.out.println("toff: "+toff);
-					System.out.println(data[i]);
-				}
-				catch(Exception e)
-				{
-					break;
-				}
-			}
-//			data[i] += this.retrieve(job, file[i], 512, 512);
-//			data[i] += this.retrieve(job, file[i], 0, 1024);
-*/
-		}
-
-		return data;
-	}
-//---------------------------------------------------------------------------------
-
 	/* Start the Gass Server on a random port within our range */
 	private void startGass(int min, int max, String host)
 		throws GassException, IOException
@@ -238,26 +164,6 @@ public class GridInt implements Serializable
 		this.gass.start();
 	}
 
-	// XXX
-	//function like above to get all data
-	//function to get next(len bytes)
-	//function to get (len bytes, offset bytes)
-	
-	/* Grab the job's stdout in chucks of len (all if len<1) */
-/*
-	public String retrieveStdout(GridJob job, int len, int off)
-		throws GassException, IOException
-	{
-		return this.retrieve(job, job.stdout, len, off);
-	}
-*/	
-	/* Grab the job's stderr in chucks of len (all if len<1) */
-/*	public String retrieveStderr(GridJob job, int len, int off)
-		throws GassException, IOException
-	{
-		return this.retrieve(job, job.stderr, len, off);
-	}
-*/	
 	/* Setup file retrieval */
 	public void startRetrieve(GridJob job, String file)
 		throws GassException, IOException, GSSException
@@ -267,7 +173,7 @@ public class GridInt implements Serializable
 		/* Remote Fetch */
 		if(job.remote(file))
 		{
-			data += "Remote Output not supported yet.";
+			throw new IOException("Remote Output not supported yet.");
 		}
 		/* Local Fetch */
 		else
@@ -295,10 +201,11 @@ public class GridInt implements Serializable
 	}
 
 
-	/* File (Chuck of 'len' bytes, 'len < 0' read all) */
-	private String retrieve(int len, int off)
+	/* File (Chunk of 'len' bytes, 'len < 1' read all) */
+	public String retrieve(int len, int off)
 		throws IOException
 	{
+		StringBuffer str = new StringBuffer("");
 		String data = "";
 		long size = this.gass.getSize();
 		long left = size - off;
@@ -314,26 +221,20 @@ public class GridInt implements Serializable
 		if(len > left)
 			len = (int)(left);
 
-		/* Read len */
-		if(len > 0 && left > 0)
+		/* If there is still data */
+		if(left > 0)
 		{
-			StringBuffer str = new StringBuffer("");
+			/* If len < 1 read the rest otherwise read len */
+			if(len < 1)
+				len = (int)(left);
+
+			/* Read the data */
 			this.gass.read(str, len, 0);
-			data += str.toString();
-		}
-		/* Read what's left */
-		else if(left > 0)
-		{
-			StringBuffer str = new StringBuffer("");
-			this.gass.read(str, (int)(left), 0);
 			data += str.toString();
 		}
 
 		return data;
 	}
-
-
-//----------------------------------------------------------------------
 
 	/* Get a Job from the list by index */
 	public GridJob getJob(int index)

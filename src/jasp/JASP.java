@@ -13,13 +13,13 @@ public class JASP {
 		"abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 		"0123456789,./?;:[]{}\\|`~!@#$%^*()_+-=";
-	
+
 	public JASP() {
 	}
-		
+
 	public String escapeHTML(String s) {
 		int i, j;
-		String t = new String(s);
+		String t = "";
 		for (i = 0; i < t.length(); i++) {
 			/* Entity names. */
 			for (j = 0; j < entmap.length; j++)

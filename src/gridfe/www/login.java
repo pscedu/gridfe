@@ -2,8 +2,10 @@
 
 import oof.*;
 
-public class login {
-	public static String main(Page page) throws Exception {
+public class login
+{
+	public static String main(Page page) throws Exception
+	{
 		String s = "";
 		OOF oof = page.getOOF();
 
@@ -55,4 +57,4 @@ public class login {
 	}
 };
 
-/* vim: set ts=4 */
+/* vim: set ts=4: */

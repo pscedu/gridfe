@@ -3,8 +3,10 @@
 import oof.*;
 import gridint.*;
 
-public class logout {
-	public static String main(Page page) throws Exception {
+public class logout
+{
+	public static String main(Page page) throws Exception
+	{
 		String s;
 		OOF oof = page.getOOF();
 		GridInt gi = page.getGridInt();

@@ -48,27 +48,8 @@ public class GassInt extends RemoteGassServer
 		super.RBudden_set_port(0);
 		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
 */
-
 		this.setOptions(this.options);
-
 		this.start(host);
-/*
-		while(success == 0 && n++ < 10)
-		{
-			try
-			{
-				System.out.println("Trying...");
-				super.start(host);
-				success = 1;
-				System.out.println("Success!!");
-			}
-			catch(GassException e)
-			{
-				System.out.println("Failed...");
-				success = 0;
-			}
-		}
-*/
 	}
 
 	/* Manually remote start a server - this fails for some reason though, more FUBAR! */

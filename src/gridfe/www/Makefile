@@ -4,8 +4,7 @@ SYSROOT = ../../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-CLASSES += login.class logout.class index.class nodes.class
-CLASSES += notfound.class
+CLASSES += certs.class index.class nodes.class notfound.class
 SUBDIRS += jobs rls
 TARGET = ${CLASSES}
 

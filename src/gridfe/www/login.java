@@ -1,6 +1,6 @@
 /* $Id$ */
 
-package www;
+package gridfe.www;
 
 import oof.*;
 

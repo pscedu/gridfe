@@ -1,4 +1,4 @@
-/* $ID$ */
+/* $Id$ */
 /*
 ** GridJob - Handles creating and maintaining of
 ** a grid job and the gram internals
@@ -10,13 +10,15 @@ import gridint.*;
 import org.ietf.jgss.*;
 import org.globus.gram.*;
 import java.net.MalformedURLException;
-public class GridJob
+import java.io.*;
+public class GridJob implements Serializable
 {
 	private String host;
 	private RSLElement rsl;
-	private GramInt gi;
+	private transient GramInt gi;
+	private String id;
 
-	/* DEBUG */
+	/* Needed for revive */
 	public GridJob()
 	{
 
@@ -75,6 +77,7 @@ public class GridJob
 	public void run() throws GramException, GSSException
 	{
 		this.gi.jobSubmit(this.rsl);	
+		this.id = new String(this.gi.getIDAsString());
 	}
 
 	public void cancel() throws GramException, GSSException
@@ -131,14 +134,31 @@ public class GridJob
 	*/
 	public void revive(String host, String id, GSSCredential gss, RSLElement rsl) throws MalformedURLException
 	{
-		/* Revive GridJob private data */
 		this.host = host;
 		this.rsl = rsl;
+		this.revive(gss);
+	}
+	public void revive(GSSCredential gss) throws MalformedURLException
+	{
+		/* Revive GridJob private data */
+		//this.host = host;
+		//this.rsl = rsl;
 
 		/* Revive GramInt and it's private data */
 		this.gi = new GramInt(gss, this.host, this.rsl);
 		this.gi.createJob();
 		this.gi.setID(id);
 	}
+
+	/* Serializable Implementation */
+	private void writeObject(ObjectOutputStream out)
+	{
+		out.defaultWriteObject();
+	}
+	private void readObject(ObjectInputStream in)
+	{
+		in.defaultWriteObject();
+	}
+
 
 }

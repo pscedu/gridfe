@@ -56,7 +56,8 @@ typedef struct
 
 /* Prototypes */
 void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs);
-void mf_kinit_set_defaults(krb5_prefs_ptr kprefs, char *pass);
+void mf_kinit_set_uap(krb5_prefs_ptr kprefs, char *principal, char *password);
+void mf_kinit_set_defaults(krb5_prefs_ptr kprefs);
 void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs);
 void mf_kinit_cleanup(krb5_inst_ptr k5);
 
@@ -71,9 +72,8 @@ int main(int argc, char *argv[])
 	if(argc < 1)
 		mf_err("too few arguments",1,TODO);
 
-	pass = argv[1];
-
-	mf_kinit_set_defaults(&kprefs, pass);
+	mf_kinit_set_defaults(&kprefs);
+	mf_kinit_set_uap(&kprefs, argv[1], argv[2]);
 	mf_kinit(&k5, &kprefs);
 
 	return 0;
@@ -109,39 +109,36 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 	*/
 	err = krb5_get_init_creds_password(k5->context, &k5->credentials,
 						k5->principal, kprefs->password,
-						NULL, NULL, kprefs->starttime,
-						kprefs->sname, &opt);
+						krb5_prompter_posix, NULL, 0,
+						NULL, &opt);
 	if(err)
 		mf_err("get initial credentials failed", err, TODO);
 		
-	/* XXX this may not be needed */
-	/* Validate the Credentials */
-	err = krb5_get_validated_creds(k5->context,
-					&k5->credentials, 
-					k5->principal,
-					k5->cache,
-					kprefs->sname);
-	if(err)
-		mf_err("validate credentials failed", err, TODO);
-	
+
 	/* Initialize the cache file */
 	err = krb5_cc_initialize(k5->context, k5->cache, k5->principal);
 	if(err)
 		mf_err("initialize cache failed", err, TODO);
 	
 	/* Store the Credential */
-	err = krb5_cc_store(k5->context, k5->cache, &k5->credentials);
+	err = krb5_cc_store_cred(k5->context, k5->cache, &k5->credentials);
 	if(err)
 		mf_err("store credentials failed", err, TODO);
 		
 	mf_kinit_cleanup(k5);
 }
 
-void mf_kinit_set_defaults(krb5_prefs_ptr kprefs, char *pass)
+/* Set the user (principal) and password */
+void mf_kinit_set_uap(krb5_prefs_ptr kprefs, char *principal, char *password)
+{
+	kprefs->password = password;
+	kprefs->pname = principal;
+}
+
+void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 {
 	kprefs->proxiable = 1;
 	kprefs->forwardable = 0;
-	kprefs->password = pass;
 
 	/* 8 hrs. default */
 	kprefs->lifetime = 28800;

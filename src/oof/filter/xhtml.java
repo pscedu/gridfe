@@ -102,7 +102,12 @@ public class xhtml extends FILTER {
 	}
 
 	public String build(List e) {
-		return this.build("ul", (ELEMENT)e);
+		String tag;
+		if (e.type.equals(this.oof.LIST_OD))
+			tag = "ol";
+		else
+			tag = "ul";
+		return this.build(tag, (ELEMENT)e);
 	}
 
 	public String build(Paragraph e) {

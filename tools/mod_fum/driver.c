@@ -6,11 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mod_fum.h"
-
 #define _PATH_MOD_FUM "mod_fum.so"
 
-void usage(void);
+static void usage(void);
+int mod_fum_main(const char *, const char *);
 
 int
 main(int argc, char *argv[])
@@ -37,19 +36,19 @@ main(int argc, char *argv[])
 
 	if ((h = dlopen(_PATH_MOD_FUM, RTLD_LAZY)) == NULL)
 		errx(1, "%s: %s", _PATH_MOD_FUM, dlerror());
-	if ((init = dlsym(h, "mf_main")) == NULL)
-		errx(1, "dlsym: %s: %s", "mf_main", dlerror());
+	if ((init = dlsym(h, "mod_fum_main")) == NULL)
+		errx(1, "dlsym: %s: %s", "mod_fum_main", dlerror());
 
-	(*init)(username, password);
-	dlclose(h);
+	(void)(*init)(username, password);
+	(void)dlclose(h);
 	exit(0);
 }
 
-void
+static void
 usage(void)
 {
 	extern char *__progname;
 
-	fprintf(stderr, "usage: %s [username [password]]\n", __progname);
+	(void)fprintf(stderr, "usage: %s [username [password]]\n", __progname);
 	exit(1);
 }

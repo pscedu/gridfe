@@ -96,7 +96,7 @@ public class GridJob extends RSLElement implements Serializable
 		/* Check for starting 'http:' or 'https:' */
 		if(file != null)
 			if(file.startsWith("http:/") ||
-			   file.startsWith("https/:"))
+			   file.startsWith("https:/"))
 				remote = true;
 		
 		return remote;

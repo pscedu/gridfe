@@ -20,6 +20,8 @@ public class certs
 
 		// DEBUG - use p.getGridInt() later;
 		GridInt gi = new GridInt(uid);
+		if (gi == null)
+			s += "GI IS NULL<br />";
 		gi.auth();
 		
 		CertInfo ci;

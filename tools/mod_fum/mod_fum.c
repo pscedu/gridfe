@@ -75,7 +75,6 @@ struct krb5_prefs {
 };
 
 static char	*mf_dstrcat(const char *, const char *);
-static char	*mf_dstritoa(int);
 static char	*mf_dstrslice(const char *, int, int);
 static char	*mf_get_uid_from_ticket_cache(const char *);
 static int	 mf_check_for_cred(const char *);
@@ -166,14 +165,14 @@ mod_fum_auth(request_rec *r)
 					 * valid X.509 certificate, Apache does
 					 * not have permissions to read it.
 					 */
-					mf_log("credentials expired", 1);
+					mf_log("credentials expired");
 			} else
-				mf_log("wrong user/pass combination", 1);
+				mf_log("wrong user/pass combination");
 		} else
 			/* Create new certs */
 			err = mod_fum_main(user, pass);
 	} else {
-		mf_log("authentication form incomplete", err);
+		mf_log("authentication incomplete (%d)", err);
 		err = HTTP_UNAUTHORIZED;
 	}
 	return (err);
@@ -182,9 +181,9 @@ mod_fum_auth(request_rec *r)
 int
 mod_fum_main(const char *principal, const char *password)
 {
+	char *tkt_cache, *uid;
 	struct krb5_prefs kp;
 	struct krb5_inst ki;
-	char *tkt_cache, *uid;
 	int err;
 
 	/* XXX Resolve UID from KDC with given principal (possible?) */
@@ -193,9 +192,10 @@ mod_fum_main(const char *principal, const char *password)
 	if ((err = mf_user_id_from_principal(principal, &uid)) != OK)
 		return (err);
 	if ((tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid)) == NULL) {
-		mf_log("tkt_cache is NULL", 1);
+		mf_log("tkt_cache is NULL");
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	}
+	free(uid);
 
 	if ((err = mf_krb5_init(&ki, tkt_cache)) != OK)
 		return (err);
@@ -270,7 +270,7 @@ mf_kxlist_crypto(struct krb5_inst *ki, char *name)
 	FILE *file;
 
 	if ((file = fopen(name, "w")) == NULL) {
-		mf_log("mem error", 1);
+		mf_log("%s", name);
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	} else {
 		klen = ki->ki_cred.ticket.length;
@@ -285,7 +285,7 @@ mf_kxlist_crypto(struct krb5_inst *ki, char *name)
 		d2i_RSAPrivateKey(&priv, (const unsigned char **)(&data), klen);
 
 		if (priv == NULL) {
-			mf_log("d2i_RSAPrivateKey failed", 1);
+			mf_log("d2i_RSAPrivateKey failed");
 			err = HTTP_INTERNAL_SERVER_ERROR;
 		} else {
 			/* Write the certificate appropriately formatted */
@@ -315,7 +315,7 @@ mf_kxlist_setup(struct krb5_inst *ki)
 	/* The primary principal will be for the client */
 	if ((err = krb5_cc_get_principal(ki->ki_ctx, ki->ki_cache,
 	    &screds.client)) != KRB5KDC_ERR_NONE) {
-		mf_log("get client principal failed", err);
+		mf_log("get client principal failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
@@ -323,7 +323,7 @@ mf_kxlist_setup(struct krb5_inst *ki)
 	if ((err = krb5_sname_to_principal(ki->ki_ctx, KX509_HOSTNAME,
 	     KX509_SERVNAME, KRB5_NT_UNKNOWN, &screds.server)) !=
 	    KRB5KDC_ERR_NONE) {
-		mf_log("get server principal failed", err);
+		mf_log("get server principal failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
@@ -332,7 +332,7 @@ mf_kxlist_setup(struct krb5_inst *ki)
 	     KRB5_TC_MATCH_SRV_NAMEONLY, &screds, &ki->ki_cred)) !=
 	    KRB5KDC_ERR_NONE)
 	if (err) {
-		mf_log("unable to retrieve kx509 credential", err);
+		mf_log("unable to retrieve kx509 credential (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 	krb5_free_cred_contents(ki->ki_ctx, &screds);
@@ -365,7 +365,7 @@ mf_get_uid_from_ticket_cache(const char *tkt)
 	/* Slice and convert the UID. */
 	uid = mf_dstrslice(tkt, b, e);
 	if (uid == NULL)
-		mf_log("uid slice error", 1);
+		mf_log("uid slice error");
 	return (uid);
 }
 
@@ -392,16 +392,17 @@ mf_user_id_from_principal(const char *principal, char **uid)
 	if (p) {
 		pw = getpwnam(p);
 		if (pw == NULL) {
-			mf_log("User not in /etc/passwd", 1);
+			mf_log("User not in /etc/passwd");
 			err = HTTP_UNAUTHORIZED;
-		} else
-			/*
-			 * convert uid to (char *),
-			 * (first snprintf gives the size)
-			 */
-			(*uid) = mf_dstritoa(pw->pw_uid);
+		} else {
+			if (asprintf(*uid, "%d", pw->pw_uid) == -1) {
+				*uid = NULL;
+				mf_log("asprintf");
+				err = HTTP_INTERNAL_SERVER_ERROR;
+			}
+		}
 	} else {
-		mf_log("principal slice error", 1);
+		mf_log("principal slice error");
 		err = HTTP_INTERNAL_SERVER_ERROR;
 	}
 	return (err);
@@ -421,7 +422,7 @@ mf_kx509(const char *tkt_cache)
 	argc = 3;
 
 	if ((err = do_kx509(argc, argv)) != KX509_STATUS_GOOD)
-		mf_log("kx509 failed", err);
+		mf_log("kx509 failed (%d)", err);
 	return (err ? HTTP_INTERNAL_SERVER_ERROR : OK);
 }
 
@@ -445,7 +446,7 @@ mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 	    ki->ki_prin, (char *)(kp->kp_pw), krb5_prompter_posix,
 	    NULL, 0, NULL, &opt);
 	if (err != KRB5KDC_ERR_NONE) {
-		mf_log("get initial credentials failed", err);
+		mf_log("get initial credentials failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
@@ -459,14 +460,14 @@ mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 		 * when there are already credentials created and mod_fum
 		 * does not have the proper permissions to read them!
 		 */
-		mf_log("initialize cache failed", err);
+		mf_log("initialize cache failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
 	/* Store the credential */
 	err = krb5_cc_store_cred(ki->ki_ctx, ki->ki_cache, &ki->ki_cred);
 	if (err)
-		mf_log("store credentials failed", err);
+		mf_log("store credentials failed (%d)", err);
 	return (err == KRB5KDC_ERR_NONE ? OK : HTTP_UNAUTHORIZED);
 }
 
@@ -491,9 +492,9 @@ mf_krb5_init(struct krb5_inst *ki, const char *tkt_cache)
 		/* err = krb5_cc_default(ki->ki_ctx, &ki->cache); */
 		err = krb5_cc_resolve(ki->ki_ctx, tkt_cache, &ki->ki_cache);
 		if (err)
-			mf_log("default cache failed", err);
+			mf_log("default cache failed (%d)", err);
 	} else
-		mf_log("krb5_init_context failed", err);
+		mf_log("krb5_init_context failed (%d)", err);
 	return (err == KRB5KDC_ERR_NONE ? OK : HTTP_UNAUTHORIZED);
 }
 
@@ -521,7 +522,7 @@ mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 	err = krb5_sname_to_principal(ki->ki_ctx, NULL, NULL, KRB5_NT_SRV_HST,
 	    &ki->ki_prin);
 	if (err) {
-		mf_log("create principal failed", err);
+		mf_log("create principal failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
@@ -531,7 +532,7 @@ mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 	 */
 	err = krb5_parse_name(ki->ki_ctx, kp->kp_prin, &ki->ki_prin);
 	if (err)
-		mf_log("parse_name failed", err);
+		mf_log("parse_name failed (%d)", err);
 	return (err == KRB5KDC_ERR_NONE ? OK : HTTP_UNAUTHORIZED);
 }
 
@@ -556,25 +557,27 @@ mf_check_for_cred(const char *principal)
 	DIR *dp;
 
 	/* Read uid from /etc/passwd */
-	err = mf_user_id_from_principal(principal, &uid);
-	if (err == OK) {
-		/* Create cert name */
-		cert = mf_dstrcat(_PATH_CERT_FILE, uid);
-		if (cert) {
-			/* Does the file exist */
-			if ((dp = opendir(_PATH_CERT_DIR)) != NULL) {
-				while ((d = readdir(dp)) != NULL) {
-					if (strcmp(d->d_name, cert) == 0) {
-						found = 1;
-						break;
-					}
-				}
-				(void)closedir(dp);
+	if ((err = mf_user_id_from_principal(principal, &uid)) != OK) {
+		mf_log("error finding uid (%d)", err);
+		return (0);
+	}
+	/* Create cert name */
+	cert = mf_dstrcat(_PATH_CERT_FILE, uid);
+	free(uid);
+	if (cert == NULL) {
+		mf_log("error creating cert string");
+		return (0);
+	}
+	/* Does the file exist */
+	if ((dp = opendir(_PATH_CERT_DIR)) != NULL) {
+		while ((d = readdir(dp)) != NULL) {
+			if (strcmp(d->d_name, cert) == 0) {
+				found = 1;
+				break;
 			}
-		} else
-			mf_log("error creating cert string", 1);
-	} else
-		mf_log("error finding uid", err);
+		}
+		(void)closedir(dp);
+	}
 	return (found);
 }
 
@@ -596,7 +599,7 @@ mf_valid_cred(char *principal)
 	int err;
 
 	if ((err = mf_user_id_from_principal(principal, &uid)) != OK) {
-		mf_log("uid failed", err);
+		mf_log("uid failed (%d)", err);
 		return (0);
 	}
 	if ((tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid)) != NULL) {
@@ -638,34 +641,34 @@ mf_valid_user(const char *principal, const char *password)
 	int err;
 
 	err = mf_krb5_init(&ki, tkt);
+	if (err != OK) {
+		mf_log("krb5_init failed (%d)", err);
+		return (0);
+	}
 	ki.ki_init = 0;
-
+	kp.kp_prin = principal;
+	kp.kp_pw = password;
+	if ((err = mf_kinit_setup(&ki, &kp)) == KRB5KDC_ERR_NONE)
+		err = OK;
+	else
+		err = HTTP_UNAUTHORIZED;
 	if (err == OK) {
-		kp.kp_prin = principal;
-		kp.kp_pw = password;
-		if ((err = mf_kinit_setup(&ki, &kp)) == KRB5KDC_ERR_NONE)
-			err = OK;
+		krb5_get_init_creds_opt_init(&opt);
+
+		/* Try and get an initial ticket */
+		err = krb5_get_init_creds_password(ki.ki_ctx,
+		    &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
+		    krb5_prompter_posix, NULL, 0, NULL, &opt);
+
+		/* If this succeeds, then the user/pass is correct */
+		if (err == OK)
+			ki.ki_init = 1;
 		else
-			err = HTTP_UNAUTHORIZED;
-		if (err == OK) {
-			krb5_get_init_creds_opt_init(&opt);
-
-			/* Try and get an initial ticket */
-			err = krb5_get_init_creds_password(ki.ki_ctx,
-			    &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
-			    krb5_prompter_posix, NULL, 0, NULL, &opt);
-
-			/* If this succeeds, then the user/pass is correct */
-			if (err == OK)
-				ki.ki_init = 1;
-			else
-				mf_log("bad authentication", err);
-		} else
-			mf_log("mf_kinit_setup failed", err);
-		mf_kinit_cleanup(&ki);
-		mf_krb5_free(&ki);
+			mf_log("bad authentication (%d)", err);
 	} else
-		mf_log("krb5_init failed", err);
+		mf_log("mf_kinit_setup failed (%d)", err);
+	mf_kinit_cleanup(&ki);
+	mf_krb5_free(&ki);
 	return (ki.ki_init);
 }
 
@@ -681,7 +684,7 @@ mf_dstrcat(const char *s1, const char *s2)
 	len = strlen(s1) + strlen(s2) + 1;
 	s = (char *)(apr_palloc(mf_pool, sizeof(char)*len));
 	if (s == NULL)
-		mf_log("malloc failed", 1);
+		mf_log("malloc failed");
 	else {
 		strncpy(s, s1, strlen(s1));
 		s[strlen(s1)] = '\0';
@@ -706,7 +709,7 @@ mf_dstrslice(const char *s, int x, int y)
 	if (len) {
 		if ((s2 = apr_palloc(mf_pool, sizeof(char) * len)) ==
 		    NULL) {
-			mf_log("malloc failed", 1);
+			mf_log("malloc failed");
 			return (NULL);
 		}
 		if (x >= 0 && y >= 0) {
@@ -722,31 +725,19 @@ mf_dstrslice(const char *s, int x, int y)
 	return (s2);
 }
 
-/*
- * dynamic integer to ascii conversion
- */
-static char *
-mf_dstritoa(int l)
-{
-	char *ascii;
-	int i, j;
-
-	i = snprintf(NULL, 0, "%d", l);
-	j = (i+1)*sizeof(char);
-	ascii = apr_palloc(mf_pool, j);
-	snprintf(ascii, j, "%d", l);
-	ascii[i] = '\0';
-	return (ascii);
-}
-
 static void
 mf_log(const char *fmt, ...)
 {
 	char buf[BUFSIZ];
 	va_list ap;
+	int __sav_errno = errno;
 
 	va_start(ap, fmt);
 	(void)vsnprintf(buf, sizeof(buf), fmt, ap);
+	if (__sav_errno)
+		(void)snprintf(buf, sizeof(buf), "%s: %s", buf,
+		    strerror(__sav_errno));
+	/* (void)snprintf(buf, sizeof(buf), "%s\n", buf); */
 	va_end(ap);
 
 	ap_log_error(APLOG_MARK, APLOG_ERR, (apr_status_t)(NULL),

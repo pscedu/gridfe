@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /*
 ** RSL (Resource Specification Language) Element
 */
@@ -8,13 +10,13 @@ import java.io.*;
 public class RSLElement implements Serializable
 {
 	/* Strings in the form "&(executable=`which hostname`)..." */
-	private final String b = "(";
-	private final String m = "=";
-	private final String e = ")";
-	private final String s = " ";
-	private final String q = "\"";
+	private final static String b = "(";
+	private final static String m = "=";
+	private final static String e = ")";
+	private final static String s = " ";
+	private final static String q = "\"";
 
-	/* 
+	/*
 	** Prepend Args
 	** Specification: (Multi+, Conjunct&, Disjunct|)
 	*/
@@ -27,28 +29,27 @@ public class RSLElement implements Serializable
 	private String vParam, kParam;
 	private String jOut;
 
-
 	public RSLElement()
 	{
 	}
-	
+
 	public RSLElement(String[] param, String[] value)
 	{
 		this.setGenerics(param, value);
 	}
-	
+
 	public RSLElement(String[] gp, String[] gv, String vp, String[] vv)
 	{
 		this.setGenerics(gp, gv);
 		this.setVarArgs(vp, vv);
 	}
-	
+
 	public RSLElement(String[] gp, String[] gv, String kp, String[] kk, String[] kv)
 	{
 		this.setGenerics(gp, gv);
 		this.setKeyPairs(kp, kk, kv);
 	}
-	
+
 	public RSLElement(String[] gp, String[] gv, String vp, String[] vv, String kp, String[] kk, String[] kv)
 	{
 		this.setGenerics(gp, gv);
@@ -70,7 +71,7 @@ public class RSLElement implements Serializable
 		this.gParam = (String[])param.clone();
 		this.gValue = (String[])value.clone();
 	}
-	
+
 	public void setVarArgs(String param, String[] value)
 	{
 		this.vParam = new String(param);
@@ -97,7 +98,7 @@ public class RSLElement implements Serializable
 	/*
 	public void setStdout(String file)
 	{
-		this.jOut = new String(file);	
+		this.jOut = new String(file);
 	}
 
 	public void setStdout()
@@ -119,7 +120,6 @@ public class RSLElement implements Serializable
 	}
 	*/
 
-
 	/* Generic build for "(param=value)" */
 	public void buildGenerics(String[] param, String[] value)
 	{
@@ -136,8 +136,8 @@ public class RSLElement implements Serializable
 		}
 	}
 
-	/* 
-	** Build in the form of '(param="arg1" "arg2")' 
+	/*
+	** Build in the form of '(param="arg1" "arg2")'
 	** Example: (arguments="arg1" "arg number 2");
 	*/
 	public void buildVarArgs(String param, String[] value)
@@ -154,8 +154,8 @@ public class RSLElement implements Serializable
 		this.data.append(e);
 	}
 
-	/* 
-	** Build in the form of "(param=(key1 value1)(key2 value2))" 
+	/*
+	** Build in the form of "(param=(key1 value1)(key2 value2))"
 	** Example: (environment=(MANPATH /usr/man)(EDITOR vi));
 	*/
 	public void buildKeyPairs(String param, String[] key, String[] value)

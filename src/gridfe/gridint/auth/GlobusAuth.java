@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /*
 ** GlobusAuth.java
 **
@@ -16,7 +18,7 @@ public class GlobusAuth
 {
 	private GlobusCredential gc = null;
 	private String file;
-	private Uid uid = null;
+	private Uid uid;
 
 	/*
 	** X.509 Standard for files /tmp/x509up_uXXX

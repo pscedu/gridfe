@@ -1,3 +1,5 @@
+/* $Id$ */
+
 /*
 ** GramInt.java - GRAM Internals
 */
@@ -48,7 +50,7 @@ public class GramInt
 		/* Make sure the host is there */
 		Gram.ping(this.host);
 
-		/* Create and Process Job */
+		/* Create and process Job */
 		this.job = new GramJob(this.gss, this.rsl);
 		this.job.request(this.host, this.batch);
 
@@ -58,7 +60,6 @@ public class GramInt
 		** and a public method call "stateChanged"
 		*/
 		//this.job.addListener(this);
-		
 	}
 
 	/* globus-job-status */
@@ -73,10 +74,3 @@ public class GramInt
 		this.job.cancel();
 	}
 }
-
-
-
-
-
-
-

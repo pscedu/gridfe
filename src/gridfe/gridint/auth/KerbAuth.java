@@ -17,10 +17,9 @@ import javax.security.auth.login.*;
 public class KerbAuth
 {
 	protected Subject subject;
-	//protected Object principal;
 	protected Set principal;
-	protected Object pbcred;
-	protected Object prcred;
+	protected Set pbcred;
+	protected Set prcred;
 	private LoginContext krb5;
 
 	public KerbAuth()
@@ -48,5 +47,10 @@ public class KerbAuth
 		throws LoginException
 	{
 		krb5.logout();
+	}
+
+	public Subject getSubject()
+	{
+		return this.subject;
 	}
 };

@@ -24,3 +24,8 @@ need to make sure that read permission is enabled to at least
 5. Add configuration to apache to not permit SSLv2... should be
 the command "SSLProtocol all -SSLv2" but figure out where it goes
 (this should be a real quick fix)
+
+6. Find out whether modfum needs to do anything special with ap_malloc
+variables... supposedly apache does it's own garbage collection, but
+do the variables need to be set to NULL so that it knows it can get
+rid of them?? (kinda like java??? remove all references to them)

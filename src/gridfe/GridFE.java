@@ -35,12 +35,19 @@ public class GridFE extends HttpServlet
 	private HttpServletRequest req;
 	private HttpServletResponse res;
 
+	/* XXX: make nestable. */
 	final DelegationHandler[] dtab = new DelegationHandler[] {
 		new DelegationHandler("",		gridfe.www.index.class),
 		new DelegationHandler("/",		gridfe.www.index.class),
-		new DelegationHandler("/login",		gridfe.www.login.class),
-		new DelegationHandler("/logout",	gridfe.www.logout.class),
-		new DelegationHandler("/certs",		gridfe.www.certs.class)
+		new DelegationHandler("/certs",		gridfe.www.certs.class),
+		new DelegationHandler("/jobs/output",	gridfe.www.jobs.output.class),
+		new DelegationHandler("/jobs/status",	gridfe.www.jobs.status.class),
+		new DelegationHandler("/jobs/submit",	gridfe.www.jobs.submit.class),
+		new DelegationHandler("/nodes",		gridfe.www.nodes.class),
+		new DelegationHandler("/rls/addcat",	gridfe.www.rls.addcat.class),
+		new DelegationHandler("/rls/addres",	gridfe.www.rls.addres.class),
+		new DelegationHandler("/rls/rmcat",	gridfe.www.rls.rmcat.class),
+		new DelegationHandler("/rls/search",	gridfe.www.rls.search.class)
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)

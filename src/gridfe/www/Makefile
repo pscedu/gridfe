@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += login.class
+CLASSES += login.class logout.class
 
 SYSROOT = ..
 

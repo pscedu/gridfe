@@ -7,7 +7,7 @@ public class logout {
 	public static String main(Page page) throws Exception {
 		String s;
 		OOF oof = page.getOOF();
-		Gridint gi = page.getGridInt();
+		GridInt gi = page.getGridInt();
 
 		gi.auth();
 		gi.logout();

@@ -2,7 +2,6 @@
 
 package gridfe.gridint;
 
-import gridfe.gridint.*;
 import java.io.*;
 import java.net.*;
 import org.globus.gram.*;
@@ -17,13 +16,13 @@ public class GridJob extends RSLElement implements Serializable
 
 	public GridJob(String host)
 	{
-		this.host = new String(host);
-		this.id = new String("No job submitted");
+		this.host = host;
+		this.id = "No job submitted";
 	}
 
 	public void setHost(String host)
 	{
-		this.host = new String(host);
+		this.host = host;
 	}
 
 	public String getHost()
@@ -57,7 +56,7 @@ public class GridJob extends RSLElement implements Serializable
 		throws GramException, GSSException
 	{
 		this.gi.jobSubmit(this);
-		this.id = new String(this.gi.getIDAsString());
+		this.id = this.gi.getIDAsString();
 	}
 
 	/* cancel the job and dispose of gramint instance */

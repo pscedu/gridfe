@@ -22,5 +22,5 @@ ${TARGET}: ${OBJS}
 install: ${TARGET}
 	${APXS} -i -a ${TARGET}
 
-driver:
+driver: driver.c
 	${CC} ${CFLAGS} ${LIBS} -fPIC -ldl driver.c -o $@

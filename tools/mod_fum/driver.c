@@ -16,20 +16,24 @@ int
 main(int argc, char *argv[])
 {
 	void *h;
-	void (*init)(const char*, const char*);
+	void (*init)(const char *, const char *);
 	char *username, *password;
 
-	if (argc == 1) {
-		username = getenv("USER");
-		password = NULL;
-	} else if (argc == 2) {
-		username = argv[1];
-		password = NULL;
-	} else if (argc == 3) {
-		username = argv[1];
+	password = NULL;
+	switch (argc) {
+	case 3:
 		password = argv[2];
-	} else
+		/* FALLTHROUGH */
+	case 2:
+		username = argv[1];
+		break;
+	case 1:
+		username = getenv("USER");
+		break;
+	default:
 		usage();
+		/* NOTREACHED */
+	}
 
 	if ((h = dlopen(_PATH_MOD_FUM, RTLD_LAZY)) == NULL)
 		errx(1, "%s: %s", _PATH_MOD_FUM, dlerror());

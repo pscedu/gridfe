@@ -24,7 +24,7 @@ XXX Things todo still:
 XXX Development Notes:
 	1) currently only users with user account can use authenticate.
 		mod_fum requires a uid lookup from /etc/passwd to write
-		the x.509 certificates in /tmp. 
+		the X.509 certificates in /tmp.
 
 	2) Apache 2.X series support only! (1.X could be added, but is
 		currently not needed for this project) Version 1.X changed
@@ -142,7 +142,7 @@ int mod_fum_auth(request_rec *r)
 			if(mf_valid_user(user, pass))
 			{
 				/*
-				** Finally check if the Credentials
+				** Finally check if the credentials
 				** have expired or not. If so create
 				** new certs, if not, do nothing
 				*/
@@ -176,7 +176,7 @@ int mod_fum_auth(request_rec *r)
 }
 
 /*
-** Save and Retrieve Pool (useful for ap_mallocs!)
+** Save and retrieve pool (useful for ap_mallocs!)
 ** #define mf_save_pool(x) mf_pool(x)
 ** #define mf_get_pool() mf_pool(NULL)
 */
@@ -191,7 +191,7 @@ static apr_pool_t* mf_pool(apr_pool_t *p)
 }
 
 /*
-** Save and Retrieve Request Record (useful for ap_log_err())
+** Save and retrieve request record (useful for ap_log_err())
 ** #define mf_save_request(x) mf_request(x)
 ** #define mf_get_request() mf_request(NULL)
 */
@@ -253,7 +253,7 @@ int mf_main(const char *principal, const char *password)
 
 			/* ----------- KX509 ----------- */
 
-			/* kx509 - just call the kx509lib*/
+			/* kx509 - just call the kx509lib */
 			err = mf_kx509(tkt_cache);
 			if(err != OK)
 				goto RET;
@@ -287,7 +287,7 @@ static int mf_kxlist(const char *tkt_cache)
 	int err;
 
 	/*
-	** Parse tkt_cache name to get uid:
+	** Parse tkt_cache name to get UID:
 	** /tmp/krb5cc_UID_FUBAR
 	** /tmp/krb5cc_UID
 	*/
@@ -438,7 +438,7 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 }
 
 /*
-** Parse the user id from the ticket_cache name
+** Parse the user ID from the ticket_cache name
 */
 static char* mf_get_uid_from_ticket_cache(const char *tkt)
 {
@@ -446,10 +446,10 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 	int b, e;
 	char *uid;
 
-	/* default to end of string */
+	/* Default to end of the string. */
 	e = strlen(tkt) - 1;
 
-	/* Grab the boundary of the uid */
+	/* Grab the boundary of the UID. */
 	for(i = 0, j = 0; i < (strlen(tkt) - 1) && j < 2; i++)
 	{
 		if(tkt[i] == '_')
@@ -462,8 +462,7 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 		}
 	}
 
-
-	/* slice and convert the uid */
+	/* Slice and convert the UID. */
 	uid = mf_dstrslice(tkt, b, e);
 
 	if(!uid)
@@ -586,7 +585,7 @@ static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	if(err)
 	{
 		/*
-		** In testing, This is thrown with the error -1765328188
+		** In testing, this is thrown with the error -1765328188
 		** when there are already credentials created and mod_fum
 		** does not have the proper permissions to read them!
 		*/
@@ -595,7 +594,7 @@ static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	}
 
 
-	/* Store the Credential */
+	/* Store the credential */
 	err = krb5_cc_store_cred(kinst->context, kinst->cache, &kinst->credentials);
 	if(err)
 		mf_err("store credentials failed", err);
@@ -632,11 +631,10 @@ static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 
 	kinst->initialized = 0;
 
-	/* Initialize Application Context */
+	/* Initialize application context */
 	err = krb5_init_context(&kinst->context);
 	if(!err)
 	{
-
 		/*
 		** Don't use the default!! we need to be able to
 		** write the tkt out with different uid's for each
@@ -861,8 +859,6 @@ static int mf_valid_user(const char *principal, const char *password)
 
 	return kinst.initialized;
 }
-
-
 
 /*
 -------------------------------DSTR-------------------------------

@@ -122,14 +122,11 @@ public class GridInt implements Serializable
 	*/
 	public String[] getJobData(GridJob job)
 	{
-		GassInt gass; 
-		Random r;
-		int port;
 		String data[] = {"No Output Available!", "No Error Output!"};
 
 		/* Is the job output local or remote? */
 		//if(job.remote())
-		if(false)
+		if(false && (job.stdout != null || job.stderr != null))
 		{
 			/* 
 			** Currently we cannot get remote output due to weird
@@ -139,62 +136,112 @@ public class GridInt implements Serializable
 			data[0] = "Remote stdout retrieval not supported yet!";
 			data[1] = "Remote stderr retrieval not supported yet!";
 		}
-		else
+		else if(job.stdout != null || job.stderr != null)
 		{
-			int active = 0;
+			/* Get local data if either stdout/stderr was set */
+			this.getLocalJobData(job, data);
+		}
 
-			/* Seed = CertLife * Uid */
-			r = new Random(
-				this.getCertInfo().time * this.uid.intValue() );
+		return data;
+	}
 
-			/*
-			** Randomly Generate a Port between
-			** our MIN/MAX Port Boundary
-			** XXX - configuration for this??
-			*/
-			final int MIN = 28000;
-			final int MAX = 28255 + 1;
-			port = r.nextInt((MAX-MIN)) + MIN;
+	private void getLocalJobData(GridJob job, String[] data)
+	{
+		GassInt gass; 
+		Random r;
+		int port;
+		int active = 0;
+		String stdout = null;
+		String stderr = null;
+		String directory = null;
 
-			/* Create a GASS Server to connect to */
-			gass = new GassInt(this.gss.getGSSCredential(),
-						job.getHost(), port);
+		/* Seed = CertLife * Uid */
+		r = new Random(
+			this.getCertInfo().time * this.uid.intValue() );
 
-			/* Read stdout/stderr and then shutdown */
+		/*
+		** Randomly Generate a Port between
+		** our MIN/MAX Port Boundary
+		** XXX - configuration for this??
+		*/
+		final int MIN = 28000;
+		final int MAX = 28255 + 1;
+		port = r.nextInt((MAX-MIN)) + MIN;
+
+		/* Create a GASS Server to connect to */
+		gass = new GassInt(this.gss.getGSSCredential(),
+					job.getHost(), port);
+
+		/*
+		** Determine if directory needs prepended to output.
+		** If stdout string starts with a '/' or '~' then
+		** the user has explicitly stated the path.
+		** If directory does not start with '/' then it
+		** needs to default to "~".
+		**
+		** ----------------------------------------------------- 
+		**
+		** Unfortunately GRAM assumes directories start from
+		** ~/ and if ~/dir is specified GRAM cannot expand the ~
+		**
+		** GASS on the other hand seems to assume a full path
+		** and support ~ expansion via the TILDE_EXPAND_ENABLE
+		** option.
+		**
+		** Therefore we have to manually adjust stdout, stderr
+		** and directory accordingly.
+		*/
+
+		if(job.directory.charAt(0) != '/')
+			directory = "~/" + job.directory;
+		else
+			directory = job.directory;
+		
+		//XXX - this needs to be cleaner somehow!!!
+		if(job.stdout != null && job.stdout.charAt(0) != '/' && 
+			job.stdout.charAt(0) != '~')
+				stdout = directory + "/" + job.stdout;
+		else
+			stdout = job.stdout;
+
+		if(job.stderr != null && job.stderr.charAt(0) != '/' &&
+			job.stderr.charAt(0) != '~')
+				stderr = directory + "/" + job.stderr;
+		else
+			stderr = job.stderr;
+
+
+		/* Read stdout/stderr and then shutdown */
+		try
+		{
+			/* start the gass server */
+			gass.start();
+			active = 1;
+
+			gass.open(stdout);
+			data[0] = gass.read();
+			gass.close();
+
 			try
 			{
-				gass.start();
-				active = 1;
-				//XXX - check job.directory...
-				gass.open(job.stdout);
-				data[0] = gass.read();
+				gass.open(stderr);
+				data[1] = gass.read();
 				gass.close();
-
-				if(job.stderr != null)
-				{
-					gass.open(job.stderr);
-					data[1] = gass.read();
-					gass.close();
-				}
 			}
 			catch(Exception e)
 			{
 				data[1] += " Exception: "+e.getMessage();
 			}
 
-			/* Make sure we terminate the gass server */
-			if(active == 1)
-			{
-				try
-				{
-					gass.shutdown();
-				}
-				catch(Exception e)
-				{}
-			}
+		}
+		catch(Exception e)
+		{
+			data[0] += " Exception: "+e.getMessage();
 		}
 
-		return data;
+		/* Make sure we terminate the gass server */
+		if(active == 1)
+			gass.shutdown();
 	}
 
 	/* Get a Job from the list */

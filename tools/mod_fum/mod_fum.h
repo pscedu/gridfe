@@ -1,4 +1,4 @@
-/*$ID$*/
+/* $Id$ */
 
 /*
 ** Free Apache Module to provide
@@ -7,7 +7,7 @@
 */
 
 #include<krb5.h>
-#include"httpd.h"
+#include<httpd/httpd.h>
 
 #define kModuleVersion "mod_fum/1.0-a"
 

@@ -26,12 +26,12 @@ XXX Developement Notes:
 		the x.509 certificates in /tmp. possibly try and find
 		a way to have the kdc give us a uid for users that do
 		not have local accounts...
-	
+
 	2) A problem exists with X.509 certificates. The certificates are
 		created with the permissions of apache/gridfe. Therefore if
 		the user logs in, he will not have permissions to create a (or
 		use the existing) valid proxy!
-	
+
 	3) Likewise (as stated above) if the user has already manually created
 		an X.509 certificate, the module does not have the required
 		permissions to read it! It will fail, saying the credentials
@@ -43,32 +43,32 @@ XXX Developement Notes:
 		the time to try and support both types at the moment.
 */
 
+#include<sys/stat.h>
 
-/* Includes */
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<krb5.h>
-#include<kx509.h>
 #include<err.h>
+#include<pwd.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
 #include<openssl/rsa.h>
 #include<openssl/x509v3.h>
 #include<openssl/pem.h>
-#include<sys/stat.h>
-#include<pwd.h>
 
-#include"httpd.h"
-#include"http_config.h"
-#include"http_core.h"
-#include"http_log.h"
-#include"http_main.h"
-#include"http_protocol.h"
-#include"http_request.h"
-#include"apr_strings.h"
+#include<krb5.h>
+#include<kx509.h>
+
+#include<httpd/httpd.h>
+#include<httpd/http_config.h>
+#include<httpd/http_core.h>
+#include<httpd/http_log.h>
+#include<httpd/http_main.h>
+#include<httpd/http_protocol.h>
+#include<httpd/http_request.h>
+#include<apr_strings.h>
 
 #include"mod_fum.h"
 
-/* Prototypes */
 static int mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
 static void mf_kinit_cleanup(krb5_inst_ptr);
 static void mf_kinit_set_uap(krb5_prefs_ptr, const char*, const char*);
@@ -126,7 +126,7 @@ int mod_fum_auth(request_rec *r)
 	/* Save request rec */
 	mf_save_pool(r->pool);
 	mf_save_request(r);
-	
+
 	/*
 	** Get user/pass - NOTE: ap_get_basic_auth_pw()
 	** must be called first!!! otherwise r->user will
@@ -197,7 +197,7 @@ static apr_pool_t* mf_pool(apr_pool_t *p)
 
 	if(p)
 		pool = p;
-	
+
 	return pool;
 }
 
@@ -212,7 +212,7 @@ static request_rec* mf_request(request_rec *r)
 
 	if(r)
 		rec = r;
-	
+
 	return rec;
 }
 
@@ -253,24 +253,24 @@ int mf_main(const char *principal, const char *password)
 			err = mf_kinit_setup(&kinst, &kprefs);
 			if(err != OK)
 				goto RET;
-		
+
 			/* kinit -c /tmp/krb5cc_$UID */
 			err = mf_kinit(&kinst, &kprefs);
 			if(err != OK)
 				goto RET;
-		
+
 			mf_kinit_cleanup(&kinst);
 			mf_krb5_free(&kinst);
-		
+
 			/* ----------- KX509 ----------- */
-			
+
 			/* kx509 - just call the kx509lib*/
 			err = mf_kx509(tkt_cache);
 			if(err != OK)
 				goto RET;
-		
+
 			/* ----------- KXLIST ----------- */
-		
+
 			/* kxlist -p */
 			err = mf_kxlist(tkt_cache);
 			if(err != OK)
@@ -283,7 +283,7 @@ int mf_main(const char *principal, const char *password)
 		}
 	}
 
-	RET:	
+	RET:
 	return err;
 }
 
@@ -297,7 +297,7 @@ static int mf_kxlist(const char *tkt_cache)
 	char *name;
 	int err;
 
-	/* 
+	/*
 	** Parse tkt_cache name to get uid:
 	** /tmp/krb5cc_UID_FUBAR
 	** /tmp/krb5cc_UID
@@ -361,7 +361,7 @@ static int mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
 
 		klen = kinst->credentials.ticket.length;
 		clen = kinst->credentials.second_ticket.length;
-	
+
 		/* Decode the Certifcate (we want PEM format) */
 		data = kinst->credentials.second_ticket.data;
 		d2i_X509((X509**)(&cert), &data, clen);
@@ -375,9 +375,9 @@ static int mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
 			/* write the certificate appropriately formated */
 			PEM_write_X509(file, cert);
 			PEM_write_RSAPrivateKey(file, priv, NULL, NULL, 0, NULL, NULL);
-			
+
 			fclose(file);
-		
+
 			/* Set proper permissions */
 			chmod(name, kX509FilePermissions);
 		}
@@ -411,13 +411,13 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 	/* The primary principal will be for the client */
 	err = krb5_cc_get_principal(kinst->context,
 					kinst->cache,
-					&screds.client);	
+					&screds.client);
 	if(err)
 	{
 		mf_err("get client principal failed", err);
 		goto RET;
 	}
-	
+
 	/* Now obtain one for the server */
 	err = krb5_sname_to_principal(kinst->context,
 					kKX509HostName,
@@ -441,7 +441,7 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 		mf_err("unable to retrieve kx509 credential", err);
 		goto RET;
 	}
-	
+
 	krb5_free_cred_contents(kinst->context, &screds);
 
 	RET:
@@ -459,7 +459,7 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 
 	/* default to end of string */
 	e = strlen(tkt) - 1;
-	
+
 	/* Grab the boundry of the uid */
 	for(i = 0, j = 0; i < (strlen(tkt) - 1) && j < 2; i++)
 	{
@@ -508,11 +508,11 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 	{
 		/* read the passwd file */
 		pw = getpwnam(p);
-		
+
 		if(pw)
 		{
-			/* 
-			** convert uid to (char*), 
+			/*
+			** convert uid to (char*),
 			** (first snprintf gives the size)
 			*/
 			(*uid) = mf_dstritoa(pw->pw_uid);
@@ -552,9 +552,9 @@ static int mf_kx509(const char *tkt_cache)
 	/* simply run kx509 */
 	err = do_kx509(argc, argv);
 
-	if(err != KX509_STATUS_GOOD) 
+	if(err != KX509_STATUS_GOOD)
 		mf_err("kx509 failed", err);
-	
+
 	return Kx509ToApache(err);
 }
 
@@ -604,8 +604,8 @@ static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 		mf_err("initialize cache failed", err);
 		goto RET;
 	}
-	
-	
+
+
 	/* Store the Credential */
 	err = krb5_cc_store_cred(kinst->context, kinst->cache, &kinst->credentials);
 	if(err)
@@ -636,7 +636,7 @@ static void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 */
 static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 {
-	krb5_error_code err; 
+	krb5_error_code err;
 
 	/* Important!! segfaults without this!! */
 	memset(&kinst->credentials, '\0', sizeof(krb5_creds));
@@ -647,7 +647,7 @@ static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 	err = krb5_init_context(&kinst->context);
 	if(!err)
 	{
-	
+
 		/*
 		** Don't use the default!! we need to be able to
 		** write the tkt out with different uid's for each
@@ -660,7 +660,7 @@ static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 	}
 	else
 		mf_err("krb5_init_context failed", err);
-	
+
 	return KrbToApache(err);
 }
 
@@ -668,7 +668,7 @@ static void mf_krb5_free(krb5_inst_ptr kinst)
 {
 	if(kinst->initialized)
 		krb5_free_cred_contents(kinst->context, &kinst->credentials);
-	
+
 	if(kinst->cache)
 		krb5_cc_close(kinst->context, kinst->cache);
 }
@@ -678,7 +678,7 @@ static void mf_krb5_free(krb5_inst_ptr kinst)
 */
 static int mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 {
-	krb5_error_code err; 
+	krb5_error_code err;
 
 	/*
 	** Generate a full principal name
@@ -691,7 +691,7 @@ static int mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 		mf_err("create principal failed", err);
 		goto RET;
 	}
-	
+
 	/*
 	** Take the principal name we were given and parse it
 	** into the appropriate form for authentication protocols
@@ -699,7 +699,7 @@ static int mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	err = krb5_parse_name(kinst->context, kprefs->pname, &kinst->principal);
 	if(err)
 		mf_err("parse_name failed", err);
-	
+
 	RET:
 	return KrbToApache(err);
 }
@@ -776,7 +776,7 @@ static int mf_valid_credentials(char *principal)
 	int err;
 	char *tkt_cache;
 	int valid = 0;
-	
+
 	err = mf_user_id_from_principal(principal, &uid);
 
 	if(err == OK)
@@ -818,7 +818,7 @@ static int mf_valid_credentials(char *principal)
 ** (for now just simulate a kerberos authentication)
 **
 ** XXX - There must be a better way to validate the
-** authenticity of the user... 
+** authenticity of the user...
 ** XXX - if this is the best way
 ** to do this, then i need to try and find a more modular
 ** way, because much of this code is similar to kinit...
@@ -837,7 +837,7 @@ static int mf_valid_user(const char *principal, const char *password)
 	if(err == OK)
 	{
 		mf_kinit_set_uap(&kprefs, principal, password);
-	
+
 		err = KrbToApache(mf_kinit_setup(&kinst, &kprefs));
 
 		if(err == OK)
@@ -905,7 +905,7 @@ static char* mf_dstrcat(const char *s1, const char *s2)
 }
 
 /*
-** dynamic string routing to slice a section 
+** dynamic string routing to slice a section
 */
 static char* mf_dstrslice(const char *s, int x, int y)
 {
@@ -928,15 +928,15 @@ static char* mf_dstrslice(const char *s, int x, int y)
 			{
 				/* ptr increment to start location */
 				s += x;
-				
+
 				strncpy(s2, s, len - 1);
 				s2[len-1] = '\0';
 			}
 			else
 				s2 = NULL;
 		}
-	}	
-	
+	}
+
 	return s2;
 }
 

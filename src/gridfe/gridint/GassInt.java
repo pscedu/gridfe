@@ -123,6 +123,10 @@ public class GassInt extends RemoteGassServer
 	public void close()
 		throws IOException
 	{
-		this.fin.close();
+		if(this.fin != null)
+		{
+			this.fin.close();
+			this.fin = null;
+		}
 	}
 };

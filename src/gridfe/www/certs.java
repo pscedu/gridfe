@@ -17,7 +17,7 @@ public class certs
 
 		int uid = 6342;
 //		int uid = page.getUserID();
-		CertInfo ci;
+		CertInfo ci = null;
 
 //		ci = p.getGridInt().getCertInfo();
 
@@ -25,13 +25,12 @@ public class certs
 		try
 		{
 			gi = new GridInt(uid);
+			ci = gi.getCertInfo();
 		}
 		catch(Exception e)
 		{
 			s += oof.p(e.getMessage());
 		}
-
-		ci = gi.getCertInfo();
 
 		long tmp;
 		long sec = ci.time;
@@ -48,6 +47,8 @@ public class certs
 				   hours + " hours, " +
 				   min + " mins)";
 
+		return (s);
+/*
 		s += p.header("Certificate Management")
 		   + oof.table(
 				new Object[] {},
@@ -158,6 +159,7 @@ public class certs
 		   + p.footer();
 
 		return (s);
+*/
 	}
 };
 

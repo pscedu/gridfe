@@ -92,9 +92,9 @@ public class GridFE extends HttpServlet
 				new Class[] { Page.class });
 			w.println("Found m: " + m);
 			w.print(p.getOOF().p("asdf"));
-
-			s = (String)handler.getMethod("main",
-				new Class[] { Page.class }).invoke(null, new Object[] {p});
+s = m.invoke(null, new Object[] {p});
+//			s = (String)handler.getMethod("main",
+//				new Class[] { Page.class }).invoke(null, new Object[] {p});
 		} catch (Exception e) {
 			s = this.handleError(p, e + ": " + e.getMessage());
 		}

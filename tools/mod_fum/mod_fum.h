@@ -24,6 +24,11 @@
 
 #define LIBKX509_PATH "libkx509.so"
 
+#define kKX509HostName "certificate"
+#define kKX509ServiceName "kx509"
+#define kX509DefaultFile "/tmp/x509up_u"
+#define kX509FilePermissions 0600
+
 typedef struct
 {
 	krb5_context context;

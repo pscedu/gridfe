@@ -175,9 +175,9 @@ public class suite {
 			"<table width=\"500\">");
 		t("table_end", o.table_end(), "</table>");
 		t("table_row", o.table_row(new Object[][] {
-					new Object[] { "c1a", "c1b" },
-					new Object[] { "c2a", "c2b" }}),
-			"<tr><td>c1ac1b</td><td>c2ac2b</td></tr>"
+					new Object[] { "c1p1k", "c1p1v" },
+					new Object[] { "c2p1k", "c2p1v" }}),
+			"<tr><td c1p1k=\"c1p1v\" /><td c2p1k=\"c2p1v\" /></tr>"
 		);
 	}
 }

@@ -6,10 +6,10 @@ import oof.*;
 import oof.filter.*;
 
 public class ELEMENT {
-	private String name;
-	private LinkedList attrs;
-	private LinkedList children;
-	private FILTER filter;
+	public String name;
+	public LinkedList attrs;
+	public LinkedList children;
+	public FILTER filter;
 
 	public ELEMENT(Object[] attrs, Object[] os) {
 		this.attrs	= new LinkedList();

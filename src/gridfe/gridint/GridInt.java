@@ -2,12 +2,12 @@
 
 package gridint;
 
-import org.ietf.jgss.*;
-import org.globus.gsi.*;
-import java.security.PrivateKey;
 import gridint.auth.*;
-import org.globus.gram.*;
 import jasp.Uid;
+import java.security.PrivateKey;
+import org.globus.gram.*;
+import org.globus.gsi.*;
+import org.ietf.jgss.*;
 
 public class GridInt
 {

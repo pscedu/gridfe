@@ -130,7 +130,6 @@ public class Page
 
 	public String header(String title)
 	{
-
 		this.addMenu("Main", "/", null);
 		this.addMenu("Jobs", "/jobs",
 			new Object[] {
@@ -139,7 +138,6 @@ public class Page
 				"Output", "/jobs/output"
 			});
 		this.addMenu("Certificate Management", "/certs", null);
-//		this.addMenu("Grid FTP", "/ftp", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalogue",		"/rls/addcat",
@@ -182,7 +180,7 @@ public class Page
 		  +					"</div>";
 
 		return (s);
-/*
+
 		// Menu
 		Menu m;
 		String name, url;
@@ -211,6 +209,7 @@ public class Page
 				}
 			}
 		}
+/*
 						// Sponsors
 		s +=				"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"

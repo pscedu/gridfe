@@ -1,11 +1,47 @@
 /* $Id$ */
 package oof.element;
 
+import java.util.*;
 import oof.*;
 import oof.element.*;
 
 public abstract class START implements Startable {
+	public LinkedList attrs;
+	public OOF oof;
+
 	public START(OOF oof, Object[] attrs) throws OOFBadElementFormException {
-		super(oof, attrs, new Object[] {});
+		this.oof	= oof;
+		this.attrs	= new LinkedList();
+		for (int i = 0; i < attrs.length; i++)
+			this.attrs.add(attrs[i]);
+	}
+
+	public String removeAttribute(String key) {
+		for (int i = 0; i < this.attrs.size(); i += 2) 
+			if (((String)this.attrs.get(i)).equals(key)) {
+				String val = (String)this.attrs.get(i + 1);
+				this.attrs.remove(i);
+				this.attrs.remove(i);
+				return val;
+			}
+		return null;
+	}
+
+	public void addAttribute(String key, String val) {
+		this.attrs.add((Object)key);
+		this.attrs.add((Object)val);
+	}
+
+	public String getAttribute(String key) {
+		Object e;
+		for (Iterator i = this.attrs.iterator();
+		     (e = i.next()) != null; )
+			if (((String)e).equals(key))
+				return (String)i.next();
+		return null;
+	}
+
+	public LinkedList getAttributes() {
+		return this.attrs;
 	}
 };

@@ -25,61 +25,78 @@ public class suite
 //		System.out.println(gi.getGSSAuth().getName());
 
 		/* RSLElement Test */
-		RSLElement r;
-		r = new RSLElement(new String[] {"executable","stdout"},
-				new String[] {"/bin/date", "job-output.gram"},
-				new String("arguments"),
-				new String[] {"-arg1", "-arg2 test"});
+//		RSLElement r;
+//		r = new RSLElement(new String[] {"executable","stdout"},
+//				new String[] {"/bin/date", "job-output.gram"},
+//				new String("arguments"),
+//				new String[] {"-arg1", "-arg2 test"});
 
 //		System.out.println(r);
 
-		r = new RSLElement(new String[] {"executable","stdout"},
-				new String[] {"/bin/date", "job-output.gram"},
-				new String("environment"),
-				new String[] {"env1", "env2"},
-				new String[] {"value1", "value2"});
+//		r = new RSLElement(new String[] {"executable","stdout"},
+//				new String[] {"/bin/date", "job-output.gram"},
+//				new String("environment"),
+//				new String[] {"env1", "env2"},
+//				new String[] {"value1", "value2"});
 
 //		System.out.println(r);
 
-		r = new RSLElement(new String[] {"executable","stdout"},
-				new String[] {"/bin/date", "job-output.gram"},
-				new String("arguments"),
-				new String[] {"-arg1", "-arg2 test"},
-				new String("environment"),
-				new String[] {"env1", "env2"},
-				new String[] {"value1", "value2"});
+//		r = new RSLElement(new String[] {"executable","stdout"},
+//				new String[] {"/bin/date", "job-output.gram"},
+//				new String("arguments"),
+//				new String[] {"-arg1", "-arg2 test"},
+//				new String("environment"),
+//				new String[] {"env1", "env2"},
+//				new String[] {"value1", "value2"});
 
 //		System.out.println(r);
 
 		/* Use RSLElement for GRAM test */
-		RSLElement rsl;
-		rsl = new RSLElement(new String[] {"executable","stdout", "stderr"},
-				new String[] {"/bin/uname", "/home/rbudden/job-output.gram", "/home/rbudden/job-err.gram"},
-				new String("arguments"),
-				new String[] {"-a"});
+//		RSLElement rsl;
+//		rsl = new RSLElement(new String[] {"executable","stdout", "stderr"},
+//				new String[] {"/bin/uname", "/home/rbudden/job-output.gram", "/home/rbudden/job-err.gram"},
+//				new String("arguments"),
+//				new String[] {"-a"});
 
-		r = new RSLElement(new String[] {"executable", "stdout"}, new String[] {"/bin/sleep", "gram.out"},
-					new String("arguments"), new String[] {"10s"});
+//		r = new RSLElement(new String[] {"executable", "stdout"}, new String[] {"/bin/sleep", "gram.out"},
+//					new String("arguments"), new String[] {"10s"});
 
-		/* Use GridInt to test GramInt */
-		GramInt gri = new GramInt(gi.getGSSAuth().getGSSCredential(), "mugatu.psc.edu");
-		System.out.println("RSL build: " + r);
-		gri.jobSubmit(r);
+		GridJob j = new GridJob("mugatu.psc.edu");
+		j.setRSL(new String[] {"executable", "stdout"},
+			new String[] {"/bin/sleep", "gram.out"},
+			new String("arguments"),
+			new String[] {"10s"});
 
-		/* check status */
+		gi.jobSubmit(j);
+
 		do
 		{
-			System.out.println(gri.getStatusAsString());
-			System.out.println(gri.getStatus());
-			Thread.sleep(1000);
+			System.out.println(j.getStatus()+" : "+j.getStatusAsString());
+			Thread.sleep(900);
 
-		}while(gri.getStatus() != -1);
-		System.out.println(gri.getStatusAsString());
-		System.out.println(gri.getStatus());
+		}while(j.getStatus() != -1);
+		System.out.println(j.getStatus()+" : "+j.getStatusAsString());
+
+
+		/* Use GridInt to test GramInt */
+//		GramInt gri = new GramInt(gi.getGSSAuth().getGSSCredential(), "mugatu.psc.edu");
+//		System.out.println("RSL build: " + r);
+//		gri.jobSubmit(r);
+
+		/* check status */
+//		do
+//		{
+//			System.out.println(gri.getStatusAsString());
+//			System.out.println(gri.getStatus());
+//			Thread.sleep(1000);
+
+//		}while(gri.getStatus() != -1);
+//		System.out.println(gri.getStatusAsString());
+//		System.out.println(gri.getStatus());
 
 		/* Other Method tests */
-		System.out.println(gri.getJob().getID());
-		System.out.println(gri.getIDAsString());
-		System.out.println("Stdout: " + gri.getStdout());
+//		System.out.println(gri.getJob().getID());
+//		System.out.println(gri.getIDAsString());
+//		System.out.println("Stdout: " + gri.getStdout());
 	}
 }

@@ -6,6 +6,7 @@ import org.ietf.jgss.*;
 import org.globus.gsi.*;
 import java.security.PrivateKey;
 import gridint.auth.*;
+import org.globus.gram.*;
 
 public class GridInt
 {
@@ -26,6 +27,33 @@ public class GridInt
 		this.gss = new GSSAuth(ga);
 		this.gss.createCredential();
 	}
+
+	public void jobSubmit(GridJob job) throws GramException, GSSException
+	{
+		job.init(this.gss.getGSSCredential());
+		job.run();
+
+		// TODO: add to linkedlist to keep track of jobs...
+	}
+
+	public void jobCancel(GridJob job) throws GramException, GSSException
+	{
+		job.cancel();
+
+		// TODO: remove from linkedlist to keep track of jobs...
+	}
+
+	public void getJobOutput()
+	{
+
+	}
+
+	public void getJobStatus()
+	{
+
+	}
+
+	
 
 	public GlobusAuth getGlobusAuth()
 	{

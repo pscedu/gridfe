@@ -76,6 +76,10 @@ public class GramInt
 	
 	private void gramRequest(String host, RSLElement rsl) throws GramException, GSSException
 	{
+		//DEBUG
+		if(host == null)
+			System.out.println("host is null");
+
 		/* Make sure the host is there */
 		Gram.ping(this.gss, host);
 

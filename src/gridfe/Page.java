@@ -158,6 +158,7 @@ public class Page
 	}
 
 	public String header(String title)
+		throws OOFException
 	{
 		String s, name, url;
 		String r = this.webroot;

@@ -18,5 +18,6 @@ CLASSPATH = `echo ${SCLASSPATH} | tr -d '\t\n\ '`
 JFLAGS = -classpath ${CLASSPATH}
 JCFLAGS = -g -classpath ${CLASSPATH}
 JDEP = ${SYSROOT}/tools/jdep/jdep
+MKDEP = mkdep
 
 -include ${SYSROOT}/lib/mk/local.mk

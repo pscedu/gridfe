@@ -5,7 +5,7 @@ import oof.*;
 
 public class suite {
 	public static void t(String desc, Object a, String b) {
-		System.out.println(desc + ":" + a);
+		System.out.println(desc + ": " + a);
 		if (!b.equals(a.toString())) {
 			System.out.println("Output does not match expected!");
 			System.out.println("expected: " + b);
@@ -105,6 +105,11 @@ public class suite {
 
 		t("list_item", o.list_item("sup"), "<li>sup</li>");
 
+		t("p", o.p(), "<p />");
+		t("p", o.p("paragraph test"), "<p>paragraph test</p>");
+		t("p", o.p(new Object[] { "align", "center" }, "paragraph test"),
+			"<p align=\"center\">paragraph test</p>");
+
 		t("pre", o.pre("some pre text"),
 			"<pre>some pre text</pre>");
 		t("pre", o.pre(new Object[] { "class", "foo" }, "some pre text"),
@@ -163,7 +168,7 @@ public class suite {
 				"</tr>" +
 			"</table>");
 		t("table_start", o.table_start(new Object[] { "width", "500" }),
-			"<table width=\"500\"></table>");
+			"<table width=\"500\">");
 		t("table_end", o.table_end(), "</table>");
 		t("table_row", o.table_row(new Object[][] {
 					new Object[] { "c1a", "c1b" },

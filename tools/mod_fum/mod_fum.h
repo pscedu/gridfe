@@ -47,7 +47,7 @@ typedef struct
 	krb5_principal principal;
 	krb5_creds credentials;
 	int initialized;
-	
+
 }krb5_inst, *krb5_inst_ptr;
 
 typedef struct
@@ -57,5 +57,5 @@ typedef struct
 	int proxiable;
 	const char *pname;
 	const char *password;
-	
+
 }krb5_prefs, *krb5_prefs_ptr;

@@ -180,7 +180,8 @@ public class Page
 		  + 	"<head>"
 		  +	 		"<title>" + this.jasp.escapeHTML(title) + "</title>"
 		  +			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
-		  +			"<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/main.css\" media=\"screen\">"
+		  +			"<link rel=\"stylesheet\" type=\"text/css\" "
+		  +				"href=\"" + r + "/lib/main.css\" media=\"screen\">"
 		  +			"<script type=\"text/javascript\" src=\"" + r + "/lib/Global.js\"></script>"
 		  +			this.addScript(
 		   				"include('" + r + "/lib/Browser.js');" +

@@ -2,7 +2,9 @@
 
 package jasp;
 
-public class Uid
+import java.io.*;
+
+public class Uid implements Serializable
 {
 	private int uid;
 

@@ -9,18 +9,19 @@
 #include<krb5.h>
 #include"httpd.h"
 
+#define kModuleVersion "mod_fum/1.0-a"
+
 /* Macro Functions */
 #define mf_save_pool(x) mf_pool(x)
 #define mf_get_pool() mf_pool(NULL)
 #define mf_save_request(x) mf_request(x)
 #define mf_get_request() mf_request(NULL)
-/*
-#define mf_err(x,y) ap_log_error(APLOG_MARK, APLOG_EMERG, \
+#define mf_err(x,y) ap_log_error(APLOG_MARK, APLOG_ERR, \
 			(apr_status_t)(NULL), (mf_get_request())->server, \
-			"%s: error: %d", x, y)
-*/
+			"%s - %s: error %d on line %d", kModuleVersion, x, \
+			y, __LINE__)
 //DEBUG
-#define mf_err(x,y) mod_fum_err(x,y)
+//#define mf_err(x,y) mod_fum_err(x,y)
 
 #define kProxiable 1
 #define kForwardable 0

@@ -12,7 +12,12 @@
 
 /*
 XXX Things todo still:
-	1) test module, fix any errors
+	1) ap_uname2id(char*) - use this to obtain user id?
+	2) fix mod_fum_auth() return value
+	3) check for previously existing credentials and whether or not
+		they are valid before creating new ones...
+	4) handle errors appropriately, allow gridfe page to explain what
+		went wrong... return error codes, can't just use exit();
 
 XXX Developement Notes:
 	1) currently only users with user account can use authenticate.
@@ -20,12 +25,13 @@ XXX Developement Notes:
 		the x.509 certificates in /tmp. possibly try and find
 		a way to have the kdc give us a uid for users that do
 		not have local accounts...
-
+		
 	2) since mod_fum runs under apache the env X509_USER_PROXY cannot
 		be read, therefore X.509 Certificates will be created at
 		the default location (/tmp/x509u_u####). Users who require
 		$X509_USER_PROXY to be set must do this manually if they
 		plan on loging into the machine remotely (via ssh, etc...)
+
 	3) Apache 2.X series support only! (1.X could be added, but is
 		currently not needed for this project) Version 1.X changed
 		enough functions, data types, etc. that it was not worth
@@ -39,7 +45,7 @@ XXX Developement Notes:
 #include<stdlib.h>
 #include<krb5.h>
 #include<kx509.h>
-#include<dlfcn.h>
+//#include<dlfcn.h>
 #include<err.h>
 #include<openssl/rsa.h>
 #include<openssl/x509v3.h>
@@ -99,8 +105,10 @@ module fum_module =
 /* Register hooks in Apache */
 static void mod_fum_hooks(apr_pool_t *p)
 {
+	/* We need to be the first to intercept the password */
 	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_FIRST);
-	//ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_MIDDLE);
+
+	ap_add_version_component(p, kModuleVersion);
 }
 
 //DEBUG
@@ -119,19 +127,10 @@ int mod_fum_auth(request_rec *r)
 	int err = OK;
 	const char *pass = NULL;
 
-	//DEBUG
-	mod_fum_err("\nentered mod_fum_auth", 1);
-
-//	auth_data_ptr data = (auth_data_ptr)
-//		ap_module_config(r->per_dir_coinfig, &fum_module);
-
 	/* Save request rec */
 	mf_save_pool(r->pool);
 	mf_save_request(r);
 	
-	//DEBUG
-	mod_fum_err("pool/request saved", 1);
-
 	/*
 	** Get user/pass - NOTE: ap_get_basic_auth_pw()
 	** must be called first!!! otherwise r->user will
@@ -139,11 +138,6 @@ int mod_fum_auth(request_rec *r)
 	*/
 	err = ap_get_basic_auth_pw(r, &pass);
 	user = r->user;
-
-	//DEBUG
-	mod_fum_err("user/pass", 1);
-	mod_fum_err(user, 1);
-	mod_fum_err(pass, 1);
 
 	if(err != OK)
 		mf_err("error retrieving password", err);
@@ -158,16 +152,12 @@ int mod_fum_auth(request_rec *r)
 	}
 	
 	/* Create Certificate */
-	//DEBUG
-	mod_fum_err("create cert", 1);
-	return HTTP_UNAUTHORIZED;
-
 	mf_main(user, pass);
 
-	mod_fum_err("cert created", 1);
-	
 	// XXX HTTP_ACCEPTED or HTTP_CREATED???
-	return HTTP_ACCEPTED;
+	// HTTP_ACCEPTED - doesn't continue with request...
+	// HTTP_OK - doesn't continue with request...
+	return HTTP_CONTINUE;
 }
 
 /*

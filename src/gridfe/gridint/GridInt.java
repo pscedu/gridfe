@@ -97,9 +97,6 @@ public class GridInt implements Serializable
 		
 		/* Add job to list */
 		this.list.push(job);
-
-		/* Register name in Map */
-		//XXX - ADD MAP
 	}
 
 	/* Cancel Job and remove from Job List */
@@ -294,10 +291,10 @@ public class GridInt implements Serializable
 	}
 
 	/* Get a job from the list by it's name */
-//	public GridJob getJob(String name)
-//	{
-
-//	}
+	public GridJob getJob(String name)
+	{
+		return this.list.get(name);
+	}
 
 	/*
 	** TODO: elegant way to get status of jobs and retrieve

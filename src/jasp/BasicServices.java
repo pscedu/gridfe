@@ -49,8 +49,8 @@ public class BasicServices
 	{
 		String t = "";
 		for (int i = 0; i < s.length(); i++)
-			if (!s.substring(i, 1).equals(" "))
-				t += s.substring(i, 1);
+			if (s.charAt(i) != ' ')
+				t += s.charAt(i);
 		return t;
 	}
 };

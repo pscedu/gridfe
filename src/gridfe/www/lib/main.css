@@ -4,3 +4,9 @@ body {
 	padding: 0px;
 	margin: 0px;
 }
+
+.bg {
+	background-color: #336699;
+	/* XXX: dynamically generate path */
+	background-image: url(img/background.png);
+}

@@ -19,6 +19,6 @@ JFLAGS = -classpath ${CLASSPATH}
 JCFLAGS = -g -classpath ${CLASSPATH}
 JDEP = ${SYSROOT}/tools/jdep/jdep
 KX509_PREFIX = /usr/local/kx509/src/lib
-APR_PREFIX = /usr/include/apr-0
+APR_PREFIX = /usr/include/httpd
 APXS = /usr/sbin/apxs
 KRB_PREFIX = /usr/kerberos

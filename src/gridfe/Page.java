@@ -236,8 +236,9 @@ public class Page
 			}
 		}
 
-						// Sponsors
-		s +=				"<a href=\"http://www-unix.globus.org/cog/\">"
+							// Sponsors
+		s +=				"<br />"
+		   +				"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"
 		   +				"</a>"
 		   +				"<a href=\"\">"

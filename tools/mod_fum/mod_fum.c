@@ -110,15 +110,17 @@ int mod_fum_auth(request_rec *);
 static apr_pool_t	*mf_pool = NULL;
 static request_rec	*mf_rec = NULL;
 
+#ifdef APXS1
+#else
 /* Apache 2.x lmodule record, handlers, & hooks */
 module fum_module = {
-	STANDARD20_MODULE_STUFF,	/* */
-	NULL,				/* */
-	NULL,				/* */
-	NULL,				/* */
-	NULL,				/* */
-	NULL,				/* */
-	mod_fum_hooks,			/* */
+	STANDARD20_MODULE_STUFF,
+	NULL,				/* create per-httpd.conf */
+	NULL,				/* merge per-httpd.conf */
+	NULL,				/* create pre-.htaccess */
+	NULL,				/* merge pre-.htaccess */
+	NULL,				/* config */
+	mod_fum_hooks,			/* hooks */
 };
 
 /* Register hooks in Apache */
@@ -126,42 +128,46 @@ void
 mod_fum_hooks(apr_pool_t *p)
 {
 #ifndef STANDALONE
-	/* We need to be the first to intercept the password */
-	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_FIRST);
+	/* We need to be the first to intercept the password. */
+	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_MIDDLE);
 	ap_add_version_component(p, MF_VERSION);
 #endif /* STANDALONE */
 }
+#endif
 
 /* Apache authentication hook */
 int
 mod_fum_auth(request_rec *r)
 {
-	const char *pass = NULL;
+	const char *auth, *name, *type, *pass = NULL;
 	char *user;
 	int err;
 
-	/* Save request rec */
+	/* Save request record. */
 	mf_pool = r->pool;
 	mf_rec = r;
 
-#ifndef STANDALONE
-	/*
-	 * Get user/pass - NOTE: ap_get_basic_auth_pw() must be called
-	 * first, otherwise r->user will be NULL.
-	 */
-	err = ap_get_basic_auth_pw(r, &pass);
-	user = r->user;
-#endif /* STANDALONE */
+	if ((type = ap_auth_type(r)) == NULL ||
+	    strcasecmp(type, "fum") != 0)
+		return (DECLINED);
 
-	if (err != OK || user == NULL || pass == NULL) {
-		mf_log("authentication incomplete (%d)", err);
-		return (HTTP_UNAUTHORIZED);
+	if ((auth = apr_table_get(r->headers_in, "Authorization")) == NULL)
+		goto failed_auth;
+	if ((type = ap_getword_white(r->pool, &auth)) == NULL ||
+	    strcasecmp(type, "Basic") != 0)
+		goto failed_auth;
+	pass = ap_pbase64decode(r->pool, auth);
+	user = ap_getword(r->pool, &pass, ':');
+
+	/* Check if previous credentials exist. */
+	if (!mf_check_for_cred(user)) {
+		/* Create new certs. */
+		if ((err = mod_fum_main(user, pass)) ==
+		    HTTP_UNAUTHORIZED)
+			goto failed_auth;
+		else
+			return (err);
 	}
-
-	/* Check if previous credentials exist */
-	if (!mf_check_for_cred(user))
-		/* Create new certs */
-		return (mod_fum_main(user, pass));
 
 	/*
 	 * They exist, make sure the user/pass is correct;
@@ -170,7 +176,7 @@ mod_fum_auth(request_rec *r)
 	 */
 	if (!mf_valid_user(user, pass)) {
 		mf_log("wrong user/pass combination");
-		return (HTTP_UNAUTHORIZED);
+		goto failed_auth;
 	}
 
 	/*
@@ -185,11 +191,18 @@ mod_fum_auth(request_rec *r)
 		 * does not have permission to read it.
 		 */
 		mf_log("credentials expired");
-		return (HTTP_UNAUTHORIZED);
+		goto failed_auth;
 	}
 
 	/* Create new certs */
-	return (mod_fum_main(user, pass));
+	if ((err = mod_fum_main(user, pass)) != HTTP_UNAUTHORIZED)
+		return (err);
+
+failed_auth:
+	name = ap_auth_name(r);
+	apr_table_add(r->err_headers_out, "WWW-Authenticate",
+	    apr_pstrcat(r->pool, "Basic realm=\"", name, "\"", NULL));
+	return (HTTP_UNAUTHORIZED);
 }
 
 int
@@ -202,15 +215,15 @@ mod_fum_main(const char *principal, const char *password)
 
 	/* XXX Resolve UID from KDC with given principal (possible?) */
 
-	/* Read uid from /etc/passwd */
+	/* Read UID from /etc/passwd */
 	if ((err = mf_user_id_from_principal(principal, &uid)) != 0)
 		return (err);
-	if ((tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid)) == NULL) {
-		free(uid);
+	tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid);
+	free(uid);
+	if (tkt_cache == NULL) {
 		mf_log("tkt_cache is NULL");
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	}
-	free(uid);
 
 	if ((err = mf_krb5_init(&ki, tkt_cache)) != 0)
 		return (err);
@@ -237,11 +250,13 @@ mod_fum_main(const char *principal, const char *password)
 	/* kxlist -p */
 	if ((err = mf_kxlist(tkt_cache)) != 0)
 		return (err);
-	
+		
+mf_log("prin: %s", principal);
+
 	if ((err = apr_env_set(MF_USERENV, principal, mf_pool)) != OK)
 		return (err);
 
-	return (0);
+	return (0); /* HTTP_OK ? */
 }
 
 static int

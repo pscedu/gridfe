@@ -57,7 +57,7 @@ test: all $(addsuffix .class,$(basename ${TESTS}))
 	done
 	@for i in ${TESTS}; do							\
 		echo "${JAVA} ${JFLAGS} $$i";					\
-		${JAVA} ${JFLAGS} $$i;						\
+		${JAVA} ${JFLAGS} $$i || exit 1;				\
 	done
 
 clean:

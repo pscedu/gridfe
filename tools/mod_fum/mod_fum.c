@@ -142,22 +142,16 @@ int mod_fum_auth(request_rec *r)
 	if(err != OK)
 		mf_err("error retrieving password", err);
 	
+	/* Create Certificate */
 	if(!user || !pass)
 	{
 		mf_err("err obtaining username/password NULL", 1);
-		return HTTP_UNAUTHORIZED;
-		
-		//DEBUG - DECLINED allows the request to go through to apache's passwd file
-		//return DECLINED;
+		err = HTTP_UNAUTHORIZED;
 	}
-	
-	/* Create Certificate */
-	mf_main(user, pass);
+	else
+		mf_main(user, pass);
 
-	// XXX HTTP_ACCEPTED or HTTP_CREATED???
-	// HTTP_ACCEPTED - doesn't continue with request...
-	// HTTP_OK - doesn't continue with request...
-	return HTTP_CONTINUE;
+	return err;
 }
 
 /*

@@ -13,13 +13,16 @@
 #define mf_warn(x,y,z) ap_log_error(APLOG_MARK,APLOG_WARN,z,x ": Err %d", y)
 #endif
 
-#define mf_err(x,y,z) errx(1, x ": error %d", y)
+//#define mf_err(x,y,z) errx(1, x ": error %d", y)
+#define mf_err(x,y,z) errx(1,"%s: error %d on line %d of %s",x,y,__LINE__,__FILE__)
 #define mf_warn(x,y,z) warnx(x ": error %d", y)
 
 #define kProxiable 1
 #define kForwardable 0
 /* 8hrs. default */
 #define kLifetime 28800
+
+#define LIBKX509_PATH "libkx509.so"
 
 typedef struct
 {

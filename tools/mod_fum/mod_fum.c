@@ -15,7 +15,9 @@ XXX When deployed:
 
 #include<stdio.h>
 #include<string.h>
-#include <krb5.h>
+#include<krb5.h>
+#include<kx509.h>
+#include<dlfcn.h>
 #include <err.h>
 
 #include"mod_fum.h"
@@ -81,6 +83,8 @@ void mf_kx509(const char *tkt_cache)
 	char *argv[3];
 	int argc;
 	int err;
+	void *h;
+	int (*do_kx509)(int, char **);
 
 	/* setup kx509 as would be called from command line */
 	argv[0] = mf_dstrcpy("kx509");
@@ -88,9 +92,21 @@ void mf_kx509(const char *tkt_cache)
 	argv[2] = mf_dstrcpy(tkt_cache);
 	argc = 3;
 
-//	if((err = do_kx509(argc, argv)))
-//		mf_err("kx509 failed", err, TODO);
+	/* dynamic load of libkx509.so */
+	if((h = dlopen(LIBKX509_PATH, RTLD_LAZY)) == NULL)
+		//mf_err("libx509.so failed", 1, TODO);
+		mf_err(dlerror(),1, TODO);
 	
+	if((do_kx509 = dlsym(h, "do_kx509")) == NULL)
+		//mf_err("dynamic sym load failed", 1, TODO);
+		mf_err(dlerror(),1, TODO);
+
+	/* run kx509 */
+	err = (*do_kx509)(argc, argv);
+	dlclose(h);
+
+	if(err != KX509_STATUS_GOOD) 
+		mf_err("kx509 failed", err, TODO);
 }
 
 

@@ -10,8 +10,8 @@ public class OOF {
 	private FILTER filter;
 	private JASP jasp;
 
-	public static final Object LIST_UN = new Integer(1);
-	public static final Object LIST_OD = new Integer(2);
+	public static final Object LIST_UN = "1";
+	public static final Object LIST_OD = "2";
 
 	public OOF(JASP j, String filter) throws ClassNotFoundException,
 						 NoSuchMethodException,
@@ -200,10 +200,16 @@ public class OOF {
 		return new List(this, new Object[] { "type", type }, new Object[] {});
 	}
 	public ELEMENT list(Object[] os) throws OOFBadElementFormException {
-		return new List(this, new Object[] {}, os);
+		Object[] items = new Object[os.length];
+		for (int i = 0; i < items.length; i++)
+			items[i] = new ListItem(this, new Object[] {}, new Object[] {os[i]});
+		return new List(this, new Object[] {}, items);
 	}
 	public ELEMENT list(Object type, Object[] os) throws OOFBadElementFormException {
-		return new List(this, new Object[] { "type", type }, os);
+		Object[] items = new Object[os.length];
+		for (int i = 0; i < items.length; i++)
+			items[i] = new ListItem(this, new Object[] {}, new Object[] {os[i]});
+		return new List(this, new Object[] { "type", type }, items);
 	}
 
 	public ELEMENT list_item() throws OOFBadElementFormException {

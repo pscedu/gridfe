@@ -36,7 +36,7 @@ public class suite
 		System.out.println(ci.issuer);
 		System.out.print("KeyStrength: ");
 		System.out.println(ci.key);
-		System.out.print("Name: ");
+//		System.out.print("Name: ");
 //		System.out.println(gi.getName());
 
 		/* Create a new job */
@@ -127,6 +127,11 @@ public class suite
 		gass.close();
 		gass.shutdown();
 		System.out.println("Gass Server shutdown");
+
+
+
+		/* Logout - remove credentials */
+		gi.logout();
 	
 		/* - this shows that the gass server does terminate properly...
 		if(gass.shutdown())

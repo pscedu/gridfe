@@ -6,11 +6,11 @@ import gridfe.gridint.*;
 import java.io.*;
 import java.util.*;
 
-public class GridJobList implements Serializable
+public class JobList implements Serializable
 {
 	private List list;
 
-	public GridJobList()
+	public JobList()
 	{
 		this.list = new ArrayList();
 	}

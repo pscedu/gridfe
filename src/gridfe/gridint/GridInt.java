@@ -21,19 +21,19 @@ public class GridInt implements Serializable
 	private transient GlobusAuth ga;
 	private transient GSSAuth gss;
 	private Uid uid;
-	private GridJobList list;
+	private JobList list;
 
 	/* ----- replace with Uid type */
 	public GridInt(String uid)
 	{
 		this.uid = new Uid(uid);
-		this.list = new GridJobList();
+		this.list = new JobList();
 	}
 
 	public GridInt(int uid)
 	{
 		this.uid = new Uid(uid);
-		this.list = new GridJobList();
+		this.list = new JobList();
 	}
 	/* ----- */
 

@@ -15,6 +15,8 @@ public class certs
 		OOF oof = p.getOOF();
 		String s = "";
 
+		s += p.header("gijoe") + "badabadba!" + p.footer();
+/*
 		int uid = 6342;
 //		int uid = page.getUserID();
 
@@ -22,7 +24,7 @@ public class certs
 		GridInt gi = new GridInt(uid);
 		if (gi == null)
 			s += "GI IS NULL<br />";
-/*
+
 		gi.auth();
 		
 		CertInfo ci;

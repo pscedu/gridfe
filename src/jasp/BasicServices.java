@@ -47,6 +47,8 @@ public class BasicServices
 
 	public static String stripSpace(String s)
 	{
+		if (s == null)
+			return (null);
 		String t = "";
 		for (int i = 0; i < s.length(); i++)
 			if (s.charAt(i) != ' ')

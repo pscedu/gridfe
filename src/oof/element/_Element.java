@@ -10,7 +10,7 @@ public abstract class ELEMENT {
 	public LinkedList children;
 	public OOF oof;
 
-	public ELEMENT(OOF oof, Object[] attrs, Object[] os) {
+	public ELEMENT(OOF oof, Object[] attrs, Object[] os) throws OOFBadElementFormException {
 		this.oof	= oof;
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
@@ -29,6 +29,22 @@ public abstract class ELEMENT {
 	}
 
 	abstract public String toString();
+
+	public void addAttribute(String key, String val) {
+		this.attrs.add((Object)key);
+		this.attrs.add((Object)val);
+	}
+
+	public String removeAttribute(String key) {
+		for (int i = 0; i < this.attrs.size(); i += 2) 
+			if (((String)this.attrs.get(i)).equals(key)) {
+				String val = (String)this.attrs.get(i + 1);
+				this.attrs.remove(i);
+				this.attrs.remove(i);
+				return val;
+			}
+		return null;
+	}
 
 	public String getAttribute(String key) {
 		Object e;

@@ -17,12 +17,12 @@ XXX When deployed:
 	3) change mf_dstrfree() for apache free
 
 XXX Developement Notes:
-	1) currently all certificates are created under apache, therefore
-		they will all have the uid of the user apache runs as...
-		this is a problem because we really need the users real
-		uid, even if they do not have a local account set up.
-		somehow, we need the kdc machine to tell us the uid if
-		that's even possible...
+	1) currently only users with user account can use gridfe.
+		gridfe requires a uid lookup from /etc/passwd to write
+		the x.509 certificates in /tmp. possibly try and find
+		a way to have the kdc give us a uid for users that do
+		not have local accounts...
+	2) mf_dstrcpy can be replaced with strdup()
 
 NOTES:
 	1) since mod_fum runs under apache the env X509_USER_PROXY cannot
@@ -77,12 +77,10 @@ int mf_main(const char *principal, const char *password)
 	char *tkt_cache;
 	char *uid;
 
-	/* XXX Resolve UID from KDC with given principal */
-	//DEBUG
-	//#define kKRB5CCNAME "/tmp/krb5cc_6342"
-	//tkt_cache = mf_dstrcpy(kKRB5CCNAME);
+	/* XXX Resolve UID from KDC with given principal (posible??) */
+	/* Read uid from /etc/passwd */
 	mf_user_id_from_principal(principal, &uid);
-	tkt_cache = mf_dstrcat("/tmp/krb5cc_", uid);
+	tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
 	free(uid);
 
 	/* ----------- KINIT ----------- */
@@ -96,9 +94,6 @@ int mf_main(const char *principal, const char *password)
 	/* kinit -c /tmp/krb5cc_$UID */
 	mf_kinit(&kinst, &kprefs);
 
-	//DEBUG
-	printf("ticket cache: %s\n",tkt_cache);
-	
 	mf_kinit_cleanup(&kinst);
 	mf_krb5_free(&kinst);
 
@@ -141,13 +136,7 @@ static void mf_kxlist(const char *tkt_cache)
 	mf_kxlist_setup(&kinst);
 
 	/* Perform Crypto & write Certficate */
-	//DEBUG
-	puts(uid);
-	puts(kX509DefaultFile);
 	name = mf_dstrcat(kX509DefaultFile, uid);
-	
-	//DEBUG
-	puts(name);
 	
 	mf_kxlist_crypto(&kinst, name);
 
@@ -156,7 +145,7 @@ static void mf_kxlist(const char *tkt_cache)
 	free(name);
 }
 
-/* XXX
+/*
 ** Perform crypto and write the X.509 Certificate
 */
 static void mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
@@ -206,6 +195,7 @@ static void mf_kxlist_setup(krb5_inst_ptr kinst)
 	krb5_error_code err;
 	krb5_creds screds;
 
+	/* just to make sure... */
 	memset(&screds, '\0', sizeof(krb5_creds));
 
 	/* The primary principal will be for the client */
@@ -290,10 +280,11 @@ void mf_user_id_from_principal(const char *principal, char **uid)
 			break;
 	}
 
-	printf("%d %d\n", i, j);
+	/* slice username */
 	p = mf_dstrslice(principal, 0, j - 1);
-	//DEBUG
-	puts(p);
+
+	if(!p)
+		mf_err("principal slice error", 1, TODO);
 
 	/* read the passwd file */
 	pw = getpwnam(p);
@@ -301,15 +292,12 @@ void mf_user_id_from_principal(const char *principal, char **uid)
 	if(!pw)
 		mf_err("User not in /etc/passwd", 1, TODO);
 
-	/* convert uid to (char*) */
-	printf("uid %d\n", pw->pw_uid);
-	i = snprintf(buf, 0, "%d", pw->pw_uid);
+	/* convert uid to (char*), (first snprintf gives the size) */
+	i = snprintf(NULL, 0, "%d", pw->pw_uid);
 	j = (i+1)*sizeof(char);
-	buf = malloc(j);
-	snprintf(buf, j, "%d", pw->pw_uid);
-	buf[i] = '\0';
-	*uid = buf;
-
+	*uid = malloc(j);
+	snprintf(*uid, j, "%d", pw->pw_uid);
+	(*uid)[i] = '\0';
 
 	free(p);
 }
@@ -570,7 +558,6 @@ static char* mf_dstrslice(const char *s, int x, int y)
 			}
 			else
 			{
-				//mf_err("bounds out of rangeg", 1, TODO);
 				free(s2);
 				s2 = NULL;
 			}

@@ -53,6 +53,8 @@ public class Page {
 	public final static Object CCDESC = (Object)"desc";
 	public final static Object CCHDR = (Object)"hdr";
 	public final static Object CCSUBHDR = (Object)"subhdr";
+	public final static Object CCTBL = (Object)"tbl";
+	public final static Object CCTBLFTR = (Object)"tblftr";
 	public final static int MENU_ITEM_HEIGHT = 35;
 
 	Page(HttpServletRequest req, HttpServletResponse res) {

@@ -27,9 +27,11 @@ static void mf_kinit_cleanup(krb5_inst_ptr);
 static void mf_kinit_set_uap(krb5_prefs_ptr, const char*, const char*);
 static void mf_kinit_set_defaults(krb5_prefs_ptr);
 static void mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
-void mf_get_ticket_cache(krb5_inst_ptr , char **);
+static void mf_get_ticket_cache(krb5_inst_ptr , char **);
 static void mf_kx509(const char*);
 static char* mf_dstrcpy(const char*); 
+static void mf_dstrfree(char *s);
+static void mf_free_ticket_cache(char *tkt_cache);
 
 /*
 ** mod_fum main... should be called by Apache
@@ -40,11 +42,6 @@ int mf_main(const char *principal, const char *password)
 	krb5_inst kinst;
 	krb5_prefs kprefs;
 	char *tkt_cache;
-	/*
-	const char *t;
-	char **argv;
-	int argc;
-	*/
 
 	/* kinit - requires only principal/password */
 	mf_kinit_set_defaults(&kprefs);
@@ -68,8 +65,7 @@ int mf_main(const char *principal, const char *password)
 	/* XXX return err if auth failed */
 
 
-	if(tkt_cache != NULL)
-		free(tkt_cache);
+	mf_free_ticket_cache(tkt_cache);
 	
 	return 0;
 }
@@ -78,12 +74,13 @@ int mf_main(const char *principal, const char *password)
 -------------------------------KX509-------------------------------
 */
 
-void mf_kx509(const char *tkt_cache)
+static void mf_kx509(const char *tkt_cache)
 {
 	char *argv[3];
 	int argc;
 	int err;
 	void *h;
+	int i;
 	int (*do_kx509)(int, char **);
 
 	/* setup kx509 as would be called from command line */
@@ -94,11 +91,9 @@ void mf_kx509(const char *tkt_cache)
 
 	/* dynamic load of libkx509.so */
 	if((h = dlopen(LIBKX509_PATH, RTLD_LAZY)) == NULL)
-		//mf_err("libx509.so failed", 1, TODO);
 		mf_err(dlerror(),1, TODO);
 	
 	if((do_kx509 = dlsym(h, "do_kx509")) == NULL)
-		//mf_err("dynamic sym load failed", 1, TODO);
 		mf_err(dlerror(),1, TODO);
 
 	/* run kx509 */
@@ -107,6 +102,9 @@ void mf_kx509(const char *tkt_cache)
 
 	if(err != KX509_STATUS_GOOD) 
 		mf_err("kx509 failed", err, TODO);
+	
+	for(i = 0; i < argc; i++)
+		mf_dstrfree(argv[i]);
 }
 
 
@@ -117,7 +115,7 @@ void mf_kx509(const char *tkt_cache)
 /*
 ** Perform the functionality of kinit...
 */
-void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
+static void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err;
 	krb5_get_init_creds_opt opt;
@@ -153,13 +151,15 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 }
 
 /* Set the user (principal) and password */
-void mf_kinit_set_uap(krb5_prefs_ptr kprefs, const char *principal, const char *password)
+static void mf_kinit_set_uap(krb5_prefs_ptr kprefs,
+				const char *principal,
+				const char *password)
 {
 	kprefs->password = password;
 	kprefs->pname = principal;
 }
 
-void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
+static void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 {
 	kprefs->proxiable = kProxiable;
 	kprefs->forwardable = kForwardable;
@@ -170,7 +170,7 @@ void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 ** Get the ticket cache location
 ** NOTE: must be called with a valid krb5_inst!
 */
-void mf_get_ticket_cache(krb5_inst_ptr kinst, char **tkt_cache)
+static void mf_get_ticket_cache(krb5_inst_ptr kinst, char **tkt_cache)
 {
 	const char *t;
 	size_t len;
@@ -186,6 +186,12 @@ void mf_get_ticket_cache(krb5_inst_ptr kinst, char **tkt_cache)
 	/* Null terminate manually, linux needs strlcpy! */
 	strncpy(*tkt_cache, t, len - 1);
 	(*tkt_cache)[len - 1] = '\0';
+}
+
+static void mf_free_ticket_cache(char *tkt_cache)
+{
+	if(tkt_cache)
+		free(tkt_cache);
 }
 
 /*
@@ -244,7 +250,7 @@ static void mf_kinit_cleanup(krb5_inst_ptr k5)
 /* 
 ** dynamic strcpy routine and malloc() wrapper
 */
-char* mf_dstrcpy(const char *s)
+static char* mf_dstrcpy(const char *s)
 {
 	char *s2;
 	size_t len;
@@ -265,7 +271,7 @@ char* mf_dstrcpy(const char *s)
 /*
 ** dynamic string function free() wrapper
 */
-void mf_dstrfree(char *s)
+static void mf_dstrfree(char *s)
 {
 	if(s)
 		free(s);

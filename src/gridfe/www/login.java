@@ -54,3 +54,5 @@ public class login {
 		return s;
 	}
 };
+
+/* vim: set ts=4 */

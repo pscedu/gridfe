@@ -73,7 +73,7 @@ public class Page {
 			 * work.
 			 */
 			String combo = new String(
-			  enc.decode((String)req.getAttribute("authorization")));
+			  enc.decode((String)req.getHeader("authorization")));
 			String[] auth = combo.split(":");
 			String kuid = auth[0];
 			UserMap m = new UserMap();
@@ -86,7 +86,7 @@ public class Page {
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
-			this.error(e.getMessage() + ": " + req.getAttribute("authorization"));
+			this.error(e.getMessage() + ": " + req.getHeader("authorization"));
 		}
 	}
 

@@ -4,7 +4,7 @@ SYSROOT = ../..
 TARGET = mod_fum.so
 OBJS = mod_fum.o
 CFLAGS += -Wall
-LIBS =
+LIBS = -lkrb5
 
 include ${SYSROOT}/lib/mk/defs.mk
 

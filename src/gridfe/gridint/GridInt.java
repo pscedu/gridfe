@@ -263,7 +263,7 @@ public class GridInt implements Serializable
 			if(file[i] != null && file[i].charAt(0) != '/' &&
 				file[i].charAt(0) != '~')
 			{
-				file[i] = new String(dir[i] + "/" + file[i]);
+				file[i] = dir[i] + "/" + file[i];
 			}
 
 			/* Read stdout/stderr */

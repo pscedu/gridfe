@@ -46,6 +46,7 @@ Building Mod_Fum:
 
 Other:
 3) Type: 'make clean' to remove mod_fum and scratch files
+for a fresh build.
 
 
 Apache Configuration:

@@ -28,6 +28,7 @@ public class RSLElement implements Serializable
 
 	/*
 	** transient date will be reconstructed
+	** during revive() calls from GridJob
 	*/
 	private transient StringBuffer data;
 

@@ -163,7 +163,9 @@ public class suite
 
 			try
 			{
-				gi.startRetrieve(j3, file[i]);
+				/* Start with port range or specific port */
+				gi.startRetrieve(j3, file[i], 28000, 28255);
+//				gi.startRetrieve(j3, file[i], 28001);
 
 				data[i] += gi.retrieve(tlen, toff);
                         	toff += tlen;

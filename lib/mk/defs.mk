@@ -3,7 +3,7 @@
 MAINMK = ${SYSROOT}/lib/mk/main.mk
 JAVAC = `which javac`
 JAVA = `which java`
-JAVA_INSTALL_PATH = /usr/java/j2sdk1.4.2_04
+JAVA_INSTALL_PATH = /usr/java/j2sdk1.4.2_05
 COG_INSTALL_PATH = /usr/java/cog-1.2
 SCLASSPATH =						\
 	${SYSROOT}/src:					\

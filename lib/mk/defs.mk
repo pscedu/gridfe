@@ -15,6 +15,7 @@ SCLASSPATH =						\
 	${COG_INSTALL_PATH}/lib/cryptix-asn1.jar:	\
 	.
 CLASSPATH = `echo ${SCLASSPATH} | tr -d '\t\n\ '`
+CFLAGS += -Wall -W -g
 JFLAGS = -classpath ${CLASSPATH}
 JCFLAGS = -g -classpath ${CLASSPATH}
 JDEP = ${SYSROOT}/tools/jdep/jdep

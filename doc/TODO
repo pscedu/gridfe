@@ -7,8 +7,3 @@ the command "SSLProtocol all -SSLv2" but figure out where it goes
 (this should be a real quick fix)
 
 2. Add timestamp to submitted jobs...
-
----- OTHER ----
-
-1. Write up documentation on what was completed while i was here.
-(Mod_fum, Gridint/*)

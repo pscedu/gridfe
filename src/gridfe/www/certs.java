@@ -18,10 +18,10 @@ public class certs
 		int uid = 6342;
 //		int uid = page.getUserID();
 
-		s += p.header("gijoe") + "badabadba!" + p.footer();
-/*
 		// DEBUG - use p.getGridInt() later;
 		GridInt gi = new GridInt(uid);
+		s += p.header("gijoe") + "badabadba!" + p.footer();
+/*
 		if (gi == null)
 			s += "GI IS NULL<br />";
 

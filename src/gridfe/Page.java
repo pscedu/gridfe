@@ -97,6 +97,28 @@ public class Page
 			+ "</script>";
 	}
 
+	public String divName(String name)
+	{
+		String t = "";
+
+		for (int i = 0; i < name.length(); i++)
+			if (name.charAt(i) != ' ')
+				t += name.charAt(i);
+		return (t);
+	}
+
+	public String imageName(String name)
+	{
+		String t = "";
+
+		for (int i = 0; i < name.length(); i++)
+			if (name.charAt(i) == ' ')
+				t += '-';
+			else
+				t += Character.toLowerCase(name.charAt(i));
+		return (t);
+	}
+
 	public String buildMenu()
 	{
 		String name, url, p, t = "var menus = [";
@@ -105,15 +127,14 @@ public class Page
 
 		for (i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
-			t += " [ '" + BasicServices.stripSpace(m.getName()) + "', ";
+			t += " [ '" + divName(m.getName()) + "', ";
 			if (m.getItems() != null) {
-				t += "menu" + BasicServices.stripSpace(m.getName());
-				p = "var menu" +
-				    BasicServices.stripSpace(m.getName()) + " = [";
+				t += "menu" + divName(m.getName());
+				p = "var menu" + divName(m.getName()) + " = [";
 				for (j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
-					p += "'" + BasicServices.stripSpace(m.getName() + name) +
+					p += "'" + divName(m.getName() + name) +
 					     "'";
 					if (j.hasNext())
 						p += ",";
@@ -189,9 +210,10 @@ public class Page
 		for (Iterator i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=			"<div style=\"position: relative; top:-80px; left:0px; "
-			   +			     "z-index:10\" id=\"" + m.getName() + "\">"
+			   +			     "z-index:10\" id=\"" + divName(m.getName()) + "\">"
 			   +				"<a href=\"" + r + m.getURL() + "\">"
-			   +					"<img src=\"" + r + "/img/buttons/main.png\" "
+			   +					"<img src=\"" + r + "/img/buttons/"
+			   +						imageName(m.getName()) + ".png\" "
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"
 			   +			"</div>";
@@ -201,9 +223,10 @@ public class Page
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
 					s +=	"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
-					   +	     "display:none\" id=\"" + m.getName() + name + "\">"
+					   +	     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
 					   +		"<a href=\"" + r + url + "\">"
-					   +			"<img src=\"img/buttons/" + name + ".png\" "
+					   +			"<img src=\"" + r + "/img/buttons/"
+					   +				imageName(name) + ".png\" "
 					   +			     "alt=\"" + name + "\" border=\"0\" />"
 					   +		"</a>"
 					   +	"</div>";

@@ -16,7 +16,7 @@ public class submit {
 				new Object[] {},
 				new Object[] {
 					oof.table(
-						new Object[] {},
+						new Object[] { "class", p.CCTBL },
 						new Object[][][] {
 							new Object[][] {
 								new Object[] {
@@ -53,6 +53,16 @@ public class submit {
 									"value", oof.input(new Object[] {
 												"type", "textarea",
 												"name", "command"
+											})
+								}
+							},
+							new Object[][] {
+								new Object[] {
+									"colspan", "2",
+									"class", p.TBLFTR,
+									"value", oof.input(new Object[] {
+												"type", "submit",
+												"value", "Submit"
 											})
 								}
 							}

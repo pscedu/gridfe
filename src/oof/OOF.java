@@ -7,7 +7,7 @@ public class OOF {
 	private Filter filter;
 	private JASP jasp;
 
-	OOF(JASP j) {
+	OOF(JASP j, String filter) {
 		this.jasp = j;
 	}
 };

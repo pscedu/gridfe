@@ -74,13 +74,15 @@ int mf_main(const char *principal, const char *password)
 	krb5_prefs kprefs;
 	char *tkt_cache;
 
+	/* ----------- KINIT ----------- */
+
 	/* kinit - requires only principal/password */
 	mf_krb5_init(&kinst);
 	mf_kinit_set_defaults(&kprefs);
 	mf_kinit_set_uap(&kprefs, principal, password);
-	//mf_kinit_setup(&kinst, &kprefs, principal, password);
 	mf_kinit_setup(&kinst, &kprefs);
 
+	/* kinit -c /tmp/krb5cc_$UID */
 	mf_kinit(&kinst, &kprefs);
 
 	/* Save the tkt_cache name kinit_cleanup() */
@@ -89,18 +91,19 @@ int mf_main(const char *principal, const char *password)
 	//DEBUG
 	printf("ticket cache: %s\n",tkt_cache);
 	
-	mf_krb5_free(&kinst);
 	mf_kinit_cleanup(&kinst);
+	mf_krb5_free(&kinst);
 
+	/* ----------- KX509 ----------- */
+	
 	/* kx509 - just call the kx509lib*/
 	mf_kx509(tkt_cache);
 
+	/* ----------- KXLIST ----------- */
+	
 	/* kxlist -p */
 	mf_kxlist(tkt_cache);
 	
-	/* XXX return err if auth failed */
-
-
 	mf_free_ticket_cache(tkt_cache);
 	
 	return 0;
@@ -412,13 +415,6 @@ static void mf_krb5_free(krb5_inst_ptr kinst)
 static void mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err; 
-
-	/* Initial defaults and principal/password setup */
-	//mf_kinit_set_defaults(&kprefs);
-	//mf_kinit_set_uap(&kprefs, principal, password);
-	
-	/* Establish context and read CC */
-	//mf_krb5_init(kinst);
 
 	/*
 	** Generate a full principal name

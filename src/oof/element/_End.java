@@ -1,14 +1,15 @@
 /* $Id$ */
 package oof.element;
 
+import oof.*;
 import oof.element.*;
 
 public class END extends ELEMENT {
-	public END() {
-		super(new Object[] {}, new Object[] {});
+	public END(OOF oof) {
+		super(oof, new Object[] {}, new Object[] {});
 	}
 
-	public END(Object[] attrs) {
-		super(attrs, new Object[] {});
+	public END(OOF oof, Object[] attrs) {
+		super(oof, attrs, new Object[] {});
 	}
 };

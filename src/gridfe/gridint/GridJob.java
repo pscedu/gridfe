@@ -89,7 +89,8 @@ public class GridJob extends RSLElement implements Serializable
 
 		/* XXX - Check for host to be localhost */
 //		if(this.host.equals(BasicServices.getLocalhost()))
-		if(this.host.equalsIgnoreCase("gridinfo.psc.edu"))
+//		if(this.host.equalsIgnoreCase("gridinfo.psc.edu"))
+		if(this.host.equalsIgnoreCase("mugatu.psc.edu"))
 			local = true;
 
 		/* Check for starting 'http:' or 'https:' */
@@ -154,7 +155,6 @@ public class GridJob extends RSLElement implements Serializable
 			file = dir + "/" + file;
 		}
 
-		System.out.println(file);
 		return file;
 	}
 

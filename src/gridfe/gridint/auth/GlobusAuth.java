@@ -8,19 +8,15 @@ package gridint.auth;
 
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
-//import org.globus.gsi.gssapi.GlobusGSSCredentialImpl.*;
 import java.security.PrivateKey;
 import org.ietf.jgss.*;
-//import org.ietf.jgss.GSSException.*;
-//import org.ietf.jgss.GSSCredential.*;
 import gridint.auth.Uid;
 
 public class GlobusAuth
 {
 	private GlobusCredential gc = null;
-//	private GSSCredential gss = null;
 	private String file;
-	private Uid uid;
+	private Uid uid = null;
 
 	/*
 	** X.509 Standard for files /tmp/x509up_uXXX
@@ -31,7 +27,7 @@ public class GlobusAuth
 
 	public GlobusAuth(Uid uid)
 	{
-		this.file = this.def + this.uid.intValue();
+		this.file = this.def + uid.intValue();
 	}
 
 	/*
@@ -57,17 +53,6 @@ public class GlobusAuth
 	public void createCredential() throws GlobusCredentialException//, GSSException
 	{
 		this.gc = new GlobusCredential(file);
-
-		/*
-		** The following class does a conversion between
-		** GlobusCredential to GSSCredential... However,
-		** this is broken in CoG 1.1 (and previous also
-		** i assume)... In order for this to work properly
-		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
-		** source code. (cvs.globus.org)
-		*/
-//		this.gss = new GlobusGSSCredentialImpl(this.gc, 
-//				GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
 	/*
@@ -79,11 +64,6 @@ public class GlobusAuth
 	{
 		return this.gc;
 	}
-
-//	public GSSCredential getGSSCredential()
-//	{
-//		return this.gss
-//	}
 
 	public Uid getUid()
 	{
@@ -123,36 +103,4 @@ public class GlobusAuth
 	{
 		return this.gc.getCertNum();
 	}
-
 };
-
-/*
-** Data type wrapper over the uid
-*/
-/*
-class Uid
-{
-	private int uid;
-
-	public Uid(int uid)
-	{
-		this.uid = uid;
-	}
-
-	public Uid(Integer uid)
-	{
-		this.uid = uid.intValue();
-	}
-	
-	public Uid(String uid)
-	{
-		Integer i = new Integer(uid);
-		this.uid = i.intValue();
-	}
-
-	public int intValue()
-	{
-		return this.uid;
-	}
-}
-*/

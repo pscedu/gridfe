@@ -7,15 +7,9 @@
 
 package gridint.auth;
 
-/*
-import javax.security.auth.*;
-import javax.security.auth.Subject.*;
-import javax.security.auth.login.*;
-import java.lang.Object.*;
-import java.security.*;
-*/
 import org.ietf.jgss.*;
 import org.globus.gsi.*;
+import java.security.PrivateKey;
 import gridint.auth.*;
 
 public class GridInt
@@ -24,12 +18,12 @@ public class GridInt
 	private GSSAuth gss;
 	private Uid uid;
 
-	public GridInt(int uid)
+	public GridInt(String uid)
 	{
 		this.uid = new Uid(uid);
 	}
 
-	public void Authenticate() throws GSSException, GlobusCredentialException
+	public void authenticate() throws GSSException, GlobusCredentialException
 	{
 	//	try
 	//	{
@@ -42,7 +36,7 @@ public class GridInt
 	//	catch(GSSException e)
 	//	catch(GlobusCredentialException)
 	//	{
-			//ADD Auth failed... do something here
+			//ADD Auth failed... try other means of auth?
 	//	}
 	}
 
@@ -68,6 +62,52 @@ public class GridInt
 	public GSSAuth getGSSAuth()
 	{
 		return this.gss;
+	}
+
+	/*
+	** Implement Methods (GlobusAuth)
+	*/
+	public PrivateKey getPrivateKey()
+	{
+		return this.ga.getPrivateKey();
+	}
+     
+	public String getSubject()
+	{
+		return this.ga.getSubject();
+	}
+
+	public int getProxyType()
+	{
+		return this.ga.getProxyType();
+	}
+	
+	public String getIssuer()
+	{
+		return this.ga.getIssuer();
+	}
+	
+	public int getStrength()
+	{
+		return this.ga.getStrength();
+	}
+	
+	public int getCertNum()
+	{
+		return this.ga.getCertNum();
+	}
+
+	/*
+	** Implement Methods (GSSAuth)
+	*/
+	public GSSName getName() throws GSSException
+	{
+		return this.gss.getName();
+	}
+	
+	public int getRemainingLifetime() throws GSSException
+	{
+		return this.gss.getRemainingLifetime();
 	}
 }
 

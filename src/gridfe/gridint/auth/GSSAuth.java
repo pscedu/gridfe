@@ -1,5 +1,5 @@
 /*
-** GlobusAuth.java
+** GSSAuth.java
 **
 ** Takes a GlobusCredential and 
 ** then creates a standard GSSCredential 

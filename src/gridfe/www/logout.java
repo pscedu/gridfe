@@ -2,8 +2,9 @@
 
 package gridfe.www;
 
+import gridfe.*;
+import gridfe.gridint.*;
 import oof.*;
-import gridint.*;
 
 public class logout
 {

@@ -213,7 +213,7 @@ public class Page
 		  +						"<br /><br />"
 		  +					"</div>";
 
-		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().items();
+		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().size();
 		for (Iterator i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=			"<div style=\"position: relative; top:" + y + "px; left:0px; "

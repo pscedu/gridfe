@@ -43,7 +43,7 @@ public class GridFE extends HttpServlet {
 		new DelegationHandler("/rls/addres",	gridfe.www.rls.addres.class),
 		new DelegationHandler("/rls/rmcat",	gridfe.www.rls.rmcat.class),
 		new DelegationHandler("/rls/search",	gridfe.www.rls.search.class),
-		new DelegationHandler("index",		gridfe.www.index.class)
+		new DelegationHandler("/index",		gridfe.www.index.class)
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)

@@ -23,6 +23,7 @@ public class GridInt implements Serializable
 	private Uid uid;
 	private GridJobList list;
 
+	/* ----- replace with Uid type */
 	public GridInt(String uid)
 	{
 		this.uid = new Uid(uid);
@@ -34,6 +35,7 @@ public class GridInt implements Serializable
 		this.uid = new Uid(uid);
 		this.list = new GridJobList();
 	}
+	/* ----- */
 
 	/* Perform all Grid authentication */
 	public void auth()

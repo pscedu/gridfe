@@ -70,7 +70,7 @@ static void mf_kinit_cleanup(krb5_inst_ptr);
 static void mf_kinit_set_uap(krb5_prefs_ptr, const char*, const char*);
 static void mf_kinit_set_defaults(krb5_prefs_ptr);
 static void mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
-static void mf_user_id_from_principal(const char *principal, char **uid);
+static int mf_user_id_from_principal(const char *principal, char **uid);
 static void mf_kx509(const char*);
 static void mf_kxlist(const char *);
 static void mf_kxlist_setup(krb5_inst_ptr);
@@ -194,38 +194,43 @@ int mf_main(const char *principal, const char *password)
 	krb5_prefs kprefs;
 	char *tkt_cache;
 	char *uid;
+	int err = OK;
 
 	/* XXX Resolve UID from KDC with given principal (posible??) */
 
 	/* Read uid from /etc/passwd */
-	mf_user_id_from_principal(principal, &uid);
-	tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
+	err = mf_user_id_from_principal(principal, &uid);
 
-	/* ----------- KINIT ----------- */
+	if(!err)
+	{
+		tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
 
-	/* kinit - requires only principal/password */
-	mf_krb5_init(&kinst, tkt_cache);
-	mf_kinit_set_defaults(&kprefs);
-	mf_kinit_set_uap(&kprefs, principal, password);
-	mf_kinit_setup(&kinst, &kprefs);
+		/* ----------- KINIT ----------- */
 
-	/* kinit -c /tmp/krb5cc_$UID */
-	mf_kinit(&kinst, &kprefs);
-
-	mf_kinit_cleanup(&kinst);
-	mf_krb5_free(&kinst);
-
-	/* ----------- KX509 ----------- */
+		/* kinit - requires only principal/password */
+		mf_krb5_init(&kinst, tkt_cache);
+		mf_kinit_set_defaults(&kprefs);
+		mf_kinit_set_uap(&kprefs, principal, password);
+		mf_kinit_setup(&kinst, &kprefs);
 	
-	/* kx509 - just call the kx509lib*/
-	mf_kx509(tkt_cache);
-
-	/* ----------- KXLIST ----------- */
+		/* kinit -c /tmp/krb5cc_$UID */
+		mf_kinit(&kinst, &kprefs);
 	
-	/* kxlist -p */
-	mf_kxlist(tkt_cache);
+		mf_kinit_cleanup(&kinst);
+		mf_krb5_free(&kinst);
 	
-	return 0;
+		/* ----------- KX509 ----------- */
+		
+		/* kx509 - just call the kx509lib*/
+		mf_kx509(tkt_cache);
+	
+		/* ----------- KXLIST ----------- */
+		
+		/* kxlist -p */
+		mf_kxlist(tkt_cache);
+	}
+	
+	return err;
 }
 
 /*
@@ -379,11 +384,12 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 ** Parse the principal and get the uid either from the KDC
 ** (if that is even possible!) or just read from /etc/passwd
 */
-static void mf_user_id_from_principal(const char *principal, char **uid)
+static int mf_user_id_from_principal(const char *principal, char **uid)
 {
 	struct passwd *pw;
 	int i, j;
 	char *p;
+	int err = 0;
 
 	/* parse principal */
 	for(i = 0, j = 0; i < strlen(principal); i++, j++)
@@ -395,21 +401,34 @@ static void mf_user_id_from_principal(const char *principal, char **uid)
 	/* slice username */
 	p = mf_dstrslice(principal, 0, j - 1);
 
-	if(!p)
+	if(p)
+	{
+
+		/* read the passwd file */
+		pw = getpwnam(p);
+		
+		if(pw)
+		{
+			/* convert uid to (char*), (first snprintf gives the size) */
+			i = snprintf(NULL, 0, "%d", pw->pw_uid);
+			j = (i+1)*sizeof(char);
+			*uid = apr_palloc(mf_get_pool(), j);
+			snprintf(*uid, j, "%d", pw->pw_uid);
+			(*uid)[i] = '\0';
+		}
+		else
+		{
+			mf_err("User not in /etc/passwd", 1);
+			err = 1;
+		}
+	}
+	else
+	{
 		mf_err("principal slice error", 1);
+		err = 1;
+	}
 
-	/* read the passwd file */
-	pw = getpwnam(p);
-
-	if(!pw)
-		mf_err("User not in /etc/passwd", 1);
-
-	/* convert uid to (char*), (first snprintf gives the size) */
-	i = snprintf(NULL, 0, "%d", pw->pw_uid);
-	j = (i+1)*sizeof(char);
-	*uid = apr_palloc(mf_get_pool(), j);
-	snprintf(*uid, j, "%d", pw->pw_uid);
-	(*uid)[i] = '\0';
+	return err;
 }
 
 

@@ -6,7 +6,7 @@ import oof.element.*;
 public class TableRow extends ELEMENT {
 	private Object[][] cells;
 	public TableRow(Object[][] oss) {
-		super();
+		super(new Object[] {}, new Object[] {});
 		this.cells = oss;
 	}
 };

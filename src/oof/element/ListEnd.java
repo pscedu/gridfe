@@ -5,6 +5,6 @@ import oof.element.*;
 
 public class ListEnd extends END {
 	public ListEnd(Object[] attrs) {
-		super(attrs, new Object[] {});
+		super(attrs);
 	}
 };

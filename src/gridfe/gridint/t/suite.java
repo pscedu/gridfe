@@ -76,34 +76,43 @@ public class suite
 		j.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/sleep", "gram.out"},
 			new String("arguments"),
+			new String[] {"20s"});
+
+		GridJob j2 = new GridJob("mugatu.psc.edu");
+		j2.setRSL(new String[] {"executable"},
+			new String[] {"/bin/sleep"},
+			new String("arguments"),
 			new String[] {"30s"});
 
 		/* Submit the job to GRAM */
 		System.out.println("Submiting Job...");
 		gi.jobSubmit(j);
+		gi.jobSubmit(j2);
 
 		/* Test Serialization */
 		System.out.println("Serializing Job...");
 		FileOutputStream fout = new FileOutputStream("job.revive");
 		ObjectOutputStream out = new ObjectOutputStream(fout);
-		out.writeObject(j);
+		out.writeObject(gi);
 		out.close();
 
 		/* Implicitly get rid of this object! */
 		System.out.println("Removing Instance of Job...");
-		WeakReference r = new WeakReference(j);
+		WeakReference r = new WeakReference(gi);
 		r.clear();
+		gi = null;
 		j = null;
+		j2 = null;
 
 		/* Test Deserialization */
 		System.out.println("Deserializing Job...");
 		FileInputStream fin = new FileInputStream("job.revive");
 		ObjectInputStream in = new ObjectInputStream(fin);
 
-		j = (GridJob)(in.readObject());
+		gi = (GridInt)(in.readObject());
 
 		in.close();
-		j.revive(gi.getGSSAuth().getGSSCredential());
+		gi.revive();
 
 		/* 
 		** Revival Test
@@ -111,18 +120,20 @@ public class suite
 		** and gss credentials. (this is actually a clone test now
 		** that deserialization has been implemented)
 		*/
-		GridJob j2 = new GridJob();
-		j2.revive(j.getHost(), j.getIDAsString(), gi.getGSSAuth().getGSSCredential(), j.getRSL());
+		//GridJob jc = new GridJob();
+		//jc.revive(j.getHost(), j.getIDAsString(), gi.getGSSAuth().getGSSCredential(), j.getRSL());
 
 		do
 		{
-			System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
-			System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
-			Thread.sleep(800);
+			System.out.println("J1: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
+			System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
+			//System.out.println("JC: "+j2.getStatus()+" : "+jc.getStatusAsString());
+			Thread.sleep(600);
 
-		}while(j.getStatus() != -1);
+		}while(gi.getJobStatus() != -1 || gi.getJobStatus(1) != -1);
 
-		System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
-		System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
+		System.out.println("J1: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
+		System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
+		//System.out.println("JC: "+j2.getStatus()+" : "+jc.getStatusAsString());
 	}
 }

@@ -164,6 +164,7 @@ public class Page {
 				"Output", "/jobs/output"
 			});
 		this.addMenu("Certificate Management", "/certs", null);
+/*
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalog",		"/rls/addcat",
@@ -172,6 +173,7 @@ public class Page {
 				"Add Resource",		"/rls/addres"
 			});
 		this.addMenu("Node Availability", "/nodes", null);
+*/
 
 		/* Start page output. */
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"

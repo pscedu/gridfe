@@ -1,6 +1,6 @@
+/* $Id$ */
+
 /*
-** GSSAuth.java
-**
 ** Takes a GlobusCredential and 
 ** then creates a standard GSSCredential 
 ** for use with all globus api
@@ -36,7 +36,7 @@ public class GSSAuth
 		** The following class does a conversion between
 		** GlobusCredential to GSSCredential... However,
 		** this is broken in CoG 1.1 (and previous also
-		** i assume)... In order for this to work properly
+		** I assume)... In order for this to work properly
 		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
 		** source code. (cvs.globus.org)
 		*/
@@ -71,5 +71,4 @@ public class GSSAuth
 	{
 		return this.gss.getRemainingLifetime();
 	}
-
 };

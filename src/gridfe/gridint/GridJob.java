@@ -4,7 +4,7 @@ package gridfe.gridint;
 
 import gridfe.gridint.*;
 import java.io.*;
-import java.net.MalformedURLException;
+import java.net.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
@@ -13,12 +13,6 @@ public class GridJob extends RSLElement implements Serializable
 	private String host;
 	private transient GramInt gi;
 	private String id;
-
-	/* Needed for revive */
-	public GridJob()
-	{
-
-	}
 
 	public GridJob(String host)
 	{
@@ -81,19 +75,6 @@ public class GridJob extends RSLElement implements Serializable
 		return this.gi.getIDAsString();
 	}
 
-	/* DEBUG */
-/*
-	public void setID(String id)
-		throws MalformedURLException
-	{
-		System.out.println("GridJob: "+id);
-		if(this.gi == null)
-			System.out.println("wtf");
-		this.gi.setID(new String(id));
-		//this.gi.getJob().setID(id);
-	}
-*/
-
 	/*
 	** Revive allows a GridJob (and hence a GramJob) to be
 	** recreated from saved values (similar to serialization).
@@ -105,7 +86,7 @@ public class GridJob extends RSLElement implements Serializable
 	{
 		/* Revive GramInt and it's private data */
 		this.gi = new GramInt(gss, this.host, this.toString());
-		this.gi.createJob();
+		this.gi.createJob(this.toString());
 		this.gi.setID(this.id);
 	}
 

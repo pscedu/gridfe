@@ -3,24 +3,18 @@
 package gridfe.gridint;
 
 import gridfe.gridint.*;
-import java.net.MalformedURLException;
+import java.net.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
 public class GramInt
 {
 	private String host;
-	//private RSLElement rsl;
-	String rsl;
+	private String rsl;
 	private GramJob job = null;
 	private boolean batch = false;
 	private GSSCredential gss;
 	private String jOut;
-
-	public GramInt(GSSCredential gss)
-	{
-		this.gss = gss;
-	}
 
 	public GramInt(GSSCredential gss, String host)
 	{
@@ -35,68 +29,20 @@ public class GramInt
 		this.rsl = rsl;
 	}
 
-	public void setHost(String host)
-	{
-		this.host = host;
-	}
-
-	public void setRsl(String rsl)
-	{
-		this.rsl = rsl;
-	}
-
-	/* globus-job-submit */
-	public void jobSubmit(String host, String rsl)
-		throws GramException, GSSException
-	{
-		this.batch = true;
-		this.rsl = rsl;
-		this.host = host;
-		this.gramRequest(this.host, this.rsl);
-	}
-
-	public void jobSubmit(String rsl)
-		throws GramException, GSSException
-	{
-		this.batch = true;
-		this.rsl = rsl;
-		this.gramRequest(this.host, this.rsl);
-	}
-
-	public void jobSubmit(GridJob job) 
-		throws GramException, GSSException
-	{
-		this.batch = true;
-		this.gramRequest(this.host, job.toString());
-	}
-
-	public void jobSubmit()
-		throws GramException, GSSException
-	{
-		this.batch = true;
-		this.gramRequest(this.host, this.rsl);
-	}
-
-	/* submit a request to the GRAM server */
-	private void gramRequest(String host, String rsl)
+	/* globus-job-submit: submit a request to the GRAM server */
+	public void jobSubmit(GridJob j) 
 		throws GramException, GSSException
 	{
 		/* Make sure the host is there */
-		Gram.ping(this.gss, host);
+		Gram.ping(this.gss, this.host);
 
 		/* Create and process Job */
-		this.job = this.createJob(rsl);
-		this.job.request(host, this.batch);
+		this.job = this.createJob(j.toString());
+		this.job.request(this.host, true);
 	}
 
-	/* Used to internally to rebuild a Gram Job */
-	public void createJob()
-	{
-		this.job = new GramJob(this.gss, this.rsl);
-	}
-
-	/* Used internally to build a gramRequest */
-	private GramJob createJob(String rsl)
+	/* Used internally to by this.gramRequest and GridJob.revive */
+	public GramJob createJob(String rsl)
 	{
 		this.job = new GramJob(this.gss, rsl);
 		return this.job;
@@ -172,18 +118,6 @@ public class GramInt
 	{
 		this.job.setID(id);
 	}
-
-	/* filename of the job output */
-//	public String getStdout()
-//	{
-		/* Attempt a build */
-/*
-		if(this.rsl.getStdout() == null)
-			this.rsl.build();
-
-		return this.rsl.getStdout();
-	}
-*/
 
 	public GramJob getJob()
 	{

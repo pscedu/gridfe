@@ -29,9 +29,11 @@ public class RSLElement implements Serializable
 	private String vParam, kParam;
 	private String jOut;
 
+	/*
 	public RSLElement()
 	{
 	}
+	*/
 
 	public void setRSL(String[] param, String[] value)
 	{
@@ -77,33 +79,10 @@ public class RSLElement implements Serializable
 		this.pre = new String(s);
 	}
 
-	/*
-	** Setup the file that will contain the job
-	** output. This filename will be needed later
-	** to retreive the data so a random name will
-	** be given. Once the job has succesfully ran
-	** the output file will be renamed according
-	** to the jobID it is given by GRAM. However,
-	** this filename can be overriden as can be
-	** seen below ...
-	*/
-/*
-	public void setStdout(String file)
-	{
-		this.jOut = new String(file);
-	}
-
-	public void setStdout()
-	{
-		// TODO: rand function for filename
-		this.jOut = new String("/home/rbudden/rand.tmp");
-	}
-*/
 	public String getStdout()
 	{
 		return this.jOut;
 	}
-
 
 	/* Generic build for "(param=value)" */
 	private void buildGenerics(String[] param, String[] value)

@@ -1,6 +1,7 @@
 /* $Id$ */
 package oof;
 
+import java.lang.reflect.*;
 import jasp.*;
 import oof.filter.*;
 import oof.element.*;
@@ -9,8 +10,9 @@ public class OOF {
 	private FILTER filter;
 	private JASP jasp;
 
-	public OOF(JASP j, String filter) {
+	public OOF(JASP j, String filter) throws Exception {
 		this.jasp = j;
+		this.filter = Class.forName("oof.filter." + filter).newInstance(this);
 	}
 
 	/* Core Elements. */

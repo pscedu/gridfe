@@ -75,7 +75,7 @@ static void mf_kx509(const char*);
 static void mf_kxlist(const char *);
 static void mf_kxlist_setup(krb5_inst_ptr);
 static void mf_kxlist_crypto(krb5_inst_ptr, char*);
-static void mf_krb5_init(krb5_inst_ptr kinst, const char*);
+static int mf_krb5_init(krb5_inst_ptr kinst, const char*);
 static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
 static char* mf_dstrslice(const char*, int, int);
@@ -139,17 +139,20 @@ int mod_fum_auth(request_rec *r)
 	err = ap_get_basic_auth_pw(r, &pass);
 	user = r->user;
 
-	if(err != OK)
-		mf_err("error retrieving password", err);
-	
-	/* Create Certificate */
-	if(!user || !pass)
+	if(err == OK)
 	{
-		mf_err("err obtaining username/password NULL", 1);
-		err = HTTP_UNAUTHORIZED;
+	
+		/* Create Certificate */
+		if(!user || !pass)
+		{
+			mf_err("err obtaining username/password NULL", 1);
+			err = HTTP_UNAUTHORIZED;
+		}
+		else
+			err = mf_main(user, pass);
 	}
 	else
-		mf_main(user, pass);
+		mf_err("ap_get_basic_auth failed", err);
 
 	return err;
 }
@@ -194,7 +197,7 @@ int mf_main(const char *principal, const char *password)
 	krb5_prefs kprefs;
 	char *tkt_cache;
 	char *uid;
-	int err = OK;
+	int err;
 
 	/* XXX Resolve UID from KDC with given principal (posible??) */
 
@@ -205,31 +208,39 @@ int mf_main(const char *principal, const char *password)
 	{
 		tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
 
-		/* ----------- KINIT ----------- */
+		if(tkt_cache)
+		{
 
-		/* kinit - requires only principal/password */
-		mf_krb5_init(&kinst, tkt_cache);
-		mf_kinit_set_defaults(&kprefs);
-		mf_kinit_set_uap(&kprefs, principal, password);
-		mf_kinit_setup(&kinst, &kprefs);
-	
-		/* kinit -c /tmp/krb5cc_$UID */
-		mf_kinit(&kinst, &kprefs);
-	
-		mf_kinit_cleanup(&kinst);
-		mf_krb5_free(&kinst);
-	
-		/* ----------- KX509 ----------- */
+			/* ----------- KINIT ----------- */
+
+			/* kinit - requires only principal/password */
+			err = mf_krb5_init(&kinst, tkt_cache);
+			if(!err)
+			{
+				mf_kinit_set_defaults(&kprefs);
+				mf_kinit_set_uap(&kprefs, principal, password);
+				mf_kinit_setup(&kinst, &kprefs);
 		
-		/* kx509 - just call the kx509lib*/
-		mf_kx509(tkt_cache);
-	
-		/* ----------- KXLIST ----------- */
+				/* kinit -c /tmp/krb5cc_$UID */
+				mf_kinit(&kinst, &kprefs);
 		
-		/* kxlist -p */
-		mf_kxlist(tkt_cache);
+				mf_kinit_cleanup(&kinst);
+				mf_krb5_free(&kinst);
+		
+				/* ----------- KX509 ----------- */
+			
+				/* kx509 - just call the kx509lib*/
+				mf_kx509(tkt_cache);
+		
+				/* ----------- KXLIST ----------- */
+		
+				/* kxlist -p */
+				mf_kxlist(tkt_cache);
+			}
+		}
 	}
-	
+
+	RET:	
 	return err;
 }
 
@@ -428,7 +439,7 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 		err = 1;
 	}
 
-	return err;
+	return ModfumToApache(err);
 }
 
 
@@ -517,24 +528,29 @@ static void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 /*
 ** Handle standard krb5 inital functions
 */
-static void mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
+static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 {
 	krb5_error_code err; 
 
 	/* Initialize Application Context */
 	err = krb5_init_context(&kinst->context);
-	if(err)
+	if(!err)
+	{
+	
+		/*
+		** Don't use the default!! we need to be able to
+		** write the tkt out with different uid's for each
+		** individual user...
+		*/
+		//err = krb5_cc_default(kinst->context, &kinst->cache);
+		err = krb5_cc_resolve(kinst->context, tkt_cache, &kinst->cache);
+		if(err)
+			mf_err("default cache failed", err);
+	}
+	else
 		mf_err("krb5_init_context failed", err);
 	
-	/*
-	** Don't use the default!! we need to be able to
-	** write the tkt out with different uid's for each
-	** individual user...
-	*/
-	//err = krb5_cc_default(kinst->context, &kinst->cache);
-	err = krb5_cc_resolve(kinst->context, tkt_cache, &kinst->cache);
-	if(err)
-		mf_err("default cache failed", err);
+	return KrbToApache(err);
 }
 
 static void mf_krb5_free(krb5_inst_ptr kinst)
@@ -589,14 +605,16 @@ static char* mf_dstrcat(const char *s1, const char *s2)
 	len = strlen(s1) + strlen(s2) + 1;
 	s = (char*)(apr_palloc(mf_get_pool(), sizeof(char)*len));
 
-	if(!s)
+	if(s)
+	{
+		strncpy(s, s1, strlen(s1));
+		/* strncpy is being a bitch null terminate ourselves */
+		s[strlen(s1)] = '\0';
+		strncat(s, s2, strlen(s2));
+		s[len-1] = '\0';
+	}
+	else
 		mf_err("malloc failed", 1);
-
-	strncpy(s, s1, strlen(s1));
-	/* strncpy is being a bitch null terminate ourselves */
-	s[strlen(s1)] = '\0';
-	strncat(s, s2, strlen(s2));
-	s[len-1] = '\0';
 
 	return s;
 }

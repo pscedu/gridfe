@@ -20,6 +20,12 @@
 			(apr_status_t)(NULL), (mf_get_request())->server, \
 			"%s - %s: error %d on line %d", kModuleVersion, x, \
 			y, __LINE__)
+
+//#define KrbToApache(x) ((x == KRB5KDC_ERR_NONE) ? OK : HTTP_INTERNAL_SERVER_ERROR)
+//#define KrbToApache(x) ((x == KRB5KDC_ERR_NONE || x == 0) ? OK : HTTP_INTERNAL_SERVER_ERROR)
+#define KrbToApache(x) ((x == KRB5KDC_ERR_NONE || x == 0) ? OK : HTTP_UNAUTHORIZED)
+#define ModfumToApache(x) ((x == 0) ? OK : HTTP_INTERNAL_SERVER_ERROR)
+
 //DEBUG
 //#define mf_err(x,y) mod_fum_err(x,y)
 

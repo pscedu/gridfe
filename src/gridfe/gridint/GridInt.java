@@ -51,25 +51,35 @@ public class GridInt implements Serializable
 	}
 
 	/* XXX Cleanup and destroy credentials */
-	//public void logout(String file)
 	public void logout()
 	{
+		this.logout(null);
+	}
+	public void logout(String file)
+	{
+		/*
+		** List of files to remove:
+		** 1) X.509 Certificate
+		** 2) Kerberos 5 TKT
+		** 3) GridInt serialize file
+		*/
 		CertFile cf = new CertFile(this.uid);
+		String[] list = new String[] 
+		{
+			cf.getX509(),
+			cf.getKrbTkt(),
+			file
+		};
+		int ln = (file == null) ? 2 : 3;
+		File fp;
 
-		/* remove krb5 tkt and X.509 cert */
-		System.out.println(cf.getX509());
-		File fp = new File(cf.getX509());
-		if(fp.exists())
-			fp.delete();
-
-		System.out.println(cf.getKrbTkt());
-		fp = new File(cf.getKrbTkt());
-		if(fp.exists())
-			fp.delete();
-
-		/* remove the serialize file */
-		//File fp = new File(file);
-		//fp.delete();
+		for(int i = 0; i < ln; i++)
+		{
+			fp = new File(list[i]);
+			
+			if(fp.exists())
+				fp.delete();
+		}
 	}
 
 	/* globus-job-submit equivalent */

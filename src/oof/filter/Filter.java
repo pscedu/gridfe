@@ -1,6 +1,7 @@
 /* $Id$ */
 package oof.filter;
 
+import oof.*;
 import oof.element.*;
 
 public abstract class FILTER {

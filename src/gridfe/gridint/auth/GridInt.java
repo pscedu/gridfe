@@ -7,43 +7,67 @@
 
 package gridint.auth;
 
-//import com.sun.security.auth.module.Krb5LoginModule;
+/*
 import javax.security.auth.*;
 import javax.security.auth.Subject.*;
 import javax.security.auth.login.*;
 import java.lang.Object.*;
 import java.security.*;
-//import java.security.cert.X509Certificate;
-
-/*
-public class GridInt
-{
-	private String user;
-	private String realm;
-
-	GridInt()
-	{
-	}
-}
 */
+import org.ietf.jgss.*;
+import org.globus.gsi.*;
+import gridint.auth.*;
 
 public class GridInt
 {
-	public static void main(String[] args)
+	private GlobusAuth ga;
+	private GSSAuth gss;
+	private Uid uid;
+
+	public GridInt(int uid)
 	{
-		try
-		{
-			KerbInt krb = new KerbInt();
-			krb.login();
+		this.uid = new Uid(uid);
+	}
+
+	public void Authenticate() throws GSSException, GlobusCredentialException
+	{
+	//	try
+	//	{
+			this.ga = new GlobusAuth(this.uid);
+			this.ga.createCredential();
+
+			this.gss = new GSSAuth(ga);
+			this.gss.createCredential();
+	//	}
+	//	catch(GSSException e)
+	//	catch(GlobusCredentialException)
+	//	{
+			//ADD Auth failed... do something here
+	//	}
+	}
+
+	/*
+	** Generic Private Data Interfaces
+	*/
 	
-			System.out.println("-------");
-			krb.logout();
-	
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.getMessage());
-		}
+	public GlobusCredential getGlobusCredential()
+	{
+		return this.ga.getCredential();
+	}
+
+	public GSSCredential getGSSCredential()
+	{
+		return this.gss.getGSSCredential();
+	}
+
+	public GlobusAuth getGlobusAuth()
+	{
+		return this.ga;
+	}
+
+	public GSSAuth getGSSAuth()
+	{
+		return this.gss;
 	}
 }
 

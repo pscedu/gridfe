@@ -2,25 +2,23 @@
 ** GlobusAuth.java
 **
 ** Obtains a GlobusCredential from 
-** a file which is a valid X.509 Certificate,
-** then creates a standard GSSCredential from
-** the GlobusCredential for use with all
-** globus api
+** a file which is a valid X.509 Certificate.
 */
 package gridint.auth;
 
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
-import org.globus.gsi.gssapi.GlobusGSSCredentialImpl.*;
+//import org.globus.gsi.gssapi.GlobusGSSCredentialImpl.*;
 import java.security.PrivateKey;
 import org.ietf.jgss.*;
-import org.ietf.jgss.GSSException.*;
-import org.ietf.jgss.GSSCredential.*;
+//import org.ietf.jgss.GSSException.*;
+//import org.ietf.jgss.GSSCredential.*;
+import gridint.auth.Uid;
 
 public class GlobusAuth
 {
 	private GlobusCredential gc = null;
-	private GSSCredential gss = null;
+//	private GSSCredential gss = null;
 	private String file;
 	private Uid uid;
 
@@ -31,7 +29,12 @@ public class GlobusAuth
 	private final String def = "/tmp/x509up_u";
 
 
+	public GlobusAuth(Uid uid)
+	{
+		this.file = this.def + this.uid.intValue();
+	}
 
+	/*
 	public GlobusAuth(int uid)
 	{
 		this.uid = new Uid(uid);
@@ -43,6 +46,7 @@ public class GlobusAuth
 		this.uid = new Uid(uid);
 		this.file = this.def + this.uid.intValue();
 	}
+	*/
 
 	/* Overide Default X.509 Certificate File*/
 	public void setFile(String file)
@@ -50,7 +54,7 @@ public class GlobusAuth
 		this.file = file;
 	}
 
-	public void createCredential() throws GlobusCredentialException, GSSException
+	public void createCredential() throws GlobusCredentialException//, GSSException
 	{
 		this.gc = new GlobusCredential(file);
 
@@ -62,18 +66,24 @@ public class GlobusAuth
 		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
 		** source code. (cvs.globus.org)
 		*/
-		this.gss = new GlobusGSSCredentialImpl(this.gc, 
-				GSSCredential.INITIATE_AND_ACCEPT);
+//		this.gss = new GlobusGSSCredentialImpl(this.gc, 
+//				GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
 	/*
 	** Generic Private Data Interfaces
 	*/
 
+	//public GlobusCredential getGlobusCredential()
 	public GlobusCredential getCredential()
 	{
 		return this.gc;
 	}
+
+//	public GSSCredential getGSSCredential()
+//	{
+//		return this.gss
+//	}
 
 	public Uid getUid()
 	{
@@ -119,6 +129,7 @@ public class GlobusAuth
 /*
 ** Data type wrapper over the uid
 */
+/*
 class Uid
 {
 	private int uid;
@@ -144,4 +155,4 @@ class Uid
 		return this.uid;
 	}
 }
-
+*/

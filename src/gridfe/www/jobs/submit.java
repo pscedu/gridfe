@@ -11,10 +11,13 @@ public class submit
 		throws Exception
 	{
 		OOF oof = page.getOOF();
+		String s = "";
 
-		return	page.header("Submit Job") +
-				oof.p("Submit job test page.") +
-				page.footer();
+		s += page.header("Submit Job")
+		   + oof.p("Submit job test page.")
+		   + page.footer();
+
+		return (s);
 	}
 };
 

@@ -43,3 +43,9 @@ function objSetDisplay(obj, disp) {
 	if (obj.style)
 		obj.style.display = disp
 }
+
+function objGetDisplay(obj) {
+	if (obj.style)
+		return (obj.style.display)
+	return (null)
+}

@@ -58,12 +58,16 @@ public class suite
 				new String("arguments"),
 				new String[] {"-a"});
 
+		r = new RSLElement(new String[] {"executable", "stdout"}, new String[] {"/home/rbudden/test", "/home/rbudden/test.out"});
+
 		/* Use GridInt to test GramInt */
 		GramInt gri = new GramInt(gi.getGSSAuth().getGSSCredential(), "mugatu.psc.edu");
-		System.out.println(rsl);
-		gri.jobRun(rsl.toString());
-		//gri.jobSubmit(rsl.toString());
-		//System.out.println(gri.getStatusString());
-		//System.out.println(gri.getStatus());
+		System.out.println(r);
+		//System.out.println(gri.getIDAsString());
+		gri.jobSubmit(r.toString());
+		System.out.println(gri.getStatusAsString());
+		System.out.println(gri.getStatus());
+		System.out.println(gri.getJob().getID());
+		System.out.println(gri.getIDAsString());
 	}
 }

@@ -2,12 +2,13 @@
 /* Authentication test suite. */
 
 import gridint.auth.*;
+import gridint.*;
 import javax.security.auth.Subject;
 import java.util.*;
 import java.security.*;
 import javax.security.auth.kerberos.KerberosKey;
 import java.lang.reflect.*;
-import java.lang.Integer;
+//import java.lang.Integer;
 
 public class suite
 {
@@ -17,7 +18,7 @@ public class suite
 		/* GridInt Test Suite */
 		GridInt gi = new GridInt(args[0]);
 		gi.authenticate();
-		System.out.println(gi.getIssuer());
+		//System.out.println(gi.getIssuer());
 		System.out.println(gi.getRemainingLifetime());
 		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
 		System.out.println(gi.getGlobusAuth().getSubject());
@@ -37,9 +38,7 @@ public class suite
 		System.out.print(ga.getStrength());
 		System.out.print("\n\n");
 		System.out.print(ga.getCertNum());
-
 		System.out.println(ga.getProxyType());
-		//int i = ga.getProxyType();
 */
 		
 		/* KerbAuth Test Suite */

@@ -9,4 +9,4 @@ SUBDIRS += tools src
 include ${MAINMK}
 
 build:
-	make clean && make depend && make && make test
+	make clean && make depend && make

@@ -221,8 +221,9 @@ public class Page
 		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";
+*/
 		return s;
-*/	}
+	}
 
 	public String footer()
 	{

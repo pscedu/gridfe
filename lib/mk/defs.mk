@@ -5,7 +5,7 @@ JAVAC = `which javac`
 JAVA = `which java`
 JAVA_INSTALL_PATH = /usr/java/j2sdk1.4.2_04
 COG_INSTALL_PATH = /usr/java/cog-1.2
-CLASSPATH =						\
+SCLASSPATH =						\
 	${SYSROOT}/lib:					\
 	/usr/share/java/servlet.jar:			\
 	${JAVA_INSTALL_PATH}/jre/lib/rt.jar:		\
@@ -14,6 +14,7 @@ CLASSPATH =						\
 	${COG_INSTALL_PATH}/lib/cryptix32.jar:		\
 	${COG_INSTALL_PATH}/lib/cryptix-asn1.jar:	\
 	.
-JFLAGS = -classpath `echo ${CLASSPATH} | tr -d '\t\n\ '`
-JCFLAGS = -g -classpath `echo ${CLASSPATH} | tr -d '\t\n\ '`
+CLASSPATH = `echo ${SCLASSPATH} | tr -d '\t\n\ '`
+JFLAGS = -classpath ${CLASSPATH}
+JCFLAGS = -g -classpath ${CLASSPATH}
 JDEP = ${SYSROOT}/tools/jdep/jdep

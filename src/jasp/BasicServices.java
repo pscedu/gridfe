@@ -4,9 +4,11 @@ package jasp;
 
 import java.io.*;
 
-public class BasicServices {
+public class BasicServices
+{
 	/* It is sad that there is no way to do this in J2SE. */
-	public static int getUserID() {
+	public static int getUserID()
+	{
 		int uid = -1;
 		String username;
 

@@ -1,6 +1,21 @@
 $Id$
 
-mod_fum Installation
+About Mod_Fum
+=============
+Mod_Fum (the Module for Free Utilization and Moderation through Kerberos)
+was specificly designed for use with Grid Portal software.  Mod_Fum's purpose
+is to provide the functionality of the command line tools "kinit", "kx509", 
+and "kxlist -p" through apache. Mod_Fum will obtain a Kerberos Ticket,
+a short term  X.509 Certificate, and a Globus Proxy for the user. These
+credentials will be specific to the user, but readable only by apache (apache
+becomes the sole owner). This allows web applications, such as portals, to
+act on the users behalf.
+
+Note: Mod_Fum should only be used in conjunction with Mod_SSL! Otherwise
+Kerberos passwords will be transmitted in cleartext across the wire.
+
+
+Mod_Fum Installation
 ====================
 
 Requirements:
@@ -18,26 +33,27 @@ Requirements:
 	# cp libkx509.so /usr/lib
 	# ldconfig
 
+	Note:
 	The kx509 header file 'kx509.h' must also be present on the system
 	to build mod fum.
 
 
 
-Building mod_fum:
+Building Mod_Fum:
 =================
 1) Type: 'make' to compile the module
-2) Then: 'make install' to compile & install (using apsx) into apache
-3) And: 'make clean' to remove extra stuff
+2) Then: 'make install' to install (using apsx) into apache
 
-
-
-
+Other:
+3) Type: 'make clean' to remove mod_fum and scratch files
 
 
 Apache Configuration:
 =====================
-1) Add the following to your <Directory> tag in your 'httpd.conf' file:
+1) Add the following to your <Directory> tags in your 'httpd.conf' file
+to enable Mod_Fum authentication:
 
+	# Mod_Fum Authentication Requirements
 	AuthName "GridFe Login"
 	AuthType Basic
 	SetHandler mod_fum_auth
@@ -46,3 +62,4 @@ Apache Configuration:
 	# Use this for mod_ssl support (recommended!!)
 	SSLRequireSSL
 	SSLProtocol all -SSLv2
+

@@ -30,18 +30,20 @@ public class GridFE extends HttpServlet {
 	private HttpServletRequest req;
 	private HttpServletResponse res;
 
-	/* XXX: make nestable. */
+	/* XXX: make nestable and modularable. */
 	final DelegationHandler[] dtab = new DelegationHandler[] {
 		new DelegationHandler("/certs",		gridfe.www.certs.class),
+		new DelegationHandler("/jobs/index",	gridfe.www.jobs.index.class),
 		new DelegationHandler("/jobs/output",	gridfe.www.jobs.output.class),
 		new DelegationHandler("/jobs/status",	gridfe.www.jobs.status.class),
 		new DelegationHandler("/jobs/submit",	gridfe.www.jobs.submit.class),
 		new DelegationHandler("/nodes",		gridfe.www.nodes.class),
+		new DelegationHandler("/rls/index",	gridfe.www.rls.index.class),
 		new DelegationHandler("/rls/addcat",	gridfe.www.rls.addcat.class),
 		new DelegationHandler("/rls/addres",	gridfe.www.rls.addres.class),
 		new DelegationHandler("/rls/rmcat",	gridfe.www.rls.rmcat.class),
 		new DelegationHandler("/rls/search",	gridfe.www.rls.search.class),
-		new DelegationHandler("/",		gridfe.www.index.class)
+		new DelegationHandler("index",		gridfe.www.index.class)
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -73,9 +75,14 @@ public class GridFE extends HttpServlet {
 			this.handleError(null, e + ": " + e.getMessage());
 			return;
 		}
+		
+		/* ``/'' is optional for index pages. */
+		if (uri.charAt(uri.length()) == '/')
+			uri += "index";
 
 		Class handler = null;
-		String s;
+		String s, best;
+		int bestlen = 5000 /* XXX: INT_MAX */;
 		char c;
 		for (int i = 0; i < this.dtab.length; i++) {
 			s = p.getServRoot() + this.dtab[i].getBase();
@@ -88,12 +95,17 @@ public class GridFE extends HttpServlet {
 				handler = this.dtab[i].getHandler();
 				break;
 			}
+			/* Handle "/foo" for "/foo/index". */
+			if (s.length() > uri.length())
+				c = s.charAt(uri.length());
+			else
+				c = '\0';
+			if (s.startsWith(uri) && c == '/' &&
+			    s.length() < bestlen) {
+				best = s;
+				bestlen = s.length();
+			}
 		}
-
-		/* ``/'' is optional for index page. */
-		if (uri.equals(p.getServRoot()))
-			handler = gridfe.www.index.class;
-
 		if (handler == null)
 			handler = gridfe.www.notfound.class;
 

@@ -1,6 +1,7 @@
 # $Id$
 
 CLASSES += Page.class GridFE.class
+PRIVCLASSES += DelegationHandler.class NavigationMenu.class
 
 SYSROOT = ..
 

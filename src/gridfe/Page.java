@@ -264,7 +264,8 @@ public class Page
 		   +			  "text-align: center;\">"
 		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
-		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";
+		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
+		   +				"<br />";
 		return (s);
 	}
 

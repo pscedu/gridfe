@@ -12,9 +12,7 @@
 
 /*
 XXX Things todo still:
-	1) change mf_dstr*() for apache malloc
-	2) change mf_dstrfree() for apache free
-	3) change all malloc's for apache malloc
+	1) test module, fix any errors
 
 XXX Developement Notes:
 	1) currently only users with user account can use authenticate.
@@ -73,8 +71,6 @@ static void mf_kxlist_crypto(krb5_inst_ptr, char*);
 static void mf_krb5_init(krb5_inst_ptr kinst, const char*);
 static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
-static char* mf_dstrcpy(const char*); 
-static void mf_dstrfree(char*);
 static char* mf_dstrslice(const char*, int, int);
 static char* mf_dstrcat(const char*, const char*);
 static void mod_fum_hooks(apr_pool_t *p);
@@ -182,7 +178,6 @@ int mf_main(const char *principal, const char *password)
 	/* Read uid from /etc/passwd */
 	mf_user_id_from_principal(principal, &uid);
 	tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
-	free(uid);
 
 	/* ----------- KINIT ----------- */
 
@@ -207,9 +202,6 @@ int mf_main(const char *principal, const char *password)
 	
 	/* kxlist -p */
 	mf_kxlist(tkt_cache);
-	
-
-	mf_dstrfree(tkt_cache);
 	
 	return 0;
 }
@@ -242,8 +234,6 @@ static void mf_kxlist(const char *tkt_cache)
 	mf_kxlist_crypto(&kinst, name);
 
 	mf_krb5_free(&kinst);
-	free(uid);
-	free(name);
 }
 
 /*
@@ -395,11 +385,9 @@ static void mf_user_id_from_principal(const char *principal, char **uid)
 	/* convert uid to (char*), (first snprintf gives the size) */
 	i = snprintf(NULL, 0, "%d", pw->pw_uid);
 	j = (i+1)*sizeof(char);
-	*uid = malloc(j);
+	*uid = ap_palloc(mf_get_pool(), j);
 	snprintf(*uid, j, "%d", pw->pw_uid);
 	(*uid)[i] = '\0';
-
-	free(p);
 }
 
 
@@ -412,12 +400,11 @@ static void mf_kx509(const char *tkt_cache)
 	char *argv[3];
 	int argc;
 	int err;
-	int i;
 
 	/* setup kx509 as would be called from command line */
-	argv[0] = mf_dstrcpy("kx509");
-	argv[1] = mf_dstrcpy("-c");
-	argv[2] = mf_dstrcpy(tkt_cache);
+	argv[0] = ap_pstrdup("kx509");
+	argv[1] = ap_pstrdup("-c");
+	argv[2] = ap_pstrdup(tkt_cache);
 	argc = 3;
 
 	/* simply run kx509 */
@@ -425,9 +412,6 @@ static void mf_kx509(const char *tkt_cache)
 
 	if(err != KX509_STATUS_GOOD) 
 		mf_err("kx509 failed", err);
-	
-	for(i = 0; i < argc; i++)
-		mf_dstrfree(argv[i]);
 }
 
 
@@ -488,36 +472,6 @@ static void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 	kprefs->forwardable = kForwardable;
 	kprefs->lifetime = kLifetime;
 }
-
-/*
-** Get the ticket cache location
-** NOTE: must be called with a valid krb5_inst!
-*/
-#if 0
-static void mf_get_ticket_cache(krb5_inst_ptr kinst, char **tkt_cache)
-{
-	const char *t;
-	size_t len;
-
-	/* Save the tkt_cache name kinit_cleanup() */
-	t = krb5_cc_get_name(kinst->context, kinst->cache);
-	len = strlen(t) + 1;
-	*tkt_cache = malloc(len * sizeof(char));
-
-	if(*tkt_cache == NULL)
-		mf_err("malloc failed", 1);
-	
-	/* Null terminate manually, linux needs strlcpy! */
-	strncpy(*tkt_cache, t, len - 1);
-	(*tkt_cache)[len - 1] = '\0';
-}
-
-static void mf_free_ticket_cache(char *tkt_cache)
-{
-	if(tkt_cache)
-		free(tkt_cache);
-}
-#endif
 
 /*
 ** Handle standard krb5 inital functions
@@ -583,29 +537,6 @@ static void mf_kinit_cleanup(krb5_inst_ptr kinst)
 		krb5_free_context(kinst->context);
 }
 
-
-/* 
-** dynamic strcpy routine and malloc() wrapper
-** (null terminated)
-*/
-static char* mf_dstrcpy(const char *s)
-{
-	char *s2;
-	size_t len;
-
-	/* this can easily be changed for ap_malloc */
-	len = strlen(s) + 1;
-	s2 = (char*)(malloc(sizeof(char)*len));
-
-	if(!s2)
-		mf_err("malloc failed", 1);
-
-	strncpy(s2,s,len);
-	s2[len] = '\0';
-
-	return s2;
-}
-
 /*
 ** dynamic strcat routine and malloc wrapper
 */
@@ -614,9 +545,8 @@ static char* mf_dstrcat(const char *s1, const char *s2)
 	char *s;
 	size_t len;
 
-	/* this can easily be changed for ap_malloc */
 	len = strlen(s1) + strlen(s2) + 1;
-	s = (char*)(malloc(sizeof(char)*len));
+	s = (char*)(ap_palloc(mf_get_pool(), sizeof(char)*len));
 
 	if(!s)
 		mf_err("malloc failed", 1);
@@ -643,7 +573,7 @@ static char* mf_dstrslice(const char *s, int x, int y)
 
 	if(len)
 	{
-		s2 = (char*)(malloc(sizeof(char)*len));
+		s2 = (char*)(ap_palloc(mf_get_pool(), sizeof(char)*len));
 
 		if(!s2)
 			mf_err("malloc failed", 1);
@@ -660,20 +590,10 @@ static char* mf_dstrslice(const char *s, int x, int y)
 			}
 			else
 			{
-				free(s2);
 				s2 = NULL;
 			}
 		}
 	}	
 	
 	return s2;
-}
-
-/*
-** dynamic string function free() wrapper
-*/
-static void mf_dstrfree(char *s)
-{
-	if(s)
-		free(s);
 }

@@ -1,6 +1,6 @@
 /* $Id$ */
 
-package gridint.auth;
+package jasp;
 
 public class Uid
 {

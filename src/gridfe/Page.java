@@ -170,7 +170,7 @@ public class Page
 				"Search Catalogues",	"/rls/search",
 				"Add Resource",			"/rls/addres"
 			});
-		this.addMenu("Node Availibility", "/nodes", null);
+		this.addMenu("Node Availability", "/nodes", null);
 
 		String r = this.webroot;
 

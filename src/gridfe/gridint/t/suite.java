@@ -9,6 +9,7 @@ import java.security.*;
 import javax.security.auth.kerberos.KerberosKey;
 import java.lang.reflect.*;
 import java.lang.Integer;
+import jasp.*;
 
 public class suite
 {
@@ -16,7 +17,7 @@ public class suite
 	{
 
 		/* GridInt Test Suite */
-		GridInt gi = new GridInt(args[0]);
+		GridInt gi = new GridInt(BasicServices.getUserID());
 		gi.authenticate();
 		System.out.print("Remaining Lifetime: ");
 		System.out.println(gi.getRemainingLifetime());
@@ -69,13 +70,23 @@ public class suite
 
 		gi.jobSubmit(j);
 
+		/* 
+		** Revival Test
+		** make sure we can recreate GridJobs from stored values
+		** and gss credentials.
+		*/
+		GridJob j2 = new GridJob();
+		j2.revive(j.getHost(), j.getIDAsString(), gi.getGSSAuth().getGSSCredential(), j.getRSL());
+
 		do
 		{
-			System.out.println(j.getStatus()+" : "+j.getStatusAsString());
-			Thread.sleep(900);
+			System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
+			System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
+			Thread.sleep(800);
 
 		}while(j.getStatus() != -1);
-		System.out.println(j.getStatus()+" : "+j.getStatusAsString());
+		System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
+		System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
 
 
 		/* Use GridInt to test GramInt */

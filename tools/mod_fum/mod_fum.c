@@ -40,7 +40,13 @@
 #include <apr_strings.h>
 #include <apr_env.h>
 
-#define MF_VERSION "mod_fum/1.0-a"
+#ifdef STANDALONE
+#define apr_palloc(pool, siz) malloc(siz)
+#define apr_pstrdup(pool, str) strdup(str)
+#define apr_env_set(name, val, pool) setenv(name, val, 1)
+#endif
+
+#define MF_VERSION "mod_fum/0.1"
 
 #define KPD_PROXIABLE 1
 #define KPD_FORWARDABLE 0
@@ -116,12 +122,14 @@ module fum_module = {
 };
 
 /* Register hooks in Apache */
-static void
+void
 mod_fum_hooks(apr_pool_t *p)
 {
+#ifndef STANDALONE
 	/* We need to be the first to intercept the password */
 	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_FIRST);
 	ap_add_version_component(p, MF_VERSION);
+#endif /* STANDALONE */
 }
 
 /* Apache authentication hook */
@@ -136,12 +144,14 @@ mod_fum_auth(request_rec *r)
 	mf_pool = r->pool;
 	mf_rec = r;
 
+#ifndef STANDALONE
 	/*
 	 * Get user/pass - NOTE: ap_get_basic_auth_pw() must be called
 	 * first, otherwise r->user will be NULL.
 	 */
 	err = ap_get_basic_auth_pw(r, &pass);
 	user = r->user;
+#endif /* STANDALONE */
 
 	if (err != OK || user == NULL || pass == NULL) {
 		mf_log("authentication incomplete (%d)", err);
@@ -747,6 +757,8 @@ mf_log(const char *fmt, ...)
 	/* (void)snprintf(buf, sizeof(buf), "%s\n", buf); */
 	va_end(ap);
 
+#ifndef STANDALONE
 	ap_log_error(APLOG_MARK, APLOG_ERR, (apr_status_t)NULL,
 	    mf_rec->server, "%s", buf);
+#endif /* STANDALONE */
 }

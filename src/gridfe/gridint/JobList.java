@@ -2,7 +2,6 @@
 
 package gridfe.gridint;
 
-import gridfe.gridint.*;
 import java.io.*;
 import java.util.*;
 

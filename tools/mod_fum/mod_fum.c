@@ -89,6 +89,7 @@ static apr_pool_t* mf_pool(apr_pool_t*);
 static void mod_fum_hooks(apr_pool_t*);
 static int mf_check_for_credentials(const char*);
 static int mf_valid_user(const char*, const char*);
+static int mf_valid_credentials(char *);
 int mod_fum_auth(request_rec*);
 int do_kx509(int, char**);
 int mf_main(const char*, const char*);
@@ -135,6 +136,7 @@ int mod_fum_auth(request_rec *r)
 
 	if(err == OK && user && pass)
 	{
+
 		/* Check if previous credentials exist */
 		if(mf_check_for_credentials(user))
 		{
@@ -160,11 +162,14 @@ int mod_fum_auth(request_rec *r)
 				** new certs, if not, do nothing
 				*/
 				// XXX Expired ???
-				if(0)
+				if(mf_valid_credentials(user))
+				//if(0)
 				{
 					/* Create new certs */
 					err = mf_main(user, pass);
 				}
+				else
+					mf_err("credentials expired", 1);
 			}
 			else
 			{
@@ -510,7 +515,10 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 		
 		if(pw)
 		{
-			/* convert uid to (char*), (first snprintf gives the size) */
+			/* 
+			** convert uid to (char*), 
+			** (first snprintf gives the size)
+			*/
 			i = snprintf(NULL, 0, "%d", pw->pw_uid);
 			j = (i+1)*sizeof(char);
 			*uid = apr_palloc(mf_get_pool(), j);
@@ -713,6 +721,8 @@ static int mf_check_for_credentials(const char *principal)
 	char *cert;
 	int found = 0;
 	int err;
+	DIR *dir;
+	struct dirent *d;
 
 	/* Read uid from /etc/passwd */
 	err = mf_user_id_from_principal(principal, &uid);
@@ -724,9 +734,6 @@ static int mf_check_for_credentials(const char *principal)
 
 		if(cert)
 		{
-			DIR *dir;
-			struct dirent *d;
-
 			/* Does the file exist */
 			dir = opendir(kCredentialPath);
 
@@ -753,15 +760,70 @@ static int mf_check_for_credentials(const char *principal)
 }
 
 /*
+** Check if the certificate has expired or not by
+** finding the kx509 certificate and checking it's
+** expiration time, compared with the current time.
+**
+** XXX - This code is so similar to stuff from mf_main
+** and kxlist, that there has to be a nice way to break
+** some of it down to be more modular and compact...
+** for now, just 
+*/
+static int mf_valid_credentials(char *principal)
+{
+	char *uid;
+	krb5_inst kinst;
+	krb5_timestamp end;
+	int err;
+	char *tkt_cache;
+	int valid = 0;
+	
+	err = mf_user_id_from_principal(principal, &uid);
+
+	if(err == OK)
+	{
+		tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
+
+		if(tkt_cache)
+		{
+			err = mf_krb5_init(&kinst, tkt_cache);
+
+			if(err != OK)
+				goto RET;
+
+			/* Grab the kx509 credentials */
+			err = mf_kxlist_setup(&kinst);
+
+			if(err != OK)
+				goto RET;
+
+			/* Get the expiration time of the cert */
+			end = kinst.credentials.times.endtime;
+
+			/* Compare with our time now */
+			if(time(NULL) < end)
+				valid = 1;
+		}
+	}
+	else
+		mf_err("uid failed", err);
+
+	RET:
+	return valid;
+}
+
+/*
 ** Check if the user/pass is valid
 ** (for now just simulate a kerberos authentication)
 **
 ** XXX - There must be a better way to validate the
-** authenticity of the user...
+** authenticity of the user... 
+** XXX - if this is the best way
+** to do this, then i need to try and find a more modular
+** way, because much of this code is similar to kinit...
 */
 static int mf_valid_user(const char *principal, const char *password)
 {
-	char *uid;
 	int err;
 	krb5_inst kinst;
 	krb5_prefs kprefs;

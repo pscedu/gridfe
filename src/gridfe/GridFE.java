@@ -128,8 +128,8 @@ public class GridFE extends HttpServlet {
 			    p.footer();
 		} catch (Exception e) {
 			/* This is bad. */
-			s = "Fatal error: " + e + ": " + e.getMessage();
-			s += "\nOriginally: " + msg;
+			s  = "<br />\nFatal error: " + e + ": " + e.getMessage();
+			s += "<br />\nOriginally: " + msg;
 		}
 		return (s);
 	}

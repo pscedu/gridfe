@@ -180,68 +180,55 @@ public class GridInt implements Serializable
 		gass = new GassInt(this.gss.getGSSCredential(),
 					job.getHost(), port);
 
-		/*
-		** Determine if directory needs prepended to output.
-		** If std(out/err) string starts with a '/' or '~'
-		** then the user has explicitly stated the path.
-		** If directory does not start with '/' then it
-		** needs to default to "~".
-		*/
-		if(job.stdout != null)
+		try
 		{
-			dir[0] = (job.stdout.charAt(0) != '/') ? "~/" : "";
-			dir[0] += (job.dir != null) ? job.dir : "";
+			/* Start the Gass Server */
+			gass.start();
+		}
+		catch(Exception e)
+		{
+			/* Flag Error, Return */
+			data[0] = e.getMessage();
+			data[1] = e.getMessage();
+			return;
 		}
 
-		if(job.stderr != null)
-		{
-			dir[1] = (job.stderr.charAt(0) != '/') ? "~/" : "";
-			dir[1] += (job.dir != null) ? job.dir : "";
-		}
-
-		/* ----------------------------------------------------- 
-		**
-		** Unfortunately GRAM assumes directories start from
-		** ~/ and if ~/dir is specified GRAM cannot expand the ~
-		**
-		** GASS on the other hand seems to assume a full path
-		** and support ~ expansion via the TILDE_EXPAND_ENABLE
-		** option.
-		**
-		** Therefore we have to manually adjust stdout, stderr
-		** and directory accordingly.
-		*/
-
-		if(job.stdout != null && job.stdout.charAt(0) != '/' &&
-			job.stdout.charAt(0) != '~')
-				file[0] = new String(dir[0] + "/" + job.stdout);
-
-		if(job.stderr != null && job.stderr.charAt(0) != '/' &&
-			job.stderr.charAt(0) != '~')
-				file[1] = new String(dir[1] + "/" + job.stderr);
-
-/*		if(file[0] != null && file[0].charAt(0) != '/' &&
-			file[0].charAt(0) != '~')
-				file[0] = new String(dir[0] + "/" + file[0]);
-
-		if(file[1] != null && file[1].charAt(0) != '/' &&
-			file[1].charAt(0) != '~')
-				file[1] = new String(dir[1] + "/" + file[1]);
-*/
-
-
-		/* Read stdout/stderr */
 		for(int i = 0; i < 2; i++)
 		{
+
+			/*
+			** Determine if directory needs prepended to output.
+			** If std(out/err) string starts with a '/' or '~'
+			** then the user has explicitly stated the path.
+			** If directory does not start with '/' then it
+			** needs to default to "~".
+			*/
+			if(file[i] != null)
+			{
+				dir[i] = (file[i].charAt(0) != '/') ? "~/" : "";
+				dir[i] += (job.dir != null) ? job.dir : "";
+			}
+
+			/* 
+			** Unfortunately GRAM assumes directories start from
+			** ~/ and if ~/dir is specified GRAM cannot expand the ~
+			**
+			** GASS on the other hand seems to assume a full path
+			** and support ~ expansion via the TILDE_EXPAND_ENABLE
+			** option.
+			**
+			** Therefore we have to manually adjust stdout, stderr
+			** and directory accordingly.
+			*/
+			if(file[i] != null && file[i].charAt(0) != '/' &&
+				file[i].charAt(0) != '~')
+			{
+				file[i] = new String(dir[i] + "/" + file[i]);
+			}
+
+			/* Read stdout/stderr */
 			try
 			{
-				/* Start the Gass Server */
-				if(active != 1)
-				{
-					gass.start();
-					active = 1;
-				}
-	
 				gass.open(file[i]);
 				data[i] = gass.read();
 				gass.close();
@@ -252,9 +239,8 @@ public class GridInt implements Serializable
 			}
 		}
 
-		/* Make sure we terminate the gass server */
-		if(active == 1)
-			gass.shutdown();
+		/* Terminate the Gass Server */
+		gass.shutdown();
 	}
 
 	/* Get a Job from the list by index */

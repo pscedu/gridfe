@@ -4,9 +4,7 @@ package oof.filter;
 import oof.element.*;
 
 public class XHTML extends FILTER {
-	private OOF oof;
-
-	public build(ELEMENT e) {
+	public String build(ELEMENT e) {
 		HTMLElement html = new HTMLElement(e.name);
 		String s;
 		Attribute attr;

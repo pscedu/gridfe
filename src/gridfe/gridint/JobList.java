@@ -3,7 +3,7 @@
 ** GridJobList -
 ** Wrapper over a GridJob manager.
 ** Something to maintain past & present
-** submitted GridJobs...
+** submitted GridJobs
 */
 
 package gridint;
@@ -23,7 +23,7 @@ public class GridJobList implements Serializable
 
 	public void push(GridJob j)
 	{
-		this.list.add(0,j);
+		this.list.add(0, j);
 	}
 
 	public GridJob pop()

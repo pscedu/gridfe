@@ -1,9 +1,12 @@
 /* $Id$ */
 
-package gridint;
+package gridfe.gridint;
+
+import jasp.*;
+import java.io.*;
 
 public class UserMap {
-	private static final _PATH_MAPFILE =
+	private static final String _PATH_MAPFILE =
 	    "/etc/grid-security/grid-mapfile";
 
 	public UserMap() {
@@ -19,9 +22,9 @@ public class UserMap {
 				DN dn = this.parseDN(line);
 				String[] fields = dn.getDN().split("/");
 				if (fields.length == 1)
-					fields == dn.getDN().split(":");
+					fields = dn.getDN().split(":");
 				for (int j = 0; j < fields.length; j++) {
-					String[] pair = fields[i].split("=");
+					String[] pair = fields[j].split("=");
 					if (pair.length == 2 &&
 					    pair[0].equals("USERID") &&
 					    pair[1].equals(prin))
@@ -32,6 +35,7 @@ public class UserMap {
 		} catch (Exception e) {
 			return null;
 		}
+		return (null);
 	}
 
 	private DN parseDN(String line) {
@@ -71,7 +75,7 @@ public class UserMap {
 				return (null);
 			}
 		}
-		return (new DN(dnstr, username));
+		return (new DN(dn, username));
 	}
 };
 

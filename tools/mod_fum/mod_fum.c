@@ -54,6 +54,9 @@ XXX Developement Notes:
 #include"http_main.h"
 #include"http_protocol.h"
 #include"http_request.h"
+//#include"apr_pools.h"
+//#include"apr_compat.h"
+#include"apr_strings.h"
 
 #include"mod_fum.h"
 
@@ -385,7 +388,7 @@ static void mf_user_id_from_principal(const char *principal, char **uid)
 	/* convert uid to (char*), (first snprintf gives the size) */
 	i = snprintf(NULL, 0, "%d", pw->pw_uid);
 	j = (i+1)*sizeof(char);
-	*uid = ap_palloc(mf_get_pool(), j);
+	*uid = apr_palloc(mf_get_pool(), j);
 	snprintf(*uid, j, "%d", pw->pw_uid);
 	(*uid)[i] = '\0';
 }
@@ -402,9 +405,9 @@ static void mf_kx509(const char *tkt_cache)
 	int err;
 
 	/* setup kx509 as would be called from command line */
-	argv[0] = ap_pstrdup("kx509");
-	argv[1] = ap_pstrdup("-c");
-	argv[2] = ap_pstrdup(tkt_cache);
+	argv[0] = apr_pstrdup(mf_get_pool(), "kx509");
+	argv[1] = apr_pstrdup(mf_get_pool(), "-c");
+	argv[2] = apr_pstrdup(mf_get_pool(), tkt_cache);
 	argc = 3;
 
 	/* simply run kx509 */
@@ -546,7 +549,7 @@ static char* mf_dstrcat(const char *s1, const char *s2)
 	size_t len;
 
 	len = strlen(s1) + strlen(s2) + 1;
-	s = (char*)(ap_palloc(mf_get_pool(), sizeof(char)*len));
+	s = (char*)(apr_palloc(mf_get_pool(), sizeof(char)*len));
 
 	if(!s)
 		mf_err("malloc failed", 1);
@@ -573,7 +576,7 @@ static char* mf_dstrslice(const char *s, int x, int y)
 
 	if(len)
 	{
-		s2 = (char*)(ap_palloc(mf_get_pool(), sizeof(char)*len));
+		s2 = (char*)(apr_palloc(mf_get_pool(), sizeof(char)*len));
 
 		if(!s2)
 			mf_err("malloc failed", 1);

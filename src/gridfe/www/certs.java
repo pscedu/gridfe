@@ -25,7 +25,8 @@ public class certs
 		CertInfo ci;
 //		ci = p.getGridInt().getCertInfo();
 
-		GridInt gi = null;
+/*
+		GridInt gi;
 		try
 		{
 			gi = new GridInt(uid);
@@ -50,8 +51,10 @@ public class certs
 		{
 			s += oof.p(e.getMessage());
 		}
+*/
 
 		s += p.footer();
+
 
 /*
 

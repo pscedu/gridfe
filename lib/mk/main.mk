@@ -33,9 +33,10 @@ depend: ${JDEP}
 			echo "<=== ${DIRPREFIX}" | sed 's!/$$!!';		\
 		fi;								\
 	done
-	rm -f .depend
+	@rm -f .depend
 	@for i in ${CLASSES}; do						\
-		${JDEP} $$i >> .depend;						\
+		echo "${JDEP} $${i%class}java";					\
+		${JDEP} $${i%class}java >> .depend || exit 1;			\
 	done
 
 test: all ${TESTS}

@@ -16,14 +16,12 @@ public class suite
 	{
 
 		/* GridInt Test Suite */
-/*
 		GridInt gi = new GridInt(args[0]);
 		gi.authenticate();
 		//System.out.println(gi.getIssuer());
 		System.out.println(gi.getRemainingLifetime());
 		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
 		System.out.println(gi.getGlobusAuth().getSubject());
-*/
 
 		/* GlobusAuth Test Suite */
 		/*
@@ -43,6 +41,7 @@ public class suite
 		*/
 		
 		/* KerbAuth Test Suite */
+		/*
 		Subject sub;
 		Set prin;
 		Set priv;
@@ -92,6 +91,7 @@ public class suite
 		System.out.println(Class.forName("javax.security.auth.Subject").getFields());
 
 		krb.logout();
+		*/
 
 		/* X509Auth Test Suite */
 /*

@@ -11,31 +11,31 @@ public class ELEMENT {
 	private LinkedList children;
 	private FILTER filter;
 
-	ELEMENT() {
+	public ELEMENT() {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 	}
 
-	ELEMENT(Object[] attrs) {
+	public ELEMENT(Object[] attrs) {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		for (int i = 0; i < attrs.length; i++)
 			this.attrs.add(attrs[i]);
 	}
 
-	ELEMENT(String s) {
+	public ELEMENT(String s) {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		this.children.add(s);
 	}
 
-	ELEMENT(ELEMENT e) {
+	public ELEMENT(ELEMENT e) {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		this.children.add(e);
 	}
 
-	ELEMENT(Object[] attrs, String s) {
+	public ELEMENT(Object[] attrs, String s) {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		for (int i = 0; i < attrs.length; i++)
@@ -43,7 +43,7 @@ public class ELEMENT {
 		this.children.add(s);
 	}
 
-	ELEMENT(Object[] attrs, ELEMENT e) {
+	public ELEMENT(Object[] attrs, ELEMENT e) {
 		this.attrs	= new LinkedList();
 		this.children	= new LinkedList();
 		for (int i = 0; i < attrs.length; i++)
@@ -68,7 +68,8 @@ public class ELEMENT {
 	}
 
 	public String toString() {
-		throw new OOFToStringException();
+//		throw new OOFToStringException();
+		return "@@@@@ GARBAGE " + this.name + " @@@@@";
 	}
 
 	public String build() {

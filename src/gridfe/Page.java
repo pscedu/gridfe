@@ -66,8 +66,15 @@ public class Page {
 
 		try {
 			UserMap m = new UserMap();
+			String kuid = req.getRemoteUser();
+			if (kuid == null)
+				throw new Exception("Invalid access");
+			String uid = m.kerberosToSystem(kuid);
+			this.gi = new GridInt(BasicServices.getUserID(uid));
+/*
 			this.gi = new GridInt(BasicServices.getUserID(
 			    m.kerberosToSystem(req.getRemoteUser())));
+*/
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {

@@ -9,7 +9,12 @@ public class Page {
 	Page() {
 		/* XXX: load jasp prefs from resource. */
 		this.jasp = new JASP();
-		this.oof  = new OOF(this.jasp, "xhtml");
+
+		try {
+			this.oof = new OOF(this.jasp, "xhtml");
+		} catch (Exception e) {
+			this.error(e.toString());
+		}
 	}
 
 	public String header(String title) {
@@ -35,5 +40,14 @@ public class Page {
 		  + "</html>";
 
 		return s;
+	}
+
+	public void error(String error) {
+		System.out.println("Error: " + error);
+		System.exit(1);
+	}
+	
+	public void error(Exception e) {
+		this.error(e.toString() + ": " + e.getMessage());
 	}
 };

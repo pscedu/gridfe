@@ -103,10 +103,5 @@ public class GridJob extends RSLElement implements Serializable
 		throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
-
-		//DEBUG
-		System.out.println("GridJob - readObject: "+this);
-		this.build();
-		System.out.println("GridJob - readObject: "+this.stdout);
 	}
 };

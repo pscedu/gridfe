@@ -21,15 +21,17 @@ public class certs
 
 //		ci = p.getGridInt().getCertInfo();
 
+		GridInt gi = null;
 		try
 		{
-			GridInt gi = new GridInt(uid);
-			ci = gi.getCertInfo();
+			gi = new GridInt(uid);
 		}
 		catch(Exception e)
 		{
 			s += oof.p(e.getMessage());
 		}
+
+		ci = gi.getCertInfo();
 
 		long tmp;
 		long sec = ci.time;

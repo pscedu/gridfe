@@ -1,10 +1,11 @@
 /* $Id$ */
+
 package oof;
 
-import java.lang.reflect.*;
 import jasp.*;
-import oof.filter.*;
+import java.lang.reflect.*;
 import oof.element.*;
+import oof.filter.*;
 
 public class OOF {
 	private Filter filter;

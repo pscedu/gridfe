@@ -342,50 +342,51 @@ public class OOF {
 	}
 
 	/* Piecewise Elements. */
-	public ELEMENT div_start() throws OOFBadElementFormException {
+	public Startable div_start() throws OOFBadElementFormException {
 		return new DivisionStart(this, new Object[] {});
 	}
-	public ELEMENT div_start(Object[] attrs) throws OOFBadElementFormException {
+	public Startable div_start(Object[] attrs) throws OOFBadElementFormException {
 		return new DivisionStart(this, attrs);
 	}
 
-	public ELEMENT div_end() throws OOFBadElementFormException {
+	public Endable div_end() throws OOFBadElementFormException {
 		return new DivisionEnd(this);
 	}
 
-	public ELEMENT form_start() throws OOFBadElementFormException {
+	public Startable form_start() throws OOFBadElementFormException {
 		return new FormStart(this, new Object[] {});
 	}
-	public ELEMENT form_start(Object[] attrs) throws OOFBadElementFormException {
+	public Startable form_start(Object[] attrs) throws OOFBadElementFormException {
 		return new FormStart(this, attrs);
 	}
 
-	public ELEMENT form_end() throws OOFBadElementFormException {
+	public Endable form_end() throws OOFBadElementFormException {
 		return new FormEnd(this);
 	}
 
-	public ELEMENT list_start() throws OOFBadElementFormException {
+	public Startable list_start() throws OOFBadElementFormException {
 		return new ListStart(this, new Object[] {});
 	}
-	public ELEMENT list_start(Object type) throws OOFBadElementFormException {
+	public Startable list_start(Object type) throws OOFBadElementFormException {
 		return new ListStart(this, new Object[] { "type", type });
 	}
 	
-	public ELEMENT list_end() throws OOFBadElementFormException {
-		return new ListEnd(this, new Object[] {});
+	public Endable list_end() throws OOFBadElementFormException {
+		return new ListEnd(this, null);
 	}
-	public ELEMENT list_end(Object type) throws OOFBadElementFormException {
-		return new ListEnd(this, new Object[] { "type", type });
+	public Endable list_end(Object type) throws OOFBadElementFormException {
+		/* XXX: make a list/array */
+		return new ListEnd(this, type);
 	}
 	
-	public ELEMENT table_start() throws OOFBadElementFormException {
+	public Startable table_start() throws OOFBadElementFormException {
 		return new TableStart(this, new Object[] {});
 	}
-	public ELEMENT table_start(Object[] attrs) throws OOFBadElementFormException {
+	public Startable table_start(Object[] attrs) throws OOFBadElementFormException {
 		return new TableStart(this, attrs);
 	}
 	
-	public ELEMENT table_end() throws OOFBadElementFormException {
+	public Endable table_end() throws OOFBadElementFormException {
 		return new TableEnd(this);
 	}
 

@@ -25,11 +25,11 @@ public class certs
 		CertInfo ci;
 //		ci = p.getGridInt().getCertInfo();
 
-/*
 		GridInt gi;
 		try
 		{
 			gi = new GridInt(uid);
+/*
 			ci = gi.getCertInfo();
 
 		long tmp;
@@ -46,12 +46,12 @@ public class certs
 				   days + " days, " +
 				   hours + " hours, " +
 				   min + " mins)";
+*/
 		}
 		catch(Exception e)
 		{
-			s += oof.p(e.getMessage());
+			s += oof.p("Exception Caught:"+e.getMessage());
 		}
-*/
 
 		s += p.footer();
 

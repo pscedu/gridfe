@@ -1,0 +1,38 @@
+.\" $Id$
+.Dd August 20, 2004
+.Dt JDEP 1
+.Os
+.Sh NAME
+.Nm jdep
+.Nd create Java dependencies
+.Sh SYNOPSIS
+.Nm jdep
+.Ar file ...
+.Li > Ns Pa .depend
+.Sh DESCRIPTION
+The
+.Nm
+utility creates a dependency file
+.Pq Pa .depend
+that lists all files required by the files given on the command line.
+The dependency file is used by
+.Xr make 1
+for calculating what needs to be recompiled when updating build
+targets.
+.Sh ENVIRONMENT
+.Bl -tag -width CLASSPATH
+.It Ev CLASSPATH
+This value will be consulted for finding packages and class files
+that are relied upon in Java
+.Ic import
+statements.
+.El
+.Sh SEE ALSO
+.Xr java 1 ,
+.Xr make 1 ,
+.Xr mkdep 1
+.Sh CREDITS
+The
+.Nm
+utility is a part of the GridFE free Grid software engine front end
+Web portal.

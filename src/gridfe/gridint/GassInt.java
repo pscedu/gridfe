@@ -37,6 +37,9 @@ public class GassInt extends RemoteGassServer
 		throws GassException, IOException
 	{
 /*
+		//This is additions after hacked CoG code, where the file RemoteGassServer.java
+		//was modified to allow additional customization... However, this still FUBAR.
+		
 		int success = 0;
 		int n = 0;
 
@@ -68,7 +71,7 @@ public class GassInt extends RemoteGassServer
 */
 	}
 
-	/* Manually remote start a server - this fails for some reason though */
+	/* Manually remote start a server - this fails for some reason though, more FUBAR! */
 /*
 	public void start_remote()
 		throws GramException, GSSException

@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $ID$ */
 /*
 ** GridJob - Handles creating and maintaining of
 ** a grid job and the gram internals
@@ -9,12 +9,18 @@ package gridint;
 import gridint.*;
 import org.ietf.jgss.*;
 import org.globus.gram.*;
-
+import java.net.MalformedURLException;
 public class GridJob
 {
 	private String host;
 	private RSLElement rsl;
 	private GramInt gi;
+
+	/* DEBUG */
+	public GridJob()
+	{
+
+	}
 
 	public GridJob(String host)
 	{
@@ -100,6 +106,39 @@ public class GridJob
 	public String getStatusAsString() throws GSSException
 	{
 		return this.gi.getStatusAsString();
+	}
+
+	public String getIDAsString()
+	{
+		return this.gi.getIDAsString();
+	}
+
+	/* DEBUG */
+	/*
+	public void setID(String id) throws MalformedURLException
+	{
+		System.out.println("GridJob: "+id);
+		if(this.gi == null)
+			System.out.println("wtf");
+		this.gi.setID(new String(id));
+		//this.gi.getJob().setID(id);
+	}
+	*/
+
+	/*
+	** Revive allows a GridJob (and hence a GramJob) to be
+	** recreated the saved values (similar to serialization).
+	*/
+	public void revive(String host, String id, GSSCredential gss, RSLElement rsl) throws MalformedURLException
+	{
+		/* Revive GridJob private data */
+		this.host = host;
+		this.rsl = rsl;
+
+		/* Revive GramInt and it's private data */
+		this.gi = new GramInt(gss, this.host, this.rsl);
+		this.gi.createJob();
+		this.gi.setID(id);
 	}
 
 }

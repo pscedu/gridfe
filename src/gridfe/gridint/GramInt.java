@@ -9,6 +9,7 @@ package gridint;
 import gridint.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
+import java.net.MalformedURLException;
 
 public class GramInt
 {
@@ -150,6 +151,12 @@ public class GramInt
 		return this.job.getIDAsString();
 	}
 
+	public void setID(String id) throws MalformedURLException
+	{
+		System.out.println("GridInt: "+id);
+		this.job.setID(id);
+	}
+
 	/* filename of the job output */
 	public String getStdout()
 	{
@@ -163,5 +170,17 @@ public class GramInt
 	public GramJob getJob()
 	{
 		return this.job;
+	}
+
+	/* DEBUG */
+	public void createJob()
+	{
+		/* DEBUG */
+		if(this.gss == null)
+			System.out.println("GramInt: GSS NULL");
+		if(this.rsl == null)
+			System.out.println("GramInt: RSL NULL");
+
+		this.job = new GramJob(this.gss, this.rsl.toString());
 	}
 }

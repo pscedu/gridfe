@@ -46,9 +46,9 @@ public class GassInt extends RemoteGassServer
 		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
 */
 
-		super.setOptions(this.options);
+		this.setOptions(this.options);
 
-		super.start(host);
+		this.start(host);
 /*
 		while(success == 0 && n++ < 10)
 		{
@@ -99,7 +99,7 @@ public class GassInt extends RemoteGassServer
 
 		/* Create a secure input stream */
 		this.fin = new GassInputStream(this.gss, auth, this.host,
-							this.port, file);
+						this.port, file);
 	}
 
 	/* Read len bytes from the open stream */
@@ -113,10 +113,8 @@ public class GassInt extends RemoteGassServer
 		{
 			/* Create a new buf that is proper size */
 			byte[] tmp = new byte[len - read];
-
 			read += this.fin.read(tmp, 0, len - read);
-
-			buf.append(new String(tmp));
+			buf.append(tmp);
 		}
 
 		return read;

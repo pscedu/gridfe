@@ -2,6 +2,7 @@
 
 /*
 -------------------------------------------------------------------
+** mod_fum - Free Unadulterated Moderation (for kerberos)
 ** Free Apache Module to provide the functionality of kinit,
 ** kx509, and kxlist -p ...
 **
@@ -13,9 +14,8 @@
 /*
 XXX Things todo still:
 	1) ap_uname2id(char*) - use this to obtain user id?
-	2) check for previously existing credentials and whether or not
-		they are valid before creating new ones...
-	3) handle errors appropriately, allow gridfe page to explain what
+
+	2) handle errors appropriately, allow gridfe page to explain what
 		went wrong... return error codes, can't just use exit();
 	
 
@@ -84,6 +84,7 @@ static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
 static char* mf_dstrslice(const char*, int, int);
 static char* mf_dstrcat(const char*, const char*);
+static char* mf_dstritoa(int);
 static request_rec* mf_request(request_rec*);
 static apr_pool_t* mf_pool(apr_pool_t*);
 static void mod_fum_hooks(apr_pool_t*);
@@ -140,14 +141,6 @@ int mod_fum_auth(request_rec *r)
 		/* Check if previous credentials exist */
 		if(mf_check_for_credentials(user))
 		{
-			/*
-			** XXX - possibly think about having
-			** the apache htpasswd file take care of
-			** situations like this... if credentials
-			** are found, just pass decline back to
-			** allow BasicAuth to see if the user/pass
-			** is correct... (just a thought)
-			*/
 
 			/*
 			** If they exist, make sure the user/pass
@@ -161,13 +154,9 @@ int mod_fum_auth(request_rec *r)
 				** have expired or not. If so create
 				** new certs, if not, do nothing
 				*/
-				// XXX Expired ???
 				if(mf_valid_credentials(user))
-				//if(0)
-				{
 					/* Create new certs */
 					err = mf_main(user, pass);
-				}
 				else
 					mf_err("credentials expired", 1);
 			}
@@ -519,11 +508,7 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 			** convert uid to (char*), 
 			** (first snprintf gives the size)
 			*/
-			i = snprintf(NULL, 0, "%d", pw->pw_uid);
-			j = (i+1)*sizeof(char);
-			*uid = apr_palloc(mf_get_pool(), j);
-			snprintf(*uid, j, "%d", pw->pw_uid);
-			(*uid)[i] = '\0';
+			(*uid) = mf_dstritoa(pw->pw_uid);
 		}
 		else
 		{
@@ -588,7 +573,7 @@ static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	krb5_get_init_creds_opt_set_tkt_life(&opt, kprefs->lifetime);
 	krb5_get_init_creds_opt_set_address_list(&opt, NULL);
 
-	/* Create credentials from give password, or prompt for password */
+	/* Create credentials from given password */
 	err = krb5_get_init_creds_password(kinst->context, &kinst->credentials,
 		kinst->principal, (char*)(kprefs->password),
 		krb5_prompter_posix, NULL, 0, NULL, &opt);
@@ -767,7 +752,6 @@ static int mf_check_for_credentials(const char *principal)
 ** XXX - This code is so similar to stuff from mf_main
 ** and kxlist, that there has to be a nice way to break
 ** some of it down to be more modular and compact...
-** for now, just 
 */
 static int mf_valid_credentials(char *principal)
 {
@@ -932,11 +916,26 @@ static char* mf_dstrslice(const char *s, int x, int y)
 				s2[len-1] = '\0';
 			}
 			else
-			{
 				s2 = NULL;
-			}
 		}
 	}	
 	
 	return s2;
+}
+
+/*
+** dynamic integer to ascii conversion
+*/
+static char* mf_dstritoa(int l)
+{
+	char *ascii;
+	int i, j;
+
+	i = snprintf(NULL, 0, "%d", l);
+	j = (i+1)*sizeof(char);
+	ascii = apr_palloc(mf_get_pool(), j);
+	snprintf(ascii, j, "%d", l);
+	ascii[i] = '\0';
+
+	return ascii;
 }

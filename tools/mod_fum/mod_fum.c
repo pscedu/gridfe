@@ -16,11 +16,13 @@ XXX When deployed:
 	2) change mf_dstrcpy() for apache malloc
 	3) change mf_dstrfree() for apache free
 
-Developement Notes:
-	1) find a way to combine all the krb5_init stuff that is used
-		for both kinit, and kxlist...
-	2) file permissions on the X.509 certifcate needed, chmod() will
-		work, but only if the file has proper ownership... chown()??
+XXX Developement Notes:
+	1) currently all certificates are created under apache, therefore
+		they will all have the uid of the user apache runs as...
+		this is a problem because we really need the users real
+		uid, even if they do not have a local account set up.
+		somehow, we need the kdc machine to tell us the uid if
+		that's even possible...
 
 NOTES:
 	1) since mod_fum runs under apache the env X509_USER_PROXY cannot

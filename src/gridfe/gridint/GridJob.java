@@ -87,12 +87,12 @@ public class GridJob extends RSLElement implements Serializable
 		/* Check for starting 'http:' or 'https:' */
 		if(this.stdout != null)
 			if(this.stdout.startsWith("http:") ||
-			this.stdout.startsWith("https:"))
+			   this.stdout.startsWith("https:"))
 				which = 1;
 
 		if(this.stderr != null)
 			if(this.stderr.startsWith("http:") ||
-			this.stdout.startsWith("https:"))
+			   this.stdout.startsWith("https:"))
 				which += 2;	
 		
 		return which;

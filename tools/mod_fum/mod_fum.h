@@ -41,11 +41,9 @@ typedef struct
 	krb5_deltat lifetime;
 	int forwardable;
 	int proxiable;
-	char *pname;
-	char *password;
+	const char *pname;
+	const char *password;
 	
 }krb5_prefs, *krb5_prefs_ptr;
 
-void mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
-void mf_kinit_set_uap(krb5_prefs_ptr, char *, char *);
-void mf_kinit_set_defaults(krb5_prefs_ptr);
+int mf_main(const char *principal, const char *password);

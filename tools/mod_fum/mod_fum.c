@@ -13,6 +13,31 @@
 
 static void mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
 static void mf_kinit_cleanup(krb5_inst_ptr);
+static void mf_kinit_set_uap(krb5_prefs_ptr, const char *, const char *);
+static void mf_kinit_set_defaults(krb5_prefs_ptr);
+static void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs);
+
+/*
+** mod_fum main... should be called by apache
+** with a username (principal) and password
+*/
+int mf_main(const char *principal, const char *password)
+{
+	krb5_inst kinst;
+	krb5_prefs kprefs;
+
+	/* kinit - requires only principal/password */
+	mf_kinit_set_defaults(&kprefs);
+	mf_kinit_set_uap(&kprefs, principal, password);
+	mf_kinit(&kinst, &kprefs);
+
+	/* XXX kx509 */
+
+	/* XXX kxlist -p */
+	
+	/* XXX return err if auth failed */
+	return 0;
+}
 
 /*
 ** Perform the functionality of kinit...
@@ -35,7 +60,7 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 
 	/* Create credentials from give password, or prompt for password */
 	err = krb5_get_init_creds_password(k5->context, &k5->credentials,
-						k5->principal, kprefs->password,
+						k5->principal, (char*)(kprefs->password),
 						krb5_prompter_posix, NULL, 0,
 						NULL, &opt);
 	if(err)
@@ -56,7 +81,7 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 }
 
 /* Set the user (principal) and password */
-void mf_kinit_set_uap(krb5_prefs_ptr kprefs, char *principal, char *password)
+void mf_kinit_set_uap(krb5_prefs_ptr kprefs, const char *principal, const char *password)
 {
 	kprefs->password = password;
 	kprefs->pname = principal;

@@ -5,13 +5,19 @@ package jasp;
 import java.io.*;
 
 public class BasicServices {
-	/* It is sad that there is no way to do this in J2SE. */
 	public static int getUserID() {
+		try {
+			return (getUserID(System.getProperty("user.name")));
+		} catch (Exception e) {
+			return (-1);
+		}
+	}
+
+	/* It is sad that there is no way to do this in J2SE. */
+	public static int getUserID(String username) {
 		int uid = -1;
-		String username;
 
 		try {
-			username = System.getProperty("user.name");
 			/*
 			 * An equivalent to getpwent() might be
 			 * better here...

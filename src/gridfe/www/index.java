@@ -14,6 +14,10 @@ public class index
 
 		return	page.header("Error") +
 				oof.p("Welcome to the portal.") +
+				oof.p("Welcome to the portal.") +
+				oof.p("Welcome to the portal.") +
+				oof.p("Welcome to the portal.") +
+				oof.p("Welcome to the portal.") +
 				page.footer();
 	}
 };

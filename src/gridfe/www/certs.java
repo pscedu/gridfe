@@ -2,24 +2,22 @@
 
 package gridfe.www;
 
-import gridfe.gridint.auth.*;
-import gridfe.gridint.*;
 import gridfe.*;
+import gridfe.gridint.*;
+import gridfe.gridint.auth.*;
 import oof.*;
 
 public class certs
 {
-	public static String main(Page page)
+	public static String main(Page p)
 		throws Exception
 	{
-		OOF oof = page.getOOF();
+		OOF oof = p.getOOF();
+		String s = "";
 
 		int uid = 6342;
-//		int uid = page.getUserid();
+//		int uid = page.getUserID();
 		CertInfo ci;
-
-		GridInt gi = new GridInt(uid);
-		gi.auth();
 
 		ci = gi.getCertInfo();
 
@@ -32,24 +30,122 @@ public class certs
 		long min = (sec / 60);
 		sec -= min * 60;
 
-		return	page.header("Certificate Management") +
-//				oof.p("Certificate management test page.") +
-				oof.p("- Location -") +
-				oof.p("Kerberos Ticket:\t" + ci.kfile) +
-				oof.p("X.509 Certificate:\t" + ci.xfile) +
-				oof.p("") +
-				oof.p("- Contents -") +
-				oof.p("Issuer:\t" + ci.issuer) +
-				oof.p("Subject:\t" + ci.sub) +
-				oof.p("Identity:\t" + ci.ident) +
-				oof.p("Type:\t\t" + ci.type) +
-				oof.p("Key Strength:\t" + ci.key + "bit") +
-				oof.p("Remaining Lifetime:\t" + ci.time + 
-						" ("+ days + " Days, " + hours + 
-						" Hours, " + min + " Minuets, " +
-						sec + " Seconds)") +
-				oof.p("") +
-				page.footer();
+		String lifetime;
+		lifetime = ci.time + " (" +
+				   days + " days, " +
+				   hours + " hours, " +
+				   min + " mins)";
+
+		s += p.header("Certificate Management")
+		   + oof.table(
+				new Object[] {},
+				new Object[][][] {
+					new Object[][] {
+						new Object[] {
+							"colspan", "2",
+							"class", p.CCHDR,
+							"value", "Current Certificate Parameters"
+						},
+					},
+					new Object[][] {
+						new Object[] {
+							"colspan", "2",
+							"class", p.CCSUBHDR,
+							"value", "Location"
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Kerberos Ticket:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.kfile
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "X.509 Certificate:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.xfile
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"colspan", "2",
+							"class", p.CCSUBHDR,
+							"value", "Contents"
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Issuer:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.issuer
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Subject:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.sub
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Identity:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.ident
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Type:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.type
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Key Strength:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", ci.key + "-bit"
+						}
+					},
+					new Object[][] {
+						new Object[] {
+							"class", p.CCDESC,
+							"value", "Remaining Lifetime:"
+						},
+						new Object[] {
+							"class", p.genClass(),
+							"value", lifetime
+						}
+					},
+				}
+		     )
+		   + p.footer();
+
+		return (s);
 	}
 };
 

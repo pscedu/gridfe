@@ -17,11 +17,10 @@ public class suite
 		/* GridInt Test Suite */
 		GridInt gi = new GridInt(args[0]);
 		gi.authenticate();
-		System.out.println(gi.getPrivateKey());
-		System.out.println(gi.getSubject());
 		System.out.println(gi.getIssuer());
-		System.out.println(gi.getName());
-		System.out.println(gi.getStrength());
+		System.out.println(gi.getRemainingLifetime());
+		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
+		System.out.println(gi.getGlobusAuth().getSubject());
 		
 
 		/* GlobusAuth Test Suite */

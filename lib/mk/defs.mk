@@ -16,3 +16,4 @@ CLASSPATH =						\
 	.
 JFLAGS = -classpath `echo ${CLASSPATH} | tr -d '\t\n\ '`
 JCFLAGS = -g -classpath `echo ${CLASSPATH} | tr -d '\t\n\ '`
+JDEP = ${SYSROOT}/tools/jdep/jdep

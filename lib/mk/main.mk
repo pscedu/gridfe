@@ -21,7 +21,7 @@ all: ${TARGET}
 .java.class:
 	${JAVAC} ${JCFLAGS} $< || exit 1
 
-depend:
+depend: ${JDEP}
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -35,7 +35,7 @@ depend:
 	done
 	rm -f .depend
 	@for i in ${CLASSES}; do						\
-		echo "$$i: $${i%class}java" >> .depend;				\
+		${JDEP} $$i >> .depend;						\
 	done
 
 test: all ${TESTS}

@@ -19,7 +19,8 @@ public class suite
 	{
 
 		/* GridInt Test Suite */
-		GridInt gi = new GridInt(BasicServices.getUserID());
+		//GridInt gi = new GridInt(BasicServices.getUserID());
+		GridInt gi = new GridInt(6342);
 		gi.auth();
 		System.out.print("Remaining Lifetime: ");
 		System.out.println(gi.getRemainingLifetime());
@@ -76,13 +77,13 @@ public class suite
 		j.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/sleep", "gram.out"},
 			new String("arguments"),
-			new String[] {"20s"});
+			new String[] {"10s"});
 
 		GridJob j2 = new GridJob("mugatu.psc.edu");
 		j2.setRSL(new String[] {"executable"},
 			new String[] {"/bin/sleep"},
 			new String("arguments"),
-			new String[] {"30s"});
+			new String[] {"15s"});
 
 		/* Submit the job to GRAM */
 		System.out.println("Submiting Job...");
@@ -96,7 +97,7 @@ public class suite
 		out.writeObject(gi);
 		out.close();
 
-		/* Implicitly get rid of this object! */
+		/* Explicitly get rid of this object! */
 		System.out.println("Removing Instance of Job...");
 		WeakReference r = new WeakReference(gi);
 		r.clear();

@@ -51,7 +51,7 @@ public class RSLElement implements Serializable
 	/* this one is internal only! */
 	private void setRSL(String param, String[] key, String[] value)
 	{
-		this.kParam = new String(param);
+		this.kParam = param;
 		this.kKey = (String[])key.clone();
 		this.kValue = (String[])value.clone();
 	}
@@ -59,7 +59,7 @@ public class RSLElement implements Serializable
 	public void setRSL(String[] gp, String[] gv, String vp, String[] vv)
 	{
 		this.setRSL(gp, gv);
-		this.vParam = new String(vp);
+		this.vParam = vp;
 		this.vValue = (String[])vv.clone();
 	}
 
@@ -83,7 +83,7 @@ public class RSLElement implements Serializable
 	*/
 	public void setRequestType(String s)
 	{
-		this.req = new String(s);
+		this.req = s;
 	}
 
 	/* Generic build for "(param=value)" */

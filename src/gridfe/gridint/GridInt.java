@@ -17,6 +17,7 @@ public class GridInt implements Serializable
 {
 	private transient GlobusAuth ga;
 	private transient GSSAuth gss;
+	private transient GassInt gass;
 	private Uid uid;
 	private JobList list;
 
@@ -122,10 +123,14 @@ public class GridInt implements Serializable
 		}
 	}
 
+//--------------------------------This needs changed--------------------------------
+
 	/* Get the job output (stdout/stderr) */
 	public String[] getJobData(GridJob job)
+		throws GassException, IOException
 	{
 		String data[];
+		String file[];
 		int remote;
 
 		/*
@@ -136,123 +141,129 @@ public class GridInt implements Serializable
 		data[OI_STDOUT] = "Error: standard output improperly specified.";
 		data[OI_STDERR] = "Error: standard error improperly specified.";
 
-		remote = job.remote();
+		/* Grab Job Outputs Locally or Remotely */
+		file = new String[OI_MAX];
+		file[OI_STDOUT] = job.stdout;
+		file[OI_STDERR] = job.stderr;
 
-		/* Make sure they asked for output at all! */
-		if(job.stdout != null || job.stderr != null)
+
+		/* Loop and grab data */
+		for(int i = 0; i < OI_MAX; i++)
 		{
-			if(remote > 0 && remote < 3)
+			/* Remote Fetch */
+			if(job.remote(file[i]))
+				data[i] = "Remote Output not supported yet.";
+			else
 			{
-				/*
-				** Currently we cannot get remote output due to
-				** weird stdout/stderr problems with setting up
-				** a remote GASS Server
-				*/
-				data[remote - 1] = "Remote data output not supported yet!";
+				/* Start Gass Server (0,0 = random port) */
+				this.startGass(0,0, job.getHost());
+
+				/* Read the data */
+				data[i] = this.retrieveLocal(job, file[i], 0);
+
+				/* Stop Gass Server */
+				this.stopGass();
 			}
-			else if (remote == 3)
+		}
+
+
+		return data;
+	}
+//---------------------------------------------------------------------------------
+
+
+	/* Data retrieval Functions */
+
+	/* Start the Gass Server on a random port within our range */
+	public void startGass(int min, int max, String host)
+		throws GassException, IOException
+	{
+		Random r;
+		int port;
+
+		/* Seed = CertLife * Uid */
+		r = new Random(this.getCertInfo().time * this.uid.intValue());
+
+		/* XXX DEBUG: Pittsburgh Supercomputing Port Range */
+		if(min == 0 && max == 0)
+		{
+			min = 28000;
+			max = 28255;
+		}
+
+		/*
+		** Randomly Generate a Port between
+		** our MIN/MAX Port Boundary using
+		** LCM (Linear Congruent Method)
+		** XXX - configuration for this??
+		*/
+		port = r.nextInt((max - min)) + min + 1;
+		
+		/* Start with the random port */
+		this.startGass(port, host);
+	}
+
+	/* Allow override of random port in range */
+	public void startGass(int port, String host)
+		throws GassException, IOException
+	{
+		/* Create a GASS Server to connect to */
+		this.gass = new GassInt(this.gss.getGSSCredential(),
+					host, port);
+
+		/* Start the Gass Server */
+		this.gass.start();
+	}
+
+	/* Retrieve Local File (Chuck of 'len' bytes, 'len < 0' read all) */
+	public String retrieveLocal(GridJob job, String file, int len)
+	{
+		String data = "";
+
+		/* Convert from GRAM -> GASS convention */
+		file = job.convert(file);
+
+		try
+		{
+			this.gass.open(file);
+
+			if(len > 0)
 			{
-				data[OI_STDOUT] = "Remote data output not supported yet!";
-				data[OI_STDERR] = "Remote data output not supported yet!";
+				StringBuffer str = new StringBuffer("");
+				this.gass.read(str, len);
+				data += str.toString();
+			}
+			else
+			{
+				data += this.gass.read();
 			}
 
-			/* Make sure there is a local output to retrieve */
-			if(remote != 3)
-			{
-				/* Get stdout/stderr or both */
-				this.getLocalJobData(job, data, job.remote());
-			}
+			this.gass.close();
+		}
+		catch(Exception e)
+		{
+			data += " Exception: "+e.getMessage();
 		}
 
 		return data;
 	}
 
-	/* Handle local GassServer Connections & Data Retrieval */
-	private void getLocalJobData(GridJob job, String[] data, int which)
+	/* Retrieve Remote Files */
+	public String retrieveRemote(GridJob job, String file)
 	{
-		GassInt gass;
-		Random r;
-		int port;
-		String dir[] = {null, null};
-		String file[] = {job.stdout, job.stderr};
-		int start;
-		int end;
+		String data = "Remote file read not supported yet.";
+		return data;
+	}
 
-		/*
-		** 'which' data to retrieve Remotely:
-		** 3 - Both
-		** 2 - Stderr (corresponds to data[1])
-		** 1 - Stdout (corresponds to data[0])
-		** 0 - Neither (Retrieve Both locally)
-		*/
-		switch(which)
-		{
-			case 3: /* This should never happen */ return;
-
-			/* 2 & 1 may seem logically reversed, be careful */
-			case 2: start = 0; end = 1; break;
-			case 1: start = 1; end = 2; break;
-
-			case 0: start = 0; end = 2; break;
-			default: which = 0; start = 0; end = 2; break;
-		}
-
-		/* Seed = CertLife * Uid */
-		r = new Random(this.getCertInfo().time * this.uid.intValue());
-
-		/*
-		** Randomly Generate a Port between
-		** our MIN/MAX Port Boundary
-		** XXX - configuration for this??
-		*/
-		final int MIN = 28000;
-		final int MAX = 28255 + 1;
-		port = r.nextInt((MAX - MIN)) + MIN;
-
-		/* Create a GASS Server to connect to */
-		gass = new GassInt(this.gss.getGSSCredential(),
-					job.getHost(), port);
-
-		try
-		{
-			/* Start the Gass Server */
-			gass.start();
-		}
-		catch(Exception e)
-		{
-			/* Flag Error, Return */
-			if(which != 0)
-				data[start] += e.getMessage();
-			else
-			{
-				data[0] += e.getMessage();
-				data[1] += e.getMessage();
-			}
-
-			// XXX I hate having returns like this... better way?
-			return;
-		}
-
-		for(int i = start; i < end; i++)
-		{
-			file[i] = job.convert(file[i]);
-
-			/* Read stdout/stderr */
-			try
-			{
-				gass.open(file[i]);
-				data[i] = gass.read();
-				gass.close();
-			}
-			catch(Exception e)
-			{
-				data[i] += " Exception: "+e.getMessage();
-			}
-		}
-
+	/* Close the Gass Server */
+	public void stopGass()
+	{
 		/* Terminate the Gass Server */
 		gass.shutdown();
 	}
+
+
+//----------------------------------------------------------------------
 
 	/* Get a Job from the list by index */
 	public GridJob getJob(int index)

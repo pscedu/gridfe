@@ -1,7 +1,5 @@
 /* $Id$ */
-/*
-** Data type wrapper over the uid
-*/
+
 package gridint.auth;
 
 public class Uid
@@ -17,7 +15,7 @@ public class Uid
 	{
 		this.uid = uid.intValue();
 	}
-	
+
 	public Uid(String uid)
 	{
 		Integer i = new Integer(uid);
@@ -29,4 +27,3 @@ public class Uid
 		return this.uid;
 	}
 }
-

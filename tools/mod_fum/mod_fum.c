@@ -55,7 +55,8 @@ static void mf_kx509(const char*);
 static void mf_kxlist(const char *);
 static void mf_kxlist_setup(krb5_inst_ptr);
 static void mf_kxlist_crypto(krb5_inst_ptr, char*);
-static void mf_krb5_init(krb5_inst_ptr);
+//static void mf_krb5_init(krb5_inst_ptr);
+static void mf_krb5_init(krb5_inst_ptr kinst, const char*);
 static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
 static char* mf_dstrcpy(const char*); 
@@ -74,10 +75,12 @@ int mf_main(const char *principal, const char *password)
 	krb5_prefs kprefs;
 	char *tkt_cache;
 
+	#define kKRB5CCNAME "/tmp/krb5cc_6342"
+
 	/* ----------- KINIT ----------- */
 
 	/* kinit - requires only principal/password */
-	mf_krb5_init(&kinst);
+	mf_krb5_init(&kinst, kKRB5CCNAME);
 	mf_kinit_set_defaults(&kprefs);
 	mf_kinit_set_uap(&kprefs, principal, password);
 	mf_kinit_setup(&kinst, &kprefs);
@@ -126,7 +129,7 @@ static void mf_kxlist(const char *tkt_cache)
 	uid = mf_get_uid_from_ticket_cache(tkt_cache);
 	
 	/* krb5 initial context setup */
-	mf_krb5_init(&kinst);
+	mf_krb5_init(&kinst, kKRB5CCNAME);
 	
 	/* Obtain proper kx509 credentials */
 	mf_kxlist_setup(&kinst);
@@ -381,7 +384,7 @@ static void mf_free_ticket_cache(char *tkt_cache)
 /*
 ** Handle standard krb5 inital functions
 */
-static void mf_krb5_init(krb5_inst_ptr kinst)
+static void mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 {
 	krb5_error_code err; 
 
@@ -396,7 +399,8 @@ static void mf_krb5_init(krb5_inst_ptr kinst)
 	** krb5__cc_resolve(kinst->context, getenv("KRB5CACHE"),
 	**			kinst->cache);
 	*/
-	err = krb5_cc_default(kinst->context, &kinst->cache);
+	//err = krb5_cc_default(kinst->context, &kinst->cache);
+	err = krb5_cc_resolve(kinst->context, tkt_cache, &kinst->cache);
 	if(err)
 		mf_err("default cache failed", err, TODO);
 }

@@ -21,25 +21,30 @@ public class RSLElement
 	private StringBuffer data;
 	private String[] gParam, gValue, vValue, kValue, kKey;
 	private String vParam, kParam;
+	private String jOut;
 
 
 	public RSLElement()
 	{
 	}
+	
 	public RSLElement(String[] param, String[] value)
 	{
 		this.setGenerics(param, value);
 	}
+	
 	public RSLElement(String[] gp, String[] gv, String vp, String[] vv)
 	{
 		this.setGenerics(gp, gv);
 		this.setVarArgs(vp, vv);
 	}
+	
 	public RSLElement(String[] gp, String[] gv, String kp, String[] kk, String[] kv)
 	{
 		this.setGenerics(gp, gv);
 		this.setKeyPairs(kp, kk, kv);
 	}
+	
 	public RSLElement(String[] gp, String[] gv, String vp, String[] vv, String kp, String[] kk, String[] kv)
 	{
 		this.setGenerics(gp, gv);
@@ -47,6 +52,10 @@ public class RSLElement
 		this.setKeyPairs(kp, kk, kv);
 	}
 
+	/*
+	** Change whether it's Multi, Conjunct, or Disjunct
+	** (default is conjunct)
+	*/
 	public void changeSpec(String s)
 	{
 		this.pre = new String(s);
@@ -57,11 +66,13 @@ public class RSLElement
 		this.gParam = (String[])param.clone();
 		this.gValue = (String[])value.clone();
 	}
+	
 	public void setVarArgs(String param, String[] value)
 	{
 		this.vParam = new String(param);
 		this.vValue = (String[])value.clone();
 	}
+
 	public void setKeyPairs(String param, String[] key, String[] value)
 	{
 		this.kParam = new String(param);
@@ -69,11 +80,56 @@ public class RSLElement
 		this.kValue = (String[])value.clone();
 	}
 
+	/*
+	** Setup the file that will contain the job
+	** output. This filename will be needed later
+	** to retreive the data so a random name will
+	** be given. Once the job has succesfully ran
+	** the output file will be renamed according
+	** to the jobID it is given by GRAM. However,
+	** this filename can be overriden as can be
+	** seen below ...
+	*/
+	/*
+	public void setStdout(String file)
+	{
+		this.jOut = new String(file);	
+	}
+
+	public void setStdout()
+	{
+		// TODO: rand function for filename
+		this.jOut = new String("/home/rbudden/rand.tmp");
+	}
+	*/
+
+	public String getStdout()
+	{
+		return this.jOut;
+	}
+
+	/*
+	public void buildStdout()
+	{
+		this.buildGenerics( new String[] {"stdout"}, new String[] {this.jOut});
+	}
+	*/
+
+
 	/* Generic build for "(param=value)" */
 	public void buildGenerics(String[] param, String[] value)
 	{
+		//for(int i = 0; i < param.length; i++)
+		//	this.data.append(b+param[i]+m+q+value[i]+q+e);
+
 		for(int i = 0; i < param.length; i++)
+		{
 			this.data.append(b+param[i]+m+q+value[i]+q+e);
+
+			/* Save stdout to retrieve job output */
+			if(param[i] == "stdout")
+				this.jOut = new String(value[i]);
+		}
 	}
 
 	/* 
@@ -110,7 +166,7 @@ public class RSLElement
 		this.data.append(e);
 	}
 
-	private void build()
+	public void build()
 	{
 		this.data = new StringBuffer(pre);
 
@@ -121,11 +177,21 @@ public class RSLElement
 			this.buildVarArgs(this.vParam, this.vValue);
 		if(this.kParam != null)
 			this.buildKeyPairs(this.kParam, this.kKey, this.kValue);
+
+		/* Unless the stdout has manually been overriden */
+		//if(this.jOut == null)
+		//{
+			/* Setup the random filename */
+		//	this.setStdout();
+		//	this.buildStdout();
+		//}
 	}
 
 	public String toString()
 	{
-		this.build();
+		if(this.data == null)
+			this.build();
+
 		return this.data.toString();
 	}
 }

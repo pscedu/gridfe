@@ -15,17 +15,11 @@ import org.ietf.jgss.*;
 
 public class GridInt implements Serializable
 {
-	/*
-	** TODO: Serialize GSSAuth - so credentials can
-	** be read back in easliy without messing with KDC
-	** & mod_KCT, etc...
-	*/
 	private transient GlobusAuth ga;
 	private transient GSSAuth gss;
 	private Uid uid;
 	private JobList list;
 
-	/* ----- replace with Uid type */
 	public GridInt(String uid)
 	{
 		this.uid = new Uid(uid);
@@ -37,7 +31,6 @@ public class GridInt implements Serializable
 		this.uid = new Uid(uid);
 		this.list = new JobList();
 	}
-	/* --------------------------- */
 
 	/* Perform all Grid authentication */
 	public void auth()
@@ -120,24 +113,13 @@ public class GridInt implements Serializable
 		}
 	}
 
-	/*
-	** TODO: provide a wrapper over this to get the job
-	** the user wants... then call this function to
-	** read the output file (from the RSLElement)
-	** and return the data...
-	*/
+	/* Get the job output (stdout/stderr) */
 	public String[] getJobData(GridJob job)
 	{
 		String data[] = {"Stdout not specified.","Stderr not specified."};
 		int remote;
 
 		remote = job.remote();
-
-		/*
-		** XXX when remote output is implemented there needs to 
-		** be a way to specify that getLocalJobData() should only
-		** retrieve stdout or stderr or both, depending...
-		*/
 
 		/* Make sure they asked for output at all! */
 		if(job.stdout != null || job.stderr != null)
@@ -168,6 +150,7 @@ public class GridInt implements Serializable
 		return data;
 	}
 
+	/* Handle local GassServer Connections & Data Retrieval */
 	private void getLocalJobData(GridJob job, String[] data, int which)
 	{
 		GassInt gass;
@@ -296,16 +279,41 @@ public class GridInt implements Serializable
 		return this.list.get(name);
 	}
 
+	/* Get the data from the job list for html output */
+	public String[][] getJobList()
+		throws GSSException
+	{
+		/*
+		** Format:
+		**
+		** String[][] = new String{{"job1", "job2", "job3"},
+		**			{"status1", "status2", "status3"},
+		**			{"rsl1", "rsl2", "rsl3"}};
+		*/
+		int len = this.list.size();
+		String[][] jobs = new String[3][len];
+
+		for(int i = 0; i < len; i++)
+		{
+			jobs[0][i] = this.list.get(i).getName();
+			jobs[1][i] = this.list.get(i).getStatusAsString();
+			jobs[2][i] = this.list.get(i).toString();
+		}
+
+		return jobs;
+	}
+
+	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 	/*
-	** TODO: elegant way to get status of jobs and retrieve
-	** the job the user wants... possibly a Map? this will
-	** be implemented when the UI is finalized
+	** XXX - Should this even be in here?? Once the GridJob is
+	** obtained through name or index (as above), just use
+	** job.getStatus() and job.getStatusAsString()
 	*/
 	/* currently get's the most recent job status */
 	public String getJobStatusAsString()
 		throws GSSException
 	{
-		return this.list.get(0).getStatusAsString();
+		return this.list.get().getStatusAsString();
 	}
 	public String getJobStatusAsString(int x)
 		throws GSSException
@@ -315,13 +323,14 @@ public class GridInt implements Serializable
 	public int getJobStatus()
 		throws GSSException
 	{
-		return this.list.get(0).getStatus();
+		return this.list.get().getStatus();
 	}
 	public int getJobStatus(int x)
 		throws GSSException
 	{
 		return this.list.get(x).getStatus();
 	}
+	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 	/* Get Certificate Information */
 	public CertInfo getCertInfo()

@@ -1,6 +1,6 @@
 # $Id$
 
-SUBDIRS += jdep
+SUBDIRS += jdep mod_fum
 
 SYSROOT = ..
 

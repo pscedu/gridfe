@@ -21,7 +21,10 @@ all: ${TARGET}
 .java.class:
 	${JAVAC} ${JCFLAGS} $< || exit 1
 
-depend: ${JDEP}
+jdep:
+	@(cd `dirname ${JDEP}` && make)
+
+depend: jdep
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -35,8 +38,9 @@ depend: ${JDEP}
 	done
 	@rm -f .depend
 	@for i in ${CLASSES}; do						\
-		echo "${JDEP} $${i%class}java";					\
-		${JDEP} $${i%class}java >> .depend || exit 1;			\
+		echo "env CLASSPATH=${CLASSPATH} ${JDEP} $${i%class}java";	\
+		env CLASSPATH=${CLASSPATH} ${JDEP} $${i%class}java >> .depend	\
+			|| exit 1;						\
 	done
 
 test: all ${TESTS}

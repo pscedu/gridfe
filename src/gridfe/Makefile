@@ -1,5 +1,7 @@
 # $Id$
 
+CLASSES += Page
+
 SYSROOT = ..
 
 include ${SYSROOT}/lib/mk/defs.mk

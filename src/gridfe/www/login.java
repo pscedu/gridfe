@@ -3,15 +3,15 @@
 import oof.*;
 
 public class login {
-	public String main(Page page) {
+	public static String main(Page page) throws Exception {
 		String s = "";
-		OOF oof = p.oof;
+		OOF oof = page.getOOF();
 
-		if (0 /* already logged on */) {
+		if (false /* already logged on */) {
 			/* XXX: make more welcomish. */
 			s +=	page.header("Error") +
-				o.p("You are already logged on.") +
-				page.footer();
+					oof.p("You are already logged on.") +
+					page.footer();
 		} else {
 			/* Display login form. */
 			s +=	page.header("Log In") +
@@ -26,7 +26,7 @@ public class login {
 										"value", "Username:"
 									},
 									new Object[] {		/* Row 1, Column 2 */
-										"class", Page.genClass(),
+										"class", page.genClass(),
 										"value", oof.input(new Object[] {
 											"type", "text",
 											"name", "username"
@@ -39,7 +39,7 @@ public class login {
 										"value", "Password:"
 									},
 									new Object[] {		/* Row 2, Column 2 */
-										"class", Page.genClass(),
+										"class", page.genClass(),
 										"value", oof.input(new Object[] {
 											"type", "password",
 											"name", "password"
@@ -47,10 +47,9 @@ public class login {
 									}
 								}
 							}
-						}
-					)
-				) +
-				page.footer();
+						)
+					) +
+					page.footer();
 		}
 		return s;
 	}

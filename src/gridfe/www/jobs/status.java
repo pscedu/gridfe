@@ -7,14 +7,16 @@ import oof.*;
 
 public class status
 {
-	public static String main(Page page)
+	public static String main(Page p)
 		throws Exception
 	{
-		OOF oof = page.getOOF();
+		OOF oof = p.getOOF();
+		String s = "";
 
-		return	page.header("Job Status") +
-				oof.p("Job status test page.") +
-				page.footer();
+		s += p.header("Job Status")
+		   + oof.p("Job status test page.")
+		   + p.footer();
+		return (s);
 	}
 };
 

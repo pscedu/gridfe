@@ -46,7 +46,7 @@ ifdef OBJS
 	mkdep ${OBJS:.o=.c}
 endif
 
-test: all $(addsuffix .class,$(basename ${TESTS}))
+test: all ${TESTS}
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -58,14 +58,14 @@ test: all $(addsuffix .class,$(basename ${TESTS}))
 			echo "<=== ${DIRPREFIX}" | sed 's!/$$!!';		\
 		fi;								\
 	done
-	@for i in ${TESTS}; do							\
+	@for i in ${TESTS:.class=}; do						\
 		echo "${JAVA} ${JFLAGS} $$i";					\
 		${JAVA} ${JFLAGS} $$i || exit 1;				\
 	done
 
 clean:
 	@# XXX: test classes
-	rm -f ${OBJS} ${TARGET} .depend $(addsuffix .class,${TESTS}) ${PRIVCLASSES}
+	rm -f ${OBJS} ${TARGET} .depend ${TESTS} ${PRIVCLASSES}
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\

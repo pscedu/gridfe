@@ -1,6 +1,6 @@
 # $Id$
 
-TESTS += suite
+TESTS += suite.class
 
 SYSROOT = ../../..
 

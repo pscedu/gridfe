@@ -96,7 +96,7 @@ public class suite {
 			"<input type=\"text\" name=\"username\" />");
 		/* XXX: select, textarea */
 
-		t("link", o.link("supername"), "<a name=\"supername\" />");
+		t("link", o.link("supername"), "<a name=\"supername\"></a>");
 		t("link", o.link("foo", "url"), "<a href=\"url\">foo</a>");
 
 		t("list", o.list(o.LIST_UN, new Object[] { "i1", "i2", "i3" }),

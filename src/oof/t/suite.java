@@ -7,9 +7,11 @@ public class suite {
 	public static void t(String desc, Object a, String b) {
 		String v = a.toString();
 		System.out.println(desc + ": " + v);
-		if (!b.equals(v)) {
-			System.out.println("Output does not match expected!");
-			System.out.println("expected: " + b);
+		if (b.equals(v))
+			System.out.println("\033[1;32mTest succeeded\033[0;0;0m\n");
+		else {
+			System.out.println("\033[1;31mTest failed!\033[0;0;0m");
+			System.out.println("Expected: " + b);
 			System.exit(1);
 		}
 	}

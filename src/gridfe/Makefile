@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += Page
+CLASSES += Page.class
 
 SYSROOT = ..
 

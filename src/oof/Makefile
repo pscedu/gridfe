@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += OOFBadElementFormException OOFException OOF
+CLASSES += OOFBadElementFormException.class OOFException.class OOF.class
 
 SYSROOT = ../..
 

@@ -18,6 +18,9 @@ Requirements:
 	# cp libkx509.so /usr/lib
 	# ldconfig
 
+	The kx509 header file 'kx509.h' must also be present on the system
+	to build mod fum.
+
 
 
 Building mod_fum:

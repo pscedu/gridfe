@@ -49,6 +49,8 @@ public class certs
 				   hours + " hours, " +
 				   min + " mins)";
 
+		s += oof.p(lifetime);
+/*
 		s += p.header("Certificate Management")
 		   + oof.table(
 				new Object[] {},
@@ -157,7 +159,7 @@ public class certs
 				}
 		     )
 		   + p.footer();
-
+*/
 		return (s);
 	}
 };

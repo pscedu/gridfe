@@ -55,13 +55,13 @@ public class suite
 			new String[] {"15s"});
 
 		/* job to test output permission */
-		String j3_out = new String("/tmp/gram.out.date");
+		String j3_out = new String("gram.out.date");
 		//String j3_host = new String("intel2.psc.edu");
 		String j3_host = new String("mugatu.psc.edu");
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
-		j3.setRSL(new String[] {"executable", "stdout"},
-			new String[] {"/bin/date", j3_out});
+		j3.setRSL(new String[] {"executable", "stdout", "directory"},
+			new String[] {"/bin/date", j3_out, "gram_jobs"});
 
 		/* Submit the job to GRAM */
 		System.out.println("RSL: " + j3);

@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class END extends ELEMENT {
+public abstract class END extends ELEMENT {
 	public END(OOF oof) {
 		super(oof, new Object[] {}, new Object[] {});
 	}

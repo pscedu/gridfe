@@ -20,9 +20,9 @@ public class suite
 		gi.authenticate();
 		System.out.print("Remaining Lifetime: ");
 		System.out.println(gi.getRemainingLifetime());
-		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
+//		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
 		System.out.println(gi.getGlobusAuth().getSubject());
-		System.out.println(gi.getGSSAuth().getName());
+//		System.out.println(gi.getGSSAuth().getName());
 
 		/* RSLElement Test */
 		RSLElement r;
@@ -31,7 +31,7 @@ public class suite
 				new String("arguments"),
 				new String[] {"-arg1", "-arg2 test"});
 
-		System.out.println(r);
+//		System.out.println(r);
 
 		r = new RSLElement(new String[] {"executable","stdout"},
 				new String[] {"/bin/date", "job-output.gram"},
@@ -39,7 +39,7 @@ public class suite
 				new String[] {"env1", "env2"},
 				new String[] {"value1", "value2"});
 
-		System.out.println(r);
+//		System.out.println(r);
 
 		r = new RSLElement(new String[] {"executable","stdout"},
 				new String[] {"/bin/date", "job-output.gram"},
@@ -49,7 +49,7 @@ public class suite
 				new String[] {"env1", "env2"},
 				new String[] {"value1", "value2"});
 
-		System.out.println(r);
+//		System.out.println(r);
 
 		/* Use RSLElement for GRAM test */
 		RSLElement rsl;
@@ -58,25 +58,28 @@ public class suite
 				new String("arguments"),
 				new String[] {"-a"});
 
-		r = new RSLElement(new String[] {"executable", "stdout"}, new String[] {"/home/rbudden/test", "/home/rbudden/test.out"});
+		r = new RSLElement(new String[] {"executable", "stdout"}, new String[] {"/bin/sleep", "gram.out"},
+					new String("arguments"), new String[] {"10s"});
 
 		/* Use GridInt to test GramInt */
 		GramInt gri = new GramInt(gi.getGSSAuth().getGSSCredential(), "mugatu.psc.edu");
-		System.out.println(r);
+		System.out.println("RSL build: " + r);
 		gri.jobSubmit(r);
 
-		/* Sleep and check status every second */
-		for(int i = 0; i < 20; i++)
+		/* check status */
+		do
 		{
 			System.out.println(gri.getStatusAsString());
 			System.out.println(gri.getStatus());
-			//java.lang.Object.wait(60);
-			//this.wait(60);
-			Thread.sleep(120);
-		}
+			Thread.sleep(1000);
 
+		}while(gri.getStatus() != -1);
+		System.out.println(gri.getStatusAsString());
+		System.out.println(gri.getStatus());
+
+		/* Other Method tests */
 		System.out.println(gri.getJob().getID());
 		System.out.println(gri.getIDAsString());
-		System.out.println(gri.getStdout());
+		System.out.println("Stdout: " + gri.getStdout());
 	}
 }

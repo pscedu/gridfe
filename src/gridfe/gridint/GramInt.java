@@ -85,14 +85,54 @@ public class GramInt
 	}
 
 	/* globus-job-status */
-	public int getStatus()
+	public int getStatus() throws GSSException
 	{
-		return this.job.getStatus();
+		/*
+		** TODO: Find a good way to tell if the 
+		** job has a status of FAIL or DONE after
+		** the jobmanager has termianted and the
+		** GramException (below) is thrown...
+		*/
+		int status = -2;
+		
+		try
+		{
+			Gram.jobStatus(this.job);
+			status = this.job.getStatus();
+		}
+		catch(GramException e)
+		{
+			/*
+			** Job manager cannont be contacted. Therefore the job
+			** is done. However, we do not know if the job finished
+			** normally or terminated. -1 can stand for DONE/FAIL.
+			*/
+			if(e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER)
+				status = -1;
+			
+		}
+
+		return status;
 	}
 
-	public String getStatusAsString()
+	public String getStatusAsString() throws GSSException
 	{
-		return this.job.getStatusAsString();
+		String status;
+		status = new String("UNKNOWN");
+
+		try
+		{
+			Gram.jobStatus(this.job);
+			status = new String(this.job.getStatusAsString());
+		}
+		catch(GramException e)
+		{
+			/* See above .getStatus() for information on this... */
+			if(e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER)
+				status = new String("DONE/FAIL");
+		}
+
+		return status;
 	}
 
 	/* globus-job-cancel */

@@ -43,10 +43,21 @@ public class suite
 			new String("arguments"),
 			new String[] {"15s"});
 
+		/* test output permission */
+		GridJob j3 = new GridJob("mugatu.psc.edu");
+		j3.setRSL(new String[] {"executable", "stdout"},
+			new String[] {"/bin/date", "/tmp/gram.out.date"});
+		System.out.println(j3.toString());
+		gi.jobSubmit(j3);
+
 		/* Submit the job to GRAM */
 		System.out.println("Submiting Job...");
 		gi.jobSubmit(j);
 		gi.jobSubmit(j2);
+
+		/* Print the job id string */
+		System.out.println("j - id string: "+j.getIDAsString());
+		System.out.println("j2 - id string: "+j2.getIDAsString());
 
 		/* Test Serialization */
 		System.out.println("Serializing Job...");

@@ -68,7 +68,7 @@ public class Page {
 			UserMap m = new UserMap();
 			String kuid = req.getRemoteUser();
 			if (kuid == null)
-				throw new Exception("Invalid access");
+				throw new Exception("Please supply your username and password");
 			String uid = m.kerberosToSystem(kuid);
 			this.gi = new GridInt(BasicServices.getUserID(uid));
 /*
@@ -78,7 +78,7 @@ public class Page {
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
-			this.error(e.toString());
+			this.error(e + ":" + e.getMessage());
 		}
 	}
 
@@ -287,7 +287,7 @@ public class Page {
 		try {
 			PrintWriter w;
 			w = this.res.getWriter();
-			w.print("Error: " + error);
+			w.println("Error: " + error);
 //			System.exit(1);
 		} catch (Exception e) {
 		}

@@ -12,6 +12,9 @@ LIBS = -lcrypto -lkrb5 -lkx509 -L${KX509_PREFIX}
 TESTS += driver
 TESTENV = LD_LIBRARY_PATH=`pwd`
 
+APXS = /usr/sbin/apxs
+APXSFLAGS = -i -a
+
 include ${MAINMK}
 
 ${TARGET}: ${OBJS}
@@ -19,3 +22,6 @@ ${TARGET}: ${OBJS}
 
 driver:
 	${CC} ${LIBS} -Wall -g -fPIC -ldl driver.c -o $@
+
+module:
+	${APXS} -I${KX509_PREFIX} ${APXSFLAGS} -c mod_fum.c ${LIBS}

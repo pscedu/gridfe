@@ -13,11 +13,16 @@
 /*
 XXX Things todo still:
 	1) ap_uname2id(char*) - use this to obtain user id?
-	2) fix mod_fum_auth() return value
-	3) check for previously existing credentials and whether or not
+	2) check for previously existing credentials and whether or not
 		they are valid before creating new ones...
-	4) handle errors appropriately, allow gridfe page to explain what
+	3) handle errors appropriately, allow gridfe page to explain what
 		went wrong... return error codes, can't just use exit();
+	
+
+	X) mf_get_uid_from_ticket_cache really isn't needed... we could
+		save the uid from what we got from passwd, but for now
+		just keep this in case code gets switched later, we don't
+		have to rely on anything except the ticket cache name.
 
 XXX Developement Notes:
 	1) currently only users with user account can use authenticate.
@@ -84,10 +89,7 @@ static apr_pool_t* mf_pool(apr_pool_t *p);
 static void mod_fum_hooks(apr_pool_t *p);
 int mod_fum_auth(request_rec *r);
 int do_kx509(int, char**);
-
-//DEBUG
-void mod_fum_err(char *str, int err);
-
+int mf_main(const char *principal, const char *password);
 
 /* Apache (2.X only!) module record, handlers, & hooks */
 module fum_module =
@@ -97,7 +99,7 @@ module fum_module =
 	NULL,
 	NULL,
 	NULL,
-	NULL, /* command table */
+	NULL,
 	mod_fum_hooks,
 };
 
@@ -108,15 +110,6 @@ static void mod_fum_hooks(apr_pool_t *p)
 	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_FIRST);
 
 	ap_add_version_component(p, kModuleVersion);
-}
-
-//DEBUG
-void mod_fum_err(char *str, int err)
-{
-	FILE *fp;
-	fp = fopen("/tmp/rbudden-mod-fum", "a");
-	fprintf(fp, "%s : error %d\n", str, err);
-	fclose(fp);
 }
 
 /* Apache Authentication Hook */
@@ -140,7 +133,6 @@ int mod_fum_auth(request_rec *r)
 
 	if(err == OK)
 	{
-	
 		/* Create Certificate */
 		if(!user || !pass)
 		{
@@ -374,7 +366,7 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 	krb5_error_code err;
 	krb5_creds screds;
 
-	/* just to make sure... */
+	/* just to make sure... (had match problems before) */
 	memset(&screds, '\0', sizeof(krb5_creds));
 
 	/* The primary principal will be for the client */
@@ -399,7 +391,7 @@ static int mf_kxlist_setup(krb5_inst_ptr kinst)
 		goto RET;
 	}
 
-	/* Retrieve the kx509 credentials search by Service Name Only! */
+	/* Retrieve the kx509 credentials, search by Service Name Only! */
 	err = krb5_cc_retrieve_cred(kinst->context,
 					kinst->cache,
 					KRB5_TC_MATCH_SRV_NAMEONLY,

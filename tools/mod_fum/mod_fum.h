@@ -1,4 +1,4 @@
-/* $Id $*/
+/* $ID$*/
 
 /*
 ** Free Apache Module to provide
@@ -24,15 +24,10 @@
 #define KrbToApache(x) ((x == KRB5KDC_ERR_NONE || x == 0) ? OK : HTTP_UNAUTHORIZED)
 #define Kx509ToApache(x) ((x == KX509_STATUS_GOOD) ? OK : HTTP_INTERNAL_SERVER_ERROR)
 
-//DEBUG
-//#define mf_err(x,y) mod_fum_err(x,y)
-
 #define kProxiable 1
 #define kForwardable 0
 /* 8hrs. default */
 #define kLifetime 28800
-
-#define LIBKX509_PATH "libkx509.so"
 
 #define kKX509HostName "certificate"
 #define kKX509ServiceName "kx509"
@@ -58,5 +53,3 @@ typedef struct
 	const char *password;
 	
 }krb5_prefs, *krb5_prefs_ptr;
-
-int mf_main(const char *principal, const char *password);

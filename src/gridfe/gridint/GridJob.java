@@ -55,6 +55,10 @@ public class GridJob extends RSLElement implements Serializable
 	public void run()
 		throws GramException, GSSException
 	{
+		/* 
+		** XXX - save a timestamp of when the job
+		** was submitted? (just a thought)
+		*/
 		this.gi.jobSubmit(this);
 		this.id = this.gi.getIDAsString();
 	}
@@ -175,18 +179,5 @@ public class GridJob extends RSLElement implements Serializable
 		this.gi = new GramInt(gss, this.host, this.toString());
 		this.gi.createJob(this.toString());
 		this.gi.setID(this.id);
-	}
-
-	/* Serializable Implementation (this can actually be ommited) */
-	private void writeObject(ObjectOutputStream out)
-		throws IOException
-	{
-		out.defaultWriteObject();
-	}
-
-	private void readObject(ObjectInputStream in)
-		throws IOException, ClassNotFoundException
-	{
-		in.defaultReadObject();
 	}
 };

@@ -3,7 +3,9 @@
 */
 package gridint;
 
-public class RSLElement
+import java.io.*;
+
+public class RSLElement implements Serializable
 {
 	/* Strings in the form "&(executable=`which hostname`)..." */
 	private final String b = "(";
@@ -18,7 +20,9 @@ public class RSLElement
 	*/
 	private String pre = "&";
 
-	private StringBuffer data;
+	/* transient buffer, this can be rebuilt */
+	private transient StringBuffer data;
+
 	private String[] gParam, gValue, vValue, kValue, kKey;
 	private String vParam, kParam;
 	private String jOut;

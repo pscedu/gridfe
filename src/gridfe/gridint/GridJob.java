@@ -148,10 +148,6 @@ public class GridJob implements Serializable
 	/* This revive should be called after a deserialization */
 	public void revive(GSSCredential gss) throws MalformedURLException
 	{
-		/* Revive GridJob private data */
-		//this.host = host;
-		//this.rsl = rsl;
-
 		/* Revive GramInt and it's private data */
 		this.gi = new GramInt(gss, this.host, this.rsl);
 		this.gi.createJob();
@@ -170,9 +166,9 @@ public class GridJob implements Serializable
 		in.defaultReadObject();
 
 		/* DEBUG */
-		System.out.println(this.host);
-		System.out.println(this.rsl.toString());
-		System.out.println(this.id);
+		System.out.println("Deserialized: "+this.host);
+		System.out.println("Deserialized: "+this.rsl.toString());
+		System.out.println("Deserialized: "+this.id);
 	}
 
 

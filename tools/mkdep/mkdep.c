@@ -98,34 +98,33 @@ freeq(struct pathqe *pq)
 	}
 }
 
-static void
-shift(FILE *fp, off_t off)
+static int
+shift(FILE *fp, off_t dif)
 {
 	char buf[BUFSIZ];
 	ssize_t siz;
 
-	while (off > 0) {
-		if (fseek(fp, off, SEEK_SET) == -1)
-			;
+	do {
+		if (fseek(fp, dif, SEEK_CUR) == -1)
+			return (1);
 		siz = fread(buf, 1, MIN(sizeof(buf), off), fp);
-
-	}
+		if (siz > 0) {
+			if (fseek(fp, -1 * (dif + siz), SEEK_CUR) == -1)
+				return (1);
+			fwrite(buf, 1, siz, fp);
+			if (fseek(fp, siz, SEEK_CUR) == -1)
+				return (1);
+		}
+	} while (siz > 0);
+	return (0);
 }
 
-static void
-mkdep(FILE *depfp, const char *s, struct pathqe *incpqh)
+getincs()
 {
-	struct pathqe *incqh, *incq;
-	char buf[BUFSIZ], *p, *t;
-	off_t shift, pos;
-	char *path;
-	FILE *fp;
-
 	if ((fp = fopen(s, "r")) == NULL) {
 		warn("open %s", s);
 		return (0);
 	}
-	incqh = NULL;
 	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		p = buf;
 		while (isspace(*p))
@@ -157,13 +156,55 @@ mkdep(FILE *depfp, const char *s, struct pathqe *incpqh)
 				/* NOTREACHED */
 		}
 	}
+	incqh = NULL;
 	(void)fclose(fp);
+}
+
+stripmke()
+{
+	/* Look for entry in .depend. */
+	fseek(depfp, 0, SEEK_SET);
+	len = strlen(s);
+	while (fgets(buf, sizeof(buf), depfp) != NULL) {
+		if (strncmp(buf, s, len - 1) == 0 &&
+		    buf[len - 1] == 'o' && buf[len] == ':') {
+			int esc = 0;
+			for (; (c = fgetc(depfp)) != EOF; gap++) {
+				switch (c) {
+				case '\\':
+					esc = !esc;
+					break;
+				case '\n':
+					if (!esc)
+						goto end;
+					/* FALLTHROUGH */
+				default:
+					esc = 0;
+					break;
+				}
+			}
+		}
+	}
+end:
+	;
+}
+
+static void
+mkdep(FILE *depfp, const char *s, struct pathqe *incpqh)
+{
+	struct pathqe *incqh, *incq;
+	char buf[BUFSIZ], *p, *t;
+	off_t shift, pos;
+	size_t len;
+	char *path;
+	FILE *fp;
+	int gap;
+
+	getincs(&incqh, s);
 
 	if (incqh == NULL)
 		return (0);
 
-	/* Look for entry in .depend. */
-	fseek(depfp, 0, SEEK_SET);
 
 	pos = ftell(depfp);
 	fseek(depfp, 0, SEEK_END);

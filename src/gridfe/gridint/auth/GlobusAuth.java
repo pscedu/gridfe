@@ -11,6 +11,7 @@ package gridint.auth;
 
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl.*;
 import java.security.PrivateKey;
 import org.ietf.jgss.*;
 import org.ietf.jgss.GSSException.*;
@@ -19,15 +20,17 @@ import org.ietf.jgss.GSSCredential.*;
 public class GlobusAuth
 {
 	private GlobusCredential gc = null;
+	private GSSCredential gss = null;
 	private String file;
 	private Uid uid;
-	private GSSCredential gss = null;
 
 	/*
 	** X.509 Standard for files /tmp/x509up_uXXX
 	** where XXX is the userid
 	*/
 	private final String def = "/tmp/x509up_u";
+
+
 
 	public GlobusAuth(int uid)
 	{
@@ -50,7 +53,16 @@ public class GlobusAuth
 	public void createCredential() throws GlobusCredentialException, GSSException
 	{
 		this.gc = new GlobusCredential(file);
-		this.gss = (GSSCredential) new GlobusGSSCredentialImpl(this.gc, 
+
+		/*
+		** The following class does a conversion between
+		** GlobusCredential to GSSCredential... However,
+		** this is broken in CoG 1.1 (and previous also
+		** i assume)... In order for this to work properly
+		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
+		** source code. (cvs.globus.org)
+		*/
+		this.gss = new GlobusGSSCredentialImpl(this.gc, 
 				GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
@@ -82,12 +94,10 @@ public class GlobusAuth
 		return this.gc.getSubject();
 	}
 
-	// this is screwing up for some reason...
 	public int getProxyType()
 	{
 		return this.gc.getProxyType();
 	}
-	// fails with a casting exception...
 
 	public String getIssuer()
 	{
@@ -97,6 +107,11 @@ public class GlobusAuth
 	public int getStrength()
 	{
 		return this.gc.getStrength();
+	}
+
+	public int getCertNum()
+	{
+		return this.gc.getCertNum();
 	}
 
 };
@@ -129,3 +144,4 @@ class Uid
 		return this.uid;
 	}
 }
+

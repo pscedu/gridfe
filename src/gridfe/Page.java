@@ -151,7 +151,7 @@ public class Page
 			});
 		this.addMenu("Node Availibility", "/nodes", null);
 
-		String r = this.root;
+		String r = this.webroot;
 
 		String s;
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"

@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += JASP.class
+CLASSES += JASP.class BasicServices.class
 
 SYSROOT = ../..
 

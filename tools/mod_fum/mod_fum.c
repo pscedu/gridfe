@@ -2,7 +2,7 @@
 
 /*
 -------------------------------------------------------------------
-** mod_fum - Free Unadulterated Moderation (for kerberos)
+** mod_fum - Free Unadulterated Moderation (for Kerberos)
 ** Free Apache Module to provide the functionality of kinit,
 ** kx509, and kxlist -p ...
 **
@@ -21,7 +21,7 @@ XXX Things todo still:
 		just keep this in case code gets switched later, we don't
 		have to rely on anything except the ticket cache name.
 
-XXX Developement Notes:
+XXX Development Notes:
 	1) currently only users with user account can use authenticate.
 		mod_fum requires a uid lookup from /etc/passwd to write
 		the x.509 certificates in /tmp. 
@@ -176,7 +176,7 @@ int mod_fum_auth(request_rec *r)
 }
 
 /*
-** Save and Retrieve Pool (usefull for ap_mallocs!)
+** Save and Retrieve Pool (useful for ap_mallocs!)
 ** #define mf_save_pool(x) mf_pool(x)
 ** #define mf_get_pool() mf_pool(NULL)
 */
@@ -191,7 +191,7 @@ static apr_pool_t* mf_pool(apr_pool_t *p)
 }
 
 /*
-** Save and Retrieve Request Record (usefull for ap_log_err())
+** Save and Retrieve Request Record (useful for ap_log_err())
 ** #define mf_save_request(x) mf_request(x)
 ** #define mf_get_request() mf_request(NULL)
 */
@@ -217,7 +217,7 @@ int mf_main(const char *principal, const char *password)
 	char *uid;
 	int err;
 
-	/* XXX Resolve UID from KDC with given principal (posible??) */
+	/* XXX Resolve UID from KDC with given principal (possible??) */
 
 	/* Read uid from /etc/passwd */
 	err = mf_user_id_from_principal(principal, &uid);
@@ -306,7 +306,7 @@ static int mf_kxlist(const char *tkt_cache)
 			if(err != OK)
 				goto RET;
 
-			/* Perform Crypto & write Certficate */
+			/* Perform crypto & write certificate */
 			name = mf_dstrcat(kX509DefaultFile, uid);
 
 			if(!name)
@@ -331,7 +331,7 @@ static int mf_kxlist(const char *tkt_cache)
 }
 
 /*
-** Perform crypto and write the X.509 Certificate
+** Perform crypto and write the X.509 certificate
 */
 static int mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
 {
@@ -351,17 +351,17 @@ static int mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
 		klen = kinst->credentials.ticket.length;
 		clen = kinst->credentials.second_ticket.length;
 
-		/* Decode the Certifcate (we want PEM format) */
+		/* Decode the certificate (we want PEM format) */
 		data = kinst->credentials.second_ticket.data;
 		d2i_X509((X509**)(&cert), &data, clen);
 
-		/* Extract & decode the RSA Private Key from the certifcate */
+		/* Extract & decode the RSA Private Key from the certificate */
 		data = kinst->credentials.ticket.data;
 		d2i_RSAPrivateKey(&priv, (const unsigned char**)(&data), klen);
 
 		if(priv)
 		{
-			/* write the certificate appropriately formated */
+			/* Write the certificate appropriately formatted */
 			PEM_write_X509(file, cert);
 			PEM_write_RSAPrivateKey(file, priv, NULL, NULL, 0, NULL, NULL);
 
@@ -449,7 +449,7 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 	/* default to end of string */
 	e = strlen(tkt) - 1;
 
-	/* Grab the boundry of the uid */
+	/* Grab the boundary of the uid */
 	for(i = 0, j = 0; i < (strlen(tkt) - 1) && j < 2; i++)
 	{
 		if(tkt[i] == '_')
@@ -621,7 +621,7 @@ static void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 }
 
 /*
-** Handle standard krb5 inital functions
+** Handle standard krb5 initial functions
 */
 static int mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 {
@@ -804,7 +804,7 @@ static int mf_valid_credentials(char *principal)
 
 /*
 ** Check if the user/pass is valid
-** (for now just simulate a kerberos authentication)
+** (for now just simulate a Kerberos authentication)
 **
 ** XXX - There must be a better way to validate the
 ** authenticity of the user...
@@ -833,7 +833,7 @@ static int mf_valid_user(const char *principal, const char *password)
 		{
 			krb5_get_init_creds_opt_init(&opt);
 
-			/* Try and get an intial ticket */
+			/* Try and get an initial ticket */
 			err = krb5_get_init_creds_password(kinst.context,
 							&kinst.credentials,
 							kinst.principal,

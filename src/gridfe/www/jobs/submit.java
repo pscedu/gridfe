@@ -59,7 +59,7 @@ public class submit {
 							new Object[][] {
 								new Object[] {
 									"colspan", "2",
-									"class", p.TBLFTR,
+									"class", p.CCTBLFTR,
 									"value", oof.input(new Object[] {
 												"type", "submit",
 												"value", "Submit"

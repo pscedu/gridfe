@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class Code extends ELEMENT {
+public class Code extends ELEMENT {
+	public Code(Object[] attrs, Object[] os) {
+		super(attrs, os);
+	}
 };

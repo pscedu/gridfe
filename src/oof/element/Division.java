@@ -3,5 +3,8 @@ package oof.element;
 
 import oof.element.*;
 
-class Division extends ELEMENT {
+public class Division extends ELEMENT {
+	public Division(Object[] attrs, Object[] o) {
+		super(attrs, os);
+	}
 };

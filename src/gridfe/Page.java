@@ -221,14 +221,13 @@ public class Page
 			   +			     "z-index:10; visibility: hidden; \" "
 			   +			     "id=\"" + divName(m.getName()) + "\">"
 			   +				"<a href=\"" + r + m.getURL() + "\" "
-			   +				   "onmouseover=\"menuShow(this)\">"
+			   +				   "onmouseover=\"menuShow(this)\" "
+			   +				   "onmouseout=\"menuHide(this)\">"
 			   +					"<img src=\"" + r + "/img/buttons/"
 			   +						imageName(m.getName()) + ".png\" "
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"
-			   +			"</div>"
-			   +			"<div onmouseout=\"menuHide(getNeighbor(this))\" "
-			   +			     "onmouseover=\"menuShow(getNeighbor(this))\">";
+			   +			"</div>";
 			if (m.getItems() != null) {
 				/* Sub-menu */
 				for (Iterator j = m.getItems().iterator();
@@ -236,7 +235,9 @@ public class Page
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
 					s +=		"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
 					   +		     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
-					   +			"<a href=\"" + r + url + "\">"
+					   +			"<a href=\"" + r + url + "\" "
+					   +			   "onmouseover=\"menuShow(getNeighbor(this))\" "
+					   +			   "onmouseout=\"menuHide(getNeighbor(this))\">"
 					   +				"<img src=\"" + r + "/img/buttons/"
 					   +					imageName(name) + ".png\" "
 					   +				     "alt=\"" + name + "\" border=\"0\" />"
@@ -244,7 +245,6 @@ public class Page
 					   +		"</div>";
 				}
 			}
-			s +=			"</div>";
 		}
 
 							/* Sponsors */

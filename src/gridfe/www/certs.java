@@ -25,9 +25,8 @@ public class certs
 		//GridInt gi = new GridInt(uid);
 //		try
 //		{
-//			GlobusAuth ga = new GlobusAuth(new Uid(uid));
+			GlobusAuth ga = new GlobusAuth(new Uid(uid));
 //			ga.createCredential();
-			Uid u = new Uid(uid);
 //		}
 //		catch(Exception e)
 //		{

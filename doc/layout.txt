@@ -10,3 +10,4 @@ $Id$
 /lib/oof/element	OOF Elements root.
 /lib/oof/filter		OOF Filters root.
 /lib/oof		OOF (Object Output Formatting) root.
+/tools/mod_fum		Apache Module (kinit, kx509, kxlist -p)

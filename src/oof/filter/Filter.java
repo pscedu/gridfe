@@ -3,5 +3,6 @@ package oof.filter;
 
 import oof.element.*;
 
-public class FILTER {
-}
+public abstract class FILTER {
+	public abstract String build(ELEMENT e);
+};

@@ -12,23 +12,36 @@ public class xhtml extends FILTER {
 	}
 
 	private String build(String name, ELEMENT e) {
-		String s = "", v = "";
+		String t = "";
 
-		s += "<" + name;
+		t += "<" + name;
+		for (Iterator i = e.attrs.iterator(); i.hasNext(); ) {
+			t += " " + i.next().toString() + "=\"" +
+			     i.next().toString() + "\"";
+		}
 
+		String v = "";
 		for (Iterator i = e.children.iterator(); i.hasNext(); )
 			v += i.next().toString();
 
-		if (!v.equals("") && !name.equals("div"))
-			s += ">" + v + "</" + name + ">";
+		if (v.equals("") && !name.equals("div"))
+			t += " />";
 		else
-			s += " />";
+			t += ">" + v + "</" + name + ">";
 
-		return s;
+		return t;
 	}
 
 	private String build(String name, START s) {
-		return "<" + name + ">";
+		String t = "";
+
+		t += "<" + name;
+		for (Iterator i = s.attrs.iterator(); i.hasNext(); ) {
+			t += " " + i.next().toString() + "=\"" +
+			     i.next().toString() + "\"";
+		}
+		t += ">";
+		return t;
 	}
 
 	private String build(String name, END e) {
@@ -48,8 +61,8 @@ public class xhtml extends FILTER {
 	}
 
 	public String build(Email e) {
-		ELEMENT l = this.oof.link("mailto:" + e.addr, (String)e.children.get(0));
-		return l.toString();
+		e.addAttribute("href", "mailto:" + e.addr);
+		return this.build("a", (ELEMENT)e);
 	}
 
 	public String build(Emphasis e) {
@@ -65,7 +78,7 @@ public class xhtml extends FILTER {
 	}
 
 	public String build(Header e) {
-		return this.build("h", (ELEMENT)e);
+		return this.build("h" + e.size, (ELEMENT)e);
 	}
 
 	public String build(HorizontalRuler e) {

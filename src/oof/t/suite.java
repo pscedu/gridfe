@@ -117,7 +117,7 @@ public class suite {
 		t("pre", o.pre("some pre text"),
 			"<pre>some pre text</pre>");
 		t("pre", o.pre(new Object[] { "class", "foo" }, "some pre text"),
-			"<pre class\"foo\">some pre text</pre>");
+			"<pre class=\"foo\">some pre text</pre>");
 
 		t("span", o.span(), "<span />");
 		t("span", o.span(new Object[] { "some ", "text" }),

@@ -1,4 +1,4 @@
-/* $Id $*/
+/* $Id$ */
 public class HTMLElement {
 	private String name;
 	private String value;

@@ -20,11 +20,14 @@ public class UserMap {
 			    new BufferedReader(new FileReader(f));
 			while ((line = br.readLine()) != null) {
 				DN dn = this.parseDN(line);
-				String[] fields = dn.getDN().split("/");
+				String[] fields =
+				    BasicServices.splitString(dn.getDN(), "/");
 				if (fields.length == 1)
-					fields = dn.getDN().split(":");
+					fields = BasicServices.splitString(dn.getDN(),
+					    ":");
 				for (int j = 0; j < fields.length; j++) {
-					String[] pair = fields[j].split("=");
+					String[] pair = BasicServices.splitString(fields[j],
+					    "=");
 					if (pair.length == 2 &&
 					    pair[0].equals("USERID") &&
 					    pair[1].equals(prin))

@@ -74,7 +74,7 @@ public class Page {
 			 */
 			String combo = new String(
 			  enc.decode((String)req.getHeader("authorization")));
-			String[] auth = combo.split(":");
+			String[] auth = BasicServices.splitString(combo, ":");
 			String kuid = auth[0];
 			UserMap m = new UserMap();
 			String uid = m.kerberosToSystem(kuid);

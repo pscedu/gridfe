@@ -29,7 +29,7 @@ public class BasicServices {
 			BufferedReader r = new BufferedReader(new
 			    FileReader(f));
 			while ((line = r.readLine()) != null) {
-				fields = line.split(":");
+				fields = splitString(line, ":");
 				if (fields.length > 0 &&
 				    fields[0].equals(username)) {
 					uid = Integer.valueOf(

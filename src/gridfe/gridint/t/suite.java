@@ -25,8 +25,23 @@ public class suite
 		CertInfo ci;
 		ci = gi.getCertInfo();
 
+		long tmp;
+		long sec = ci.time;
+		long days = (sec / (tmp = 24*60*60));
+		sec -= days * tmp;
+		long hours = (sec / (tmp = 60*60));
+		sec -= hours * tmp;
+		long min = (sec / 60);
+		sec -= min * 60;
+
 		System.out.print("Remaining Lifetime: ");
-		System.out.println(ci.time);
+		System.out.print(ci.time);
+
+		System.out.print(" (" + days + "Days, ");
+		System.out.print(hours + "Hours, ");
+		System.out.print(min + "Minuets, ");
+		System.out.println( sec + "Seconds)");
+
 		System.out.print("Subject: ");
 		System.out.println(ci.sub);
 		System.out.print("Identity: ");

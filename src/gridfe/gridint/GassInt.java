@@ -52,33 +52,31 @@ public class GassInt extends RemoteGassServer
 		this.start(this.host);
 	}
 
+	/*
+	** XXX - there has to be a way to succesfully start a remote gass server!
+	** Event the CoG API for RemoteGassServer fails.
+	*/
 	/* Manually remote start a server - this fails for some reason though, more FUBAR! */
+/*
 	public void start_remote()
 		throws GramException, GSSException
 	{
 //		GridJob j = new GridJob("intel2.psc.edu");
 		GridJob j = new GridJob(this.host);
+*/
+		/* Build a gridjob that starts the gass server */
 /*
 		j.setRSL(new String[] {"executable", "stdout", "stderr"},
 		new String[] {"$GLOBUS_LOCATION/bin/globus-gass-server",
 		"/tmp/gram.stdout", "/tmp/gram.stderr"},
 		new String("arguments"),
-		//new String[] {"-p", Integer.toString(this.port),"-c", "-r", "&"});
-		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
-*/
-
-		System.out.println("Trying manual job submit");
-		j.setRSL(new String[] {"executable"},
-//		new String[] {"script.sh"});
-		new String[] {"test"});
-//		new String[] {"$GLOBUS_LOCATION/bin/globus-gass-server"},
-//		new String("arguments"),
 //		new String[] {"-p", Integer.toString(this.port),"-c", "-r", "&"});
-//		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
+		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
 
 		j.init(this.gss);
 		j.run();
 	}
+*/
 
 	/*
 	** Inherited Methods (needed from RemoteGassServer):
@@ -98,7 +96,7 @@ public class GassInt extends RemoteGassServer
 	}
 
 	/* Read len bytes from the open stream */
-	public int read(StringBuffer buf, int len, int offset)
+	public int read(StringBuffer buf, int len)
 		throws IOException
 	{
 		int read = 0;
@@ -108,7 +106,6 @@ public class GassInt extends RemoteGassServer
 		{
 			/* Create a new buf that is proper size */
 			byte[] tmp = new byte[len - read];
-//			read += this.fin.read(tmp, offset, len - read);
 			read += this.fin.read(tmp, 0, len - read);
 			buf.append(new String(tmp));
 		}

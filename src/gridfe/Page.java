@@ -207,7 +207,7 @@ public class Page
 				}
 			}
 		}
-/*
+
 						// Sponsors
 		s +=				"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"
@@ -221,7 +221,6 @@ public class Page
 		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";
-*/
 		return s;
 	}
 

@@ -103,7 +103,7 @@ public class Page
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			t += " [ '" + m.getName() + "', ";
 			if (m.getItems() != null) {
-				t += "menu" + m.getName().replaceAll(" ", "");
+				t += "menu" + BasicServices.stripSpace(m.getName());
 				p = "var menu" + m.getName() + " = [";
 				for (j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&

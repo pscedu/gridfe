@@ -75,7 +75,10 @@ int mf_main(const char *principal, const char *password)
 	krb5_prefs kprefs;
 	char *tkt_cache;
 
+	/* XXX Resolve UID from KDC with given principal */
+	//DEBUG
 	#define kKRB5CCNAME "/tmp/krb5cc_6342"
+	tkt_cache = mf_dstrcpy(kKRB5CCNAME);
 
 	/* ----------- KINIT ----------- */
 
@@ -89,7 +92,7 @@ int mf_main(const char *principal, const char *password)
 	mf_kinit(&kinst, &kprefs);
 
 	/* Save the tkt_cache name kinit_cleanup() */
-	mf_get_ticket_cache(&kinst, &tkt_cache);
+	//mf_get_ticket_cache(&kinst, &tkt_cache);
 
 	//DEBUG
 	printf("ticket cache: %s\n",tkt_cache);
@@ -107,7 +110,8 @@ int mf_main(const char *principal, const char *password)
 	/* kxlist -p */
 	mf_kxlist(tkt_cache);
 	
-	mf_free_ticket_cache(tkt_cache);
+	//mf_free_ticket_cache(tkt_cache);
+	free(tkt_cache);
 	
 	return 0;
 }

@@ -15,6 +15,9 @@ public class certs
 		OOF oof = p.getOOF();
 		String s = "";
 
+		s += oof.p("Test Cert Page");
+
+/*
 		int uid = 6342;
 //		int uid = page.getUserID();
 		CertInfo ci = null;
@@ -46,6 +49,7 @@ public class certs
 				   days + " days, " +
 				   hours + " hours, " +
 				   min + " mins)";
+*/
 
 		return (s);
 /*

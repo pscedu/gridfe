@@ -17,7 +17,7 @@ public class xhtml extends FILTER {
 
 		if (v.equals("") && !name.equals("div") && !name.equals("a")) {
 			/* Strip completed start tag. */
-			t = t.substr(0, t.length() - 2) + " />";
+			t = t.substring(0, t.length() - 2) + " />";
 		} else
 			t += v + this.build(name, (Endable)e);
 
@@ -28,7 +28,7 @@ public class xhtml extends FILTER {
 		String t = "";
 
 		t += "<" + name;
-		for (Iterator i = s.getAttributes.iterator(); i.hasNext(); ) {
+		for (Iterator i = s.getAttributes().iterator(); i.hasNext(); ) {
 			t += " " + i.next().toString() + "=\"" +
 			     i.next().toString() + "\"";
 		}

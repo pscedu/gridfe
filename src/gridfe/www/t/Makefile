@@ -2,7 +2,7 @@
 
 TESTS += suite
 
-SYSROOT = ../..
+SYSROOT = ../../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 

@@ -2,7 +2,7 @@
 
 CLASSES += login.class logout.class
 
-SYSROOT = ..
+SYSROOT = ../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 

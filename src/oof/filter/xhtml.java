@@ -20,9 +20,9 @@ public class xhtml extends FILTER {
 			v += i.next().toString();
 
 		if (!v.equals("") && !name.equals("div"))
-			s += ">" + "</" + name + ">";
+			s += ">" + v + "</" + name + ">";
 		else
-			s += "/>";
+			s += " />";
 
 		return s;
 	}

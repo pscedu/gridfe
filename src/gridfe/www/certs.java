@@ -20,6 +20,7 @@ public class certs
 		String s = "";
 
 		int uid = 6342;
+/*
 //		int uid = page.getUserID();
 //		FileOutputStream fp = new FileOutputStream("/tmp/gridfe.err");
 
@@ -33,9 +34,10 @@ public class certs
 		
 		CertInfo ci;
 		ci = gi.getCertInfo();
-
+*/
 		long tmp;
-		long sec = ci.time;
+//		long sec = ci.time;
+		long sec = 123456;
 		long days = (sec / (tmp = 24*60*60));
 		sec -= days * tmp;
 		long hours = (sec / (tmp = 60*60));
@@ -44,7 +46,8 @@ public class certs
 		sec -= min * 60;
 
 		String lifetime;
-		lifetime = ci.time + " (" +
+//		lifetime = ci.time + " (" +
+		lifetime = " (" +
 				   days + " days, " +
 				   hours + " hours, " +
 				   min + " mins)";

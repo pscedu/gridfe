@@ -17,25 +17,11 @@ public class certs {
 		OOF oof = p.getOOF();
 		String s = "";
 
-		int uid = 6342;
-/*
-//		int uid = page.getUserID();
-//		FileOutputStream fp = new FileOutputStream("/tmp/gridfe.err");
-
-		// DEBUG - use p.getGridInt() later;
-//		fp.write(65);
-		GridInt gi = new GridInt(uid);
-//		fp.write(66);
-		gi.auth();
-//		fp.write(67);
-//		fp.close();
-		
 		CertInfo ci;
 		ci = gi.getCertInfo();
-*/
+
 		long tmp;
-//		long sec = ci.time;
-		long sec = 123456;
+		long sec = ci.time;
 		long days = (sec / (tmp = 24*60*60));
 		sec -= days * tmp;
 		long hours = (sec / (tmp = 60*60));
@@ -44,14 +30,11 @@ public class certs {
 		sec -= min * 60;
 
 		String lifetime;
-//		lifetime = ci.time + " (" +
-		lifetime = " (" +
+		lifetime = 
 				   days + " days, " +
 				   hours + " hours, " +
-				   min + " mins)";
+				   min + " mins";
 
-		s += oof.p(lifetime);
-/*
 		s += p.header("Certificate Management")
 		   + oof.table(
 				new Object[] {},
@@ -160,7 +143,6 @@ public class certs {
 				}
 		     )
 		   + p.footer();
-*/
 		return (s);
 	}
 };

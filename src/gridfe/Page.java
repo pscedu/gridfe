@@ -54,20 +54,19 @@ public class Page
 
 	Page(HttpServletRequest req, HttpServletResponse res)
 	{
+		this.classCount = 1;
+		this.req = req;
+		this.res = res;
+		this.root = "/gridfe";
 		this.jasp = new JASP();
-		//this.gi = new GridInt(0/* XXX: get kerb uid */);
 
 		try {
+			// this.gi = new GridInt(0/* XXX: get kerb uid */);
 			/* XXX: load oof prefs from resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
 			this.error(e.toString());
 		}
-
-		this.classCount = 1;
-		this.req = req;
-		this.res = res;
-		this.root = "/gridfe";
 	}
 
 	private void registerNavigationMenu(String name, String url, Object[] sub)
@@ -232,8 +231,13 @@ public class Page
 
 	public void error(String error)
 	{
-		System.out.println("Error: " + error);
-		System.exit(1);
+		try {
+			PrintWriter w;
+			w = this.res.getWriter();
+			w.print("Error: " + error);
+//			System.exit(1);
+		} catch (Exception e) {
+		}
 	}
 
 	public void error(Exception e)

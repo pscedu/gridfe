@@ -24,11 +24,46 @@ public class suite
 		System.out.println(gi.getGlobusAuth().getSubject());
 		System.out.println(gi.getGSSAuth().getName());
 
+		/* RSLElement Test */
+		RSLElement r;
+		r = new RSLElement(new String[] {"executable","stdout"},
+				new String[] {"/bin/date", "job-output.gram"},
+				new String("arguments"),
+				new String[] {"-arg1", "-arg2 test"});
+
+		System.out.println(r);
+
+		r = new RSLElement(new String[] {"executable","stdout"},
+				new String[] {"/bin/date", "job-output.gram"},
+				new String("environment"),
+				new String[] {"env1", "env2"},
+				new String[] {"value1", "value2"});
+
+		System.out.println(r);
+
+		r = new RSLElement(new String[] {"executable","stdout"},
+				new String[] {"/bin/date", "job-output.gram"},
+				new String("arguments"),
+				new String[] {"-arg1", "-arg2 test"},
+				new String("environment"),
+				new String[] {"env1", "env2"},
+				new String[] {"value1", "value2"});
+
+		System.out.println(r);
+
+		/* Use RSLElement for GRAM test */
+		RSLElement rsl;
+		rsl = new RSLElement(new String[] {"executable","stdout", "stderr"},
+				new String[] {"/bin/uname", "/home/rbudden/job-output.gram", "/home/rbudden/job-err.gram"},
+				new String("arguments"),
+				new String[] {"-a"});
+
 		/* Use GridInt to test GramInt */
 		GramInt gri = new GramInt(gi.getGSSAuth().getGSSCredential(), "mugatu.psc.edu");
-		gri.jobRun("&(executable="+args[1]+")(stdout=/home/rbudden/gram-job-output.log)");
-//		System.out.println("Status of `which hostname` on mugatu.psc.edu: "+gri.getStatusString());
-
-		return ;
+		System.out.println(rsl);
+		gri.jobRun(rsl.toString());
+		//gri.jobSubmit(rsl.toString());
+		//System.out.println(gri.getStatusString());
+		//System.out.println(gri.getStatus());
 	}
 }

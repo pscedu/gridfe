@@ -31,6 +31,11 @@ XXX Developement Notes:
 		created with the permissions of apache/gridfe. Therefore if
 		the user logs in, he will not have permissions to create a (or
 		use the existing) valid proxy!
+	
+	3) Likewise (as stated above) if the user has already manually created
+		an X.509 certificate, the module does not have the required
+		permissions to read it! It will fail, saying the credentials
+		have expired...
 
 	3) Apache 2.X series support only! (1.X could be added, but is
 		currently not needed for this project) Version 1.X changed
@@ -133,6 +138,9 @@ int mod_fum_auth(request_rec *r)
 	if(err == OK && user && pass)
 	{
 
+		/* Default Error */
+		err = HTTP_UNAUTHORIZED;
+
 		/* Check if previous credentials exist */
 		if(mf_check_for_credentials(user))
 		{
@@ -153,13 +161,17 @@ int mod_fum_auth(request_rec *r)
 					/* Create new certs */
 					err = mf_main(user, pass);
 				else
+					/*
+					** XXX This could also be a permissions
+					** problem... If the user has already
+					** a valid X.509 certificate, apache
+					** does not have permissions to read
+					** it!!
+					*/
 					mf_err("credentials expired", 1);
 			}
 			else
-			{
 				mf_err("wrong user/pass combination", 1);
-				err = HTTP_UNAUTHORIZED;
-			}
 		}
 		else
 			/* Create new certs */
@@ -473,7 +485,7 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 
 /*
 ** Parse the principal and get the uid either from the KDC
-** (if that is even possible!) or just read from /etc/passwd
+** (XXX if that is even possible!) or just read from /etc/passwd
 */
 static int mf_user_id_from_principal(const char *principal, char **uid)
 {

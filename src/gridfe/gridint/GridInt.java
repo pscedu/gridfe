@@ -149,9 +149,16 @@ public class GridInt implements Serializable
 		file[OI_STDERR] = job.stderr;
 
 
-		/* Loop and grab data */
+		/* Loop and grab all data from all files */
 		for(int i = 0; i < OI_MAX; i++)
-			data[i] += this.retrieve(job, file[i], 0, 0);
+		{
+//			data[i] += this.retrieve(job, file[i], 0, 0);
+
+			/* Test multiple reads */
+			data[i] += this.retrieve(job, file[i], 512, 0);
+			data[i] += this.retrieve(job, file[i], 512, 512);
+			data[i] += this.retrieve(job, file[i], 0, 1024);
+		}
 
 
 		return data;
@@ -205,19 +212,25 @@ public class GridInt implements Serializable
 	//function to get (len bytes, offset bytes)
 	
 	/* Grab the job's stdout in chucks of len (all if len<1) */
+/*
 	public String retrieveStdout(GridJob job, int len, int off)
 		throws GassException, IOException
 	{
 		return this.retrieve(job, job.stdout, len, off);
 	}
-	
+*/	
 	/* Grab the job's stderr in chucks of len (all if len<1) */
-	public String retrieveStderr(GridJob job, int len, int off)
+/*	public String retrieveStderr(GridJob job, int len, int off)
 		throws GassException, IOException
 	{
 		return this.retrieve(job, job.stderr, len, off);
 	}
-	
+*/	
+	/*
+	** XXX - this is going to be too slow...
+	** gass server should not have to start up
+	** and shut down between every chunk of data read
+	*/
 	private String retrieve(GridJob job, String file, int len, int off)
 		throws GassException, IOException
 	{
@@ -229,7 +242,7 @@ public class GridInt implements Serializable
 		else
 		{
 			/* Start Gass Server (0,0 = random port) */
-			this.startGass(0,0, job.getHost());
+			this.startGass(0, 0, job.getHost());
 
 			/* Read the data */
 			data += this.retrieveLocal(job, file, len, off);

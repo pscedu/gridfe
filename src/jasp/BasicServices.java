@@ -53,4 +53,4 @@ public class BasicServices
 				t += s.substring(i, 1);
 		return t;
 	}
-}
+};

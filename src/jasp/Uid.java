@@ -28,4 +28,4 @@ public class Uid implements Serializable
 	{
 		return this.uid;
 	}
-}
+};

@@ -1,4 +1,5 @@
 /* $Id$ */
+
 package jasp;
 
 import java.util.*;
@@ -80,7 +81,7 @@ public class HTMLElement
 	{
 		this.value += s;
 	}
-}
+};
 
 class Attribute {
 	private String name;
@@ -101,4 +102,4 @@ class Attribute {
 	{
 		return this.value;
 	}
-}
+};

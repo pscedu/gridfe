@@ -1,4 +1,5 @@
 /* $Id$ */
+
 package jasp;
 
 public class JASP

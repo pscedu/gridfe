@@ -7,4 +7,4 @@ public class suite {
 		System.out.println("User ID: " + new Integer(
 			BasicServices.getUserID()));
 	}
-}
+};

@@ -2,31 +2,34 @@
 
 import gridint.*;
 import jasp.*;
+import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
 
-private class navigationMenu
+class NavigationMenu
 {
 	private String name;
 	private String url;
 	private LinkedList items;
 
-	public navigationMenu(String name, String url, Object[] items)
+	public NavigationMenu(String name, String url, Object[] items)
 	{
 		this.name = name;
 		this.url = url;
-		this.items = new LinkedList(items);
+		this.items = new LinkedList();
+		for (int i = 0; i < items.length; i++)
+			this.items.add(items[i]);
 	}
 
-	public getName() {
+	public String getName() {
 		return this.name;
 	}
 
-	public getURL() {
+	public String getURL() {
 		return this.url;
 	}
 
-	public getItems()
+	public LinkedList getItems()
 	{
 		return this.items;
 	}
@@ -89,14 +92,14 @@ public class Page
 		String name, url, p, t = "var menus = [";
 		NavigationMenu m;
 		Iterator i, j;
-		for (i = this.getNavigationMenus.iterator();
+		for (i = this.getNavigationMenus().iterator();
 		     i.hasNext() && (m = (NavigationMenu)i.next()) != null; ) {
 			t += " [ '" + m.getName() + "', ";
 			if (m.getItems() != null) {
 				t += "menu" + m.getName();
 				p = "";
 				p += "var menu" + m.getName() + " = [";
-				for (j = m.getItems.iterator();
+				for (j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
 					p += "'" + m.getName() + name + "'";
@@ -118,23 +121,23 @@ public class Page
 
 	public String header(String title)
 	{
-		this.registerNav("Main", "/", null);
-		this.registerNav("Jobs", "/jobs",
+		this.registerNavigationMenu("Main", "/", null);
+		this.registerNavigationMenu("Jobs", "/jobs",
 			new Object[] {
 				"Submit", "/jobs/submit",
 				"Status", "/jobs/status",
 				"Output", "/jobs/output"
 			});
-		this.registerNav("Certificate Management", "/certs", null);
-		this.registerNav("Grid FTP", "/ftp", null);
-		this.registerNav("Replica Locator", "/rls",
+		this.registerNavigationMenu("Certificate Management", "/certs", null);
+		this.registerNavigationMenu("Grid FTP", "/ftp", null);
+		this.registerNavigationMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalogue",	"/rls/add-catalogue",
 				"Remove Catalogue",	"/rls/remove-catalogue",
 				"Search Catalogues",	"/rls/search",
 				"Add Resource",		"/rls/add-resource"
 			});
-		this.registerNav("Node Availibility", "/nodes", null);
+		this.registerNavigationMenu("Node Availibility", "/nodes", null);
 
 		String r = this.root;
 
@@ -146,11 +149,13 @@ public class Page
 		   +		"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
 		   +		"<link rel=\"stylesheet\" type=\"text/css\" href=\"/lib/main.css\" media=\"screen\">"
 		   +		"<script type=\"text/javascript\" src=\"" + r + "/lib/Global.js\"></script>"
-		   +		addScript(
+		   +		this.addScript(
 		   			"include('" + r + "/lib/Browser.js');" +
-		   			"include('" + r + "/lib/util.js');" +
-		   			"include('" + r + "/lib/main.js');");
-		   +		addScript(this.buildMenuCode)
+		   			"include('" + r + "/lib/util.js');")
+		   +		this.addScript(this.buildMenuCode())
+		   +		this.addScript(
+		   			/* This must be loaded last. */
+		   			"include('" + r + "/lib/main.js');")
 		   +	"</head>"
 		   +	"<body>"
 		   +		"<div class=\"bg\" style=\"width: 826px;\">"
@@ -161,7 +166,7 @@ public class Page
 		   +					"<a href=\"http://www.psc.edu/\">"
 		   +						"<img src=\"img/psc.png\" "
 		   +						     "alt=\"[Pittsburgh Supercomputing Center]\" "
-		   +						     "border="0" />"
+		   +						     "border=\"0\" />"
 		   +					"</a>"
 		   +					"<br /><br />"
 		   +				"</div>";
@@ -169,7 +174,7 @@ public class Page
 		/* Menu */
 		NavigationMenu m;
 		String name, url;
-		for (Iterator i = this.getNavigationMenus();
+		for (Iterator i = this.getNavigationMenus().iterator();
 		     i.hasNext() && (m = (NavigationMenu)i.next()) != null; ) {
 			s +=			"<div style=\"position: relative; top:-80px; left:0px; "
 			   +			     "z-index:10\" id=\"" + m.getName() + "\">"
@@ -185,7 +190,7 @@ public class Page
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
 					s +=	"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
-					   +	     "display:none\" id=\"" + m.getName() + name + "\">
+					   +	     "display:none\" id=\"" + m.getName() + name + "\">"
 					   +		"<a href=\"" + r + url + "\">"
 					   +			"<img src=\"img/buttons/" + name + ".png\" "
 					   +			     "alt=\"" + name + "\" border=\"0\" />"
@@ -194,9 +199,8 @@ public class Page
 				}
 			}
 		}
-
-		s +=				/* Sponsors */
-		   +				"<a href=\"http://www-unix.globus.org/cog/\">"
+						/* Sponsors */
+		s +=				"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"
 		   +				"</a>"
 		   +				"<a href=\"\">"
@@ -205,9 +209,9 @@ public class Page
 		   +				"<br /><br />"
 		   +			"</div>"
 		   +			"<div style=\"width: 700px; margin-left: 413px;\">"
-		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />
+		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
-		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
+		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";
 		return s;
 	}
 

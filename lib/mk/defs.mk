@@ -19,3 +19,4 @@ CLASSPATH = `echo ${SCLASSPATH} | tr -d '\t\n\ '`
 JFLAGS = -classpath ${CLASSPATH}
 JCFLAGS = -g -classpath ${CLASSPATH}
 JDEP = ${SYSROOT}/tools/jdep/jdep
+KX509_PREFIX = /usr/local/kx509/src/lib

@@ -16,7 +16,6 @@
 #include <sys/stat.h>
 
 #include <dirent.h>
-#include <err.h>
 #include <pwd.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -60,38 +59,39 @@
 #define X509_FILE_PERM 0600
 
 struct krb5_inst {
-	krb5_context	 ki_context;
+	krb5_context	 ki_ctx;
 	krb5_ccache	 ki_cache;
-	krb5_principal	 ki_principal;
-	krb5_creds	 ki_credentials;
-	int		 ki_initialized;
+	krb5_principal	 ki_prin;
+	krb5_creds	 ki_cred;
+	int		 ki_init;
 };
 
 struct krb5_prefs {
-	krb5_deltat	 kp_lifetime;
-	int		 kp_forwardable;
-	int		 kp_proxiable;
-	const char	*kp_pname;
-	const char	*kp_password;
+	krb5_deltat	 kp_life;
+	int		 kp_fwd;
+	int		 kp_proxy;
+	const char	*kp_prin;
+	const char	*kp_pw;
 };
 
 static char	*mf_dstrcat(const char *, const char *);
 static char	*mf_dstritoa(int);
 static char	*mf_dstrslice(const char *, int, int);
 static char	*mf_get_uid_from_ticket_cache(const char *);
-static int	 mf_check_for_credentials(const char *);
+static int	 mf_check_for_cred(const char *);
 static int	 mf_kinit(struct krb5_inst *, struct krb5_prefs *);
 static int	 mf_kinit_setup(struct krb5_inst *, struct krb5_prefs *);
-static int	 mf_krb5_init(struct krb5_inst *kinst, const char *);
+static int	 mf_krb5_init(struct krb5_inst *, const char *);
 static int	 mf_kx509(const char *);
 static int	 mf_kxlist(const char *);
 static int	 mf_kxlist_crypto(struct krb5_inst *, char *);
 static int	 mf_kxlist_setup(struct krb5_inst *);
 static int	 mf_user_id_from_principal(const char *, char **);
-static int	 mf_valid_credentials(char *);
+static int	 mf_valid_cred(char *);
 static int	 mf_valid_user(const char *, const char *);
 static void	 mf_kinit_cleanup(struct krb5_inst *);
 static void	 mf_krb5_free(struct krb5_inst *);
+static void	 mf_log(const char *, ...);
 static void	 mod_fum_hooks(apr_pool_t *);
 
 int do_kx509(int, char **);
@@ -131,7 +131,7 @@ mod_fum_auth(request_rec *r)
 
 	/* Save request rec */
 	mf_pool = r->pool;
-	mf_req = r;
+	mf_rec = r;
 
 	/*
 	 * Get user/pass - NOTE: ap_get_basic_auth_pw() must be called
@@ -144,7 +144,7 @@ mod_fum_auth(request_rec *r)
 		err = HTTP_UNAUTHORIZED;
 
 		/* Check if previous credentials exist */
-		if (mf_check_for_credentials(user)) {
+		if (mf_check_for_cred(user)) {
 			/*
 			 * If they exist, make sure the user/pass is correct;
 			 * otherwise, a correct username and wrong password
@@ -156,7 +156,7 @@ mod_fum_auth(request_rec *r)
 				 * or not.  If so create new certs, if not, do
 				 * nothing.
 				 */
-				if (mf_valid_credentials(user))
+				if (mf_valid_cred(user))
 					/* Create new certs */
 					err = mod_fum_main(user, pass);
 				else
@@ -182,8 +182,8 @@ mod_fum_auth(request_rec *r)
 int
 mod_fum_main(const char *principal, const char *password)
 {
-	struct krb5_prefs kprefs;
-	struct krb5_inst kinst;
+	struct krb5_prefs kp;
+	struct krb5_inst ki;
 	char *tkt_cache, *uid;
 	int err;
 
@@ -197,24 +197,24 @@ mod_fum_main(const char *principal, const char *password)
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	}
 
-	if ((err = mf_krb5_init(&kinst, tkt_cache)) != OK)
+	if ((err = mf_krb5_init(&ki, tkt_cache)) != OK)
 		return (err);
 
-	kprefs.kp_proxiable = PROXIABLE;
-	kprefs.kp_forwardable = FORWARDABLE;
-	kprefs.kp_lifetime = LIFETIME;
-	kprefs.kp_principal = principal;
-	kprefs.kp_password = password;
+	kp.kp_proxy = KPD_PROXIABLE;
+	kp.kp_fwd = KPD_FORWARDABLE;
+	kp.kp_life = KPD_LIFETIME;
+	kp.kp_prin = principal;
+	kp.kp_pw = password;
 
-	if ((err = mf_kinit_setup(&kinst, &kprefs)) != OK)
+	if ((err = mf_kinit_setup(&ki, &kp)) != OK)
 		return (err);
 
 	/* kinit -c /tmp/krb5cc_$UID */
-	if ((err = mf_kinit(&kinst, &kprefs)) != OK)
+	if ((err = mf_kinit(&ki, &kp)) != OK)
 		return (err);
 
-	mf_kinit_cleanup(&kinst);
-	mf_krb5_free(&kinst);
+	mf_kinit_cleanup(&ki);
+	mf_krb5_free(&ki);
 
 	if ((err = mf_kx509(tkt_cache)) != OK)
 		return (err);
@@ -227,7 +227,7 @@ static int
 mf_kxlist(const char *tkt_cache)
 {
 	char *uid, *name;
-	struct krb5_inst kinst;
+	struct krb5_inst ki;
 	int err;
 
 	/*
@@ -238,18 +238,18 @@ mf_kxlist(const char *tkt_cache)
 	uid = mf_get_uid_from_ticket_cache(tkt_cache);
 	if (uid) {
 		/* krb5 initial context setup */
-		err = mf_krb5_init(&kinst, tkt_cache);
+		err = mf_krb5_init(&ki, tkt_cache);
 		if (err == OK) {
 			/* Obtain proper kx509 credentials */
-			if ((err = mf_kxlist_setup(&kinst)) != OK)
+			if ((err = mf_kxlist_setup(&ki)) != OK)
 				return (err);
 
 			/* Perform crypto & write certificate */
-			name = mf_dstrcat(_PATH_KX509CERT, uid);
+			name = mf_dstrcat(_PATH_X509CERT, uid);
 			if (name == NULL)
 				return (HTTP_INTERNAL_SERVER_ERROR);
-			err = mf_kxlist_crypto(&kinst, name);
-			mf_krb5_free(&kinst);
+			err = mf_kxlist_crypto(&ki, name);
+			mf_krb5_free(&ki);
 		}
 	} else
 		return (HTTP_INTERNAL_SERVER_ERROR);
@@ -260,7 +260,7 @@ mf_kxlist(const char *tkt_cache)
  * Perform crypto and write the X.509 certificate
  */
 static int
-mf_kxlist_crypto(struct krb5_inst *kinst, char *name)
+mf_kxlist_crypto(struct krb5_inst *ki, char *name)
 {
 	unsigned int klen, clen;
 	unsigned char *data;
@@ -273,15 +273,15 @@ mf_kxlist_crypto(struct krb5_inst *kinst, char *name)
 		mf_log("mem error", 1);
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	} else {
-		klen = kinst->credentials.ticket.length;
-		clen = kinst->credentials.second_ticket.length;
+		klen = ki->ki_cred.ticket.length;
+		clen = ki->ki_cred.second_ticket.length;
 
 		/* Decode the certificate (we want PEM format) */
-		data = kinst->credentials.second_ticket.data;
+		data = ki->ki_cred.second_ticket.data;
 		d2i_X509((X509**)(&cert), &data, clen);
 
 		/* Extract & decode the RSA private key from the certificate */
-		data = kinst->credentials.ticket.data;
+		data = ki->ki_cred.ticket.data;
 		d2i_RSAPrivateKey(&priv, (const unsigned char **)(&data), klen);
 
 		if (priv == NULL) {
@@ -295,7 +295,7 @@ mf_kxlist_crypto(struct krb5_inst *kinst, char *name)
 			(void)fclose(file);
 
 			/* Set proper permissions */
-			(void)chmod(name, KX509_FILE_PERM);
+			(void)chmod(name, X509_FILE_PERM);
 		}
 	}
 	return (err);
@@ -305,7 +305,7 @@ mf_kxlist_crypto(struct krb5_inst *kinst, char *name)
  * Load the kx509 credentials
  */
 static int
-mf_kxlist_setup(struct krb5_inst *kinst)
+mf_kxlist_setup(struct krb5_inst *ki)
 {
 	krb5_error_code err;
 	krb5_creds screds;
@@ -313,29 +313,29 @@ mf_kxlist_setup(struct krb5_inst *kinst)
 	memset(&screds, '\0', sizeof(krb5_creds));
 
 	/* The primary principal will be for the client */
-	if ((err = krb5_cc_get_principal(kinst->context, kinst->cache,
+	if ((err = krb5_cc_get_principal(ki->ki_ctx, ki->ki_cache,
 	    &screds.client)) != KRB5KDC_ERR_NONE) {
 		mf_log("get client principal failed", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
 	/* Now obtain one for the server */
-	if ((err = krb5_sname_to_principal(kinst->context, KKX509_HOSTNAME,
-	     KKX509_SERVNAME, KRB5_NT_UNKNOWN, &screds.server)) !=
+	if ((err = krb5_sname_to_principal(ki->ki_ctx, KX509_HOSTNAME,
+	     KX509_SERVNAME, KRB5_NT_UNKNOWN, &screds.server)) !=
 	    KRB5KDC_ERR_NONE) {
 		mf_log("get server principal failed", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
-	/* Retrieve the kx509 credentials, search by Service Name Only! */
-	if ((err = krb5_cc_retrieve_cred(kinst->context, kinst->cache,
-	     KRB5_TC_MATCH_SRV_NAMEONLY, &screds, &kinst->credentials)) !=
+	/* Retrieve the kx509 credentials, search by service name only */
+	if ((err = krb5_cc_retrieve_cred(ki->ki_ctx, ki->ki_cache,
+	     KRB5_TC_MATCH_SRV_NAMEONLY, &screds, &ki->ki_cred)) !=
 	    KRB5KDC_ERR_NONE)
 	if (err) {
 		mf_log("unable to retrieve kx509 credential", err);
 		return (HTTP_UNAUTHORIZED);
 	}
-	krb5_free_cred_contents(kinst->context, &screds);
+	krb5_free_cred_contents(ki->ki_ctx, &screds);
 	return (OK);
 }
 
@@ -426,7 +426,7 @@ mf_kx509(const char *tkt_cache)
 }
 
 static int
-mf_kinit(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
+mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 {
 	krb5_get_init_creds_opt opt;
 	krb5_error_code err;
@@ -435,25 +435,24 @@ mf_kinit(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
 	krb5_get_init_creds_opt_init(&opt);
 
 	/* Make our changes to the defaults */
-	krb5_get_init_creds_opt_set_forwardable(&opt, kprefs->forwardable);
-	krb5_get_init_creds_opt_set_proxiable(&opt, kprefs->proxiable);
-	krb5_get_init_creds_opt_set_tkt_life(&opt, kprefs->lifetime);
+	krb5_get_init_creds_opt_set_forwardable(&opt, kp->kp_fwd);
+	krb5_get_init_creds_opt_set_proxiable(&opt, kp->kp_proxy);
+	krb5_get_init_creds_opt_set_tkt_life(&opt, kp->kp_life);
 	krb5_get_init_creds_opt_set_address_list(&opt, NULL);
 
 	/* Create credentials from given password */
-	err = krb5_get_init_creds_password(kinst->context, &kinst->credentials,
-	    kinst->principal, (char *)(kprefs->password), krb5_prompter_posix,
+	err = krb5_get_init_creds_password(ki->ki_ctx, &ki->ki_cred,
+	    ki->ki_prin, (char *)(kp->kp_pw), krb5_prompter_posix,
 	    NULL, 0, NULL, &opt);
 	if (err != KRB5KDC_ERR_NONE) {
 		mf_log("get initial credentials failed", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
-	kinst->initialized = 1;
+	ki->ki_init = 1;
 
 	/* Initialize the cache file */
-	err = krb5_cc_initialize(kinst->context, kinst->cache,
-	    kinst->principal);
+	err = krb5_cc_initialize(ki->ki_ctx, ki->ki_cache, ki->ki_prin);
 	if (err) {
 		/*
 		 * In testing, this is thrown with the error -1765328188
@@ -465,8 +464,7 @@ mf_kinit(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
 	}
 
 	/* Store the credential */
-	err = krb5_cc_store_cred(kinst->context, kinst->cache,
-	    &kinst->credentials);
+	err = krb5_cc_store_cred(ki->ki_ctx, ki->ki_cache, &ki->ki_cred);
 	if (err)
 		mf_log("store credentials failed", err);
 	return (err == KRB5KDC_ERR_NONE ? OK : HTTP_UNAUTHORIZED);
@@ -476,22 +474,22 @@ mf_kinit(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
  * Handle standard krb5 initial functions
  */
 static int
-mf_krb5_init(struct krb5_inst *kinst, const char *tkt_cache)
+mf_krb5_init(struct krb5_inst *ki, const char *tkt_cache)
 {
 	krb5_error_code err;
 
-	memset(&kinst->credentials, '\0', sizeof(krb5_creds));
-	kinst->initialized = 0;
+	memset(&ki->ki_cred, '\0', sizeof(krb5_creds));
+	ki->ki_init = 0;
 
 	/* Initialize application context */
-	if ((err = krb5_init_context(&kinst->context)) == KRB5KDC_ERR_NONE) {
+	if ((err = krb5_init_context(&ki->ki_ctx)) == KRB5KDC_ERR_NONE) {
 		/*
 		 * Don't use the default.  We need to be able to
 		 * write the tkt out with different uid's for each
 		 * individual user.
 		 */
-		/* err = krb5_cc_default(kinst->context, &kinst->cache); */
-		err = krb5_cc_resolve(kinst->context, tkt_cache, &kinst->cache);
+		/* err = krb5_cc_default(ki->ki_ctx, &ki->cache); */
+		err = krb5_cc_resolve(ki->ki_ctx, tkt_cache, &ki->ki_cache);
 		if (err)
 			mf_log("default cache failed", err);
 	} else
@@ -500,19 +498,19 @@ mf_krb5_init(struct krb5_inst *kinst, const char *tkt_cache)
 }
 
 static void
-mf_krb5_free(struct krb5_inst *kinst)
+mf_krb5_free(struct krb5_inst *ki)
 {
-	if (kinst->initialized)
-		krb5_free_cred_contents(kinst->context, &kinst->credentials);
-	if (kinst->cache)
-		krb5_cc_close(kinst->context, kinst->cache);
+	if (ki->ki_init)
+		krb5_free_cred_contents(ki->ki_ctx, &ki->ki_cred);
+	if (ki->ki_cache)
+		krb5_cc_close(ki->ki_ctx, ki->ki_cache);
 }
 
 /*
  * Kinit initial setup
  */
 static int
-mf_kinit_setup(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
+mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 {
 	krb5_error_code err;
 
@@ -520,8 +518,8 @@ mf_kinit_setup(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
 	 * Generate a full principal name
 	 * to be used for authentication.
 	 */
-	err = krb5_sname_to_principal(kinst->context, NULL, NULL,
-	    KRB5_NT_SRV_HST, &kinst->principal);
+	err = krb5_sname_to_principal(ki->ki_ctx, NULL, NULL, KRB5_NT_SRV_HST,
+	    &ki->ki_prin);
 	if (err) {
 		mf_log("create principal failed", err);
 		return (HTTP_UNAUTHORIZED);
@@ -531,26 +529,26 @@ mf_kinit_setup(struct krb5_inst *kinst, struct krb5_prefs *kprefs)
 	 * Take the principal name we were given and parse it
 	 * into the appropriate form for authentication protocols
 	 */
-	err = krb5_parse_name(kinst->context, kprefs->pname, &kinst->principal);
+	err = krb5_parse_name(ki->ki_ctx, kp->kp_prin, &ki->ki_prin);
 	if (err)
 		mf_log("parse_name failed", err);
 	return (err == KRB5KDC_ERR_NONE ? OK : HTTP_UNAUTHORIZED);
 }
 
 static void
-mf_kinit_cleanup(struct krb5_inst *kinst)
+mf_kinit_cleanup(struct krb5_inst *ki)
 {
-	if (kinst->principal)
-		krb5_free_principal(kinst->context, kinst->principal);
-	if (kinst->context)
-		krb5_free_context(kinst->context);
+	if (ki->ki_prin)
+		krb5_free_principal(ki->ki_ctx, ki->ki_prin);
+	if (ki->ki_ctx)
+		krb5_free_context(ki->ki_ctx);
 }
 
 /*
  * Check for previous credentials in /tmp
  */
 static int
-mf_check_for_credentials(const char *principal)
+mf_check_for_cred(const char *principal)
 {
 	char *uid, *cert;
 	int err, found = 0;
@@ -590,27 +588,28 @@ mf_check_for_credentials(const char *principal)
  * modular and compact.
  */
 static int
-mf_valid_credentials(char *principal)
+mf_valid_cred(char *principal)
 {
 	char *uid, *tkt_cache;
-	struct krb5_inst kinst;
+	struct krb5_inst ki;
 	krb5_timestamp end;
+	int err;
 
 	if ((err = mf_user_id_from_principal(principal, &uid)) != OK) {
 		mf_log("uid failed", err);
 		return (0);
 	}
 	if ((tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid)) != NULL) {
-		if (mf_krb5_init(&kinst, tkt_cache) != OK)
+		if (mf_krb5_init(&ki, tkt_cache) != OK)
 			return (0);
 
 		/* Grab the kx509 credentials */
-		if (mf_kxlist_setup(&kinst) != OK)
+		if (mf_kxlist_setup(&ki) != OK)
 			return (0);
 
 		/* Get the expiration time of the cert */
-		end = kinst.credentials.times.endtime;
-		mf_krb5_free(&kinst);
+		end = ki.ki_cred.times.endtime;
+		mf_krb5_free(&ki);
 
 		/* Compare with our time now */
 		if (time(NULL) < end)
@@ -634,41 +633,40 @@ mf_valid_user(const char *principal, const char *password)
 {
 	char tkt[] = _PATH_MFTMP;
 	krb5_get_init_creds_opt opt;
-	struct krb5_prefs kprefs;
-	struct krb5_inst kinst;
+	struct krb5_prefs kp;
+	struct krb5_inst ki;
 	int err;
 
-	err = mf_krb5_init(&kinst, tkt);
-	kinst.initialized = 0;
+	err = mf_krb5_init(&ki, tkt);
+	ki.ki_init = 0;
 
 	if (err == OK) {
-		kprefs.kp_principle = principal;
-		kprefs.kp_password = password;
-		if ((err = mf_kinit_setup(&kinst, &kprefs)) == KRB5KDC_ERR_NONE)
+		kp.kp_prin = principal;
+		kp.kp_pw = password;
+		if ((err = mf_kinit_setup(&ki, &kp)) == KRB5KDC_ERR_NONE)
 			err = OK;
 		else
-			err = HTTP_UNAUTHORIZED
+			err = HTTP_UNAUTHORIZED;
 		if (err == OK) {
 			krb5_get_init_creds_opt_init(&opt);
 
 			/* Try and get an initial ticket */
-			err = krb5_get_init_creds_password(kinst.context,
-			    &kinst.credentials, kinst.principal,
-			    (char *)(kprefs.password), krb5_prompter_posix,
-			    NULL, 0, NULL, &opt);
+			err = krb5_get_init_creds_password(ki.ki_ctx,
+			    &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
+			    krb5_prompter_posix, NULL, 0, NULL, &opt);
 
 			/* If this succeeds, then the user/pass is correct */
 			if (err == OK)
-				kinst.initialized = 1;
+				ki.ki_init = 1;
 			else
 				mf_log("bad authentication", err);
 		} else
 			mf_log("mf_kinit_setup failed", err);
-		mf_kinit_cleanup(&kinst);
-		mf_krb5_free(&kinst);
+		mf_kinit_cleanup(&ki);
+		mf_krb5_free(&ki);
 	} else
 		mf_log("krb5_init failed", err);
-	return (kinst.initialized);
+	return (ki.ki_init);
 }
 
 /*
@@ -752,5 +750,5 @@ mf_log(const char *fmt, ...)
 	va_end(ap);
 
 	ap_log_error(APLOG_MARK, APLOG_ERR, (apr_status_t)(NULL),
-	    mf_req->server, "%s", buf);
+	    mf_rec->server, "%s", buf);
 }

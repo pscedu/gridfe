@@ -62,6 +62,7 @@ public class suite
 		//String j3_host = "intel2.psc.edu";
 		String j3_err = "gram.out";
 		String j3_host = "mugatu.psc.edu";
+		String j3_name = "Date";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
 //		j3.setRSL(new String[] {"executable", "stdout", "directory"},
@@ -70,6 +71,7 @@ public class suite
 //			new String[] {"/bin/date", j3_out, j3_err});
 		j3.setRSL(new String[] {"executable", "stdout", "directory", "stderr"},
 			new String[] {"/bin/date", j3_out, "gram_jobs", j3_err});
+		j3.setName(j3_name);
 
 		/* Submit the job to GRAM */
 		System.out.println("RSL: " + j3);
@@ -143,7 +145,8 @@ public class suite
 
 		String[] data;
 		System.out.println("Retrieving job data...");
-		j3 = gi.getJob(0);
+//		j3 = gi.getJob(2);
+		j3 = gi.getJob(j3_name);
 		System.out.println("J3: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
 		System.out.println(j3);
 		System.out.println(j3.stdout);
@@ -166,7 +169,7 @@ public class suite
 		*/
 
 		/* 
-		** Wow! this is the only way i can get the test suite to terminate
+		** XXX Wow! this is the only way i can get the test suite to terminate
 		** when using the GassInt code... seems like there is some kind of
 		** thread still running that needs terminated!
 		*/

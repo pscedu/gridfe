@@ -6,43 +6,51 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-class DelegationHandler {
+class DelegationHandler
+{
 	private String base;
 	private Class handler;
 
-	public DelegationHandler(String base, Class handler) {
+	public DelegationHandler(String base, Class handler)
+	{
 		this.base = base;
 		this.handler = handler;
 	}
 
-	public String getBase() {
+	public String getBase()
+	{
 		return this.base;
 	}
 
-	public Class getHandler() {
+	public Class getHandler()
+	{
 		return this.handler;
 	}
 };
 
-public class GridFE extends HttpServlet {
+public class GridFE extends HttpServlet
+{
 	final DelegationHandler[] dtab = new DelegationHandler[] {
 		new DelegationHandler("/login", login.class),
 		new DelegationHandler("/logout", logout.class)
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
-	throws IOException, ServletException {
+		throws IOException, ServletException
+	{
 		System.out.print(this.workHorse(req, res));
 	}
 
 	public void doPost(HttpServletRequest req, HttpServletResponse res)
-	throws IOException, ServletException {
+		throws IOException, ServletException
+	{
 		this.workHorse(req, res);
 		System.out.print(this.workHorse(req, res));
 	}
 
 	/* XXX: remove exceptions to always output a gridfe page. */
-	private String workHorse(HttpServletRequest req, HttpServletResponse res) {
+	private String workHorse(HttpServletRequest req, HttpServletResponse res)
+	{
 		Class handler = null;
 		String uri = req.getRequestURI();
 		Page p = new Page(req, res);
@@ -68,7 +76,8 @@ public class GridFE extends HttpServlet {
 		return s;
 	}
 
-	private String handleError(Page p, String msg) {
+	private String handleError(Page p, String msg)
+	{
 		String s;
 
 		try {

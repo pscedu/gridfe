@@ -2,12 +2,12 @@
 
 package gridfe.gridint.auth;
 
-import jasp.Uid;
+import gridfe.gridint.*;
+import jasp.*;
 import java.security.PrivateKey;
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
 import org.ietf.jgss.*;
-import gridfe.gridint.*;
 
 public class GlobusAuth
 {

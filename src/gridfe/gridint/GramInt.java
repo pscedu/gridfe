@@ -63,7 +63,7 @@ public class GramInt
 		this.batch = false;
 		this.gramRequest(host, rsl);
 	}
-	
+
 	public void gramJobRun(String rsl) throws GramException, GSSException
 	{
 		this.batch = false;

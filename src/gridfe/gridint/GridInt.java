@@ -35,7 +35,7 @@ public class GridInt implements Serializable
 		this.uid = new Uid(uid);
 		this.list = new JobList();
 	}
-	/* ----- */
+	/* --------------------------- */
 
 	/* Perform all Grid authentication */
 	public void auth()
@@ -117,19 +117,10 @@ public class GridInt implements Serializable
 		return this.list.get(x).getStatus();
 	}
 
-	/*
-	** TODO: - later there need to be lots more
-	** functions for obtaining certificate information
-	*/
-	public int getRemainingLifetime()
-		throws GSSException
+	/* Get Certificate Information */
+	public CertInfo getCertInfo()
 	{
-		return this.gss.getRemainingLifetime();
-	}
-
-	public GSSName getName() throws GSSException
-	{
-		return this.gss.getName();
+		return this.ga.getCertInfo();
 	}
 
 	/* This could actually be omitted, (explicit declaration) */
@@ -148,11 +139,14 @@ public class GridInt implements Serializable
 		this.revive();
 	}
 
-
-
-	//DEBUG
+	//-----------------------------------------DEBUG
 	public GSSCredential getCredential()
 	{
 		return this.gss.getGSSCredential();
 	}
+	public GlobusAuth getGlobusAuth()
+	{
+		return this.ga;
+	}
+	//-----------------------------------------DEBUG
 };

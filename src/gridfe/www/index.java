@@ -11,12 +11,10 @@ public class index
 		throws Exception
 	{
 		OOF oof = page.getOOF();
-		return "test";
-/*
+
 		return	page.header("Error") +
 				oof.p("You are already logged on.") +
 				page.footer();
-	*/
 	}
 };
 

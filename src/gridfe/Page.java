@@ -123,6 +123,7 @@ public class Page
 
 	public String header(String title)
 	{
+/*
 		this.registerNavigationMenu("Main", "/", null);
 		this.registerNavigationMenu("Jobs", "/jobs",
 			new Object[] {
@@ -140,10 +141,10 @@ public class Page
 				"Add Resource",		"/rls/add-resource"
 			});
 		this.registerNavigationMenu("Node Availibility", "/nodes", null);
-
+*/
 		String r = this.root;
 
-		String s = new String();
+		String s = new String("");
 		s += "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
 		   + "<html lang=\"en-US\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/1999/xhtml\">"
 		   + 	"<head>"
@@ -156,14 +157,14 @@ public class Page
 		   			"include('" + r + "/lib/util.js');")
 		   +		this.addScript(this.buildMenuCode())
 		   +		this.addScript(
-		   			/* This must be loaded last. */
+		   			// This must be loaded last.
 		   			"include('" + r + "/lib/main.js');")
 		   +	"</head>"
 		   +	"<body>"
 		   +		"<div class=\"bg\" style=\"width: 826px;\">"
 		   +			"<div class=\"bg\" style=\"width: 200px; float: left; text-align:center;\">"
 		   +				"<br />"
-		   				/* PSC logo */
+		   				// PSC logo
 		   +				"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
 		   +					"<a href=\"http://www.psc.edu/\">"
 		   +						"<img src=\"img/psc.png\" "
@@ -173,7 +174,9 @@ public class Page
 		   +					"<br /><br />"
 		   +				"</div>";
 
-		/* Menu */
+		return (s);
+/*
+		// Menu
 		NavigationMenu m;
 		String name, url;
 		for (Iterator i = this.getNavigationMenus().iterator();
@@ -187,7 +190,7 @@ public class Page
 			   +				"</a>"
 			   +			"</div>";
 			if (m.getItems() != null) {
-				/* Sub-menu */
+				// Sub-menu
 				for (Iterator j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
@@ -201,7 +204,7 @@ public class Page
 				}
 			}
 		}
-						/* Sponsors */
+						// Sponsors
 		s +=				"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"
 		   +				"</a>"
@@ -215,7 +218,7 @@ public class Page
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";
 		return s;
-	}
+*/	}
 
 	public String footer()
 	{

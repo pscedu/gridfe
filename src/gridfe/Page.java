@@ -54,8 +54,9 @@ public class Page
 	private JASP jasp;
 	private OOF oof;
 
-	/* CSS class desc */
+	/* CSS class desc. */
 	public final static Object CCDESC = (Object)"desc";
+	public final static int MENU_ITEM_HEIGHT = 35;
 
 	Page(HttpServletRequest req, HttpServletResponse res)
 	{
@@ -84,17 +85,20 @@ public class Page
 
 	private LinkedList getMenus()
 	{
-		return this.menus;
+		return (this.menus);
 	}
 
 	private String addScript(String code)
 	{
-		return	  "<script type=\"text/javascript\">"
+		String s;
+
+		s =   "<script type=\"text/javascript\">"
 			+	"<!--\n" /* Mozilla requires a newline here. */
 					/* XXX: quote/JS escape */
 			+		code
 			+	"// -->"
 			+ "</script>";
+		return (s);
 	}
 
 	public String divName(String name)
@@ -150,11 +154,17 @@ public class Page
 		}
 
 		t += "];";
-		return t;
+		return (t);
 	}
 
 	public String header(String title)
 	{
+		String s, name, url;
+		String r = this.webroot;
+		Menu m;
+		int y;
+
+		/* Register menu. */
 		this.addMenu("Main", "/", null);
 		this.addMenu("Jobs", "/jobs",
 			new Object[] {
@@ -172,9 +182,7 @@ public class Page
 			});
 		this.addMenu("Node Availability", "/nodes", null);
 
-		String r = this.webroot;
-
-		String s;
+		/* Start page output. */
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
 		  + "<html lang=\"en-US\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/1999/xhtml\">"
 		  + 	"<head>"
@@ -188,14 +196,14 @@ public class Page
 		   				"include('" + r + "/lib/util.js');")
 		  +			this.addScript(this.buildMenu())
 		  +			this.addScript(
-		   				// This must be loaded last.
+		   				/* This must be loaded last. */
 		   				"include('" + r + "/lib/main.js');")
 		  +		"</head>"
 		  +		"<body>"
 		  +			"<div class=\"bg\" style=\"width: 826px;\">"
 		  +				"<div class=\"bg\" style=\"width: 200px; float: left; text-align:center;\">"
 		  +					"<br />"
-		   					// PSC logo
+		   					/* PSC logo. */
 		  +					"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
 		  +						"<a href=\"http://www.psc.edu/\">"
 		  +							"<img src=\"" + r + "/img/psc.png\" "
@@ -205,13 +213,11 @@ public class Page
 		  +						"<br /><br />"
 		  +					"</div>";
 
-		// Menu
-		Menu m;
-		String name, url;
+		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().items();
 		for (Iterator i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
-			s +=			"<div style=\"position: relative; top:-80px; left:0px; "
-											/* Netscape 4 will not like this. */
+			s +=			"<div style=\"position: relative; top:" + y + "px; left:0px; "
+											/* Netscape 4 may not like this. */
 			   +			     "z-index:10; visibility: hidden; \" "
 			   +			     "id=\"" + divName(m.getName()) + "\">"
 			   +				"<a href=\"" + r + m.getURL() + "\">"
@@ -237,7 +243,7 @@ public class Page
 			}
 		}
 
-							// Sponsors
+							/* Sponsors */
 		s +=				"<br />"
 		   +				"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"
@@ -251,7 +257,7 @@ public class Page
 		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";
-		return s;
+		return (s);
 	}
 
 	public String footer()
@@ -263,7 +269,7 @@ public class Page
 		   +	"</body>"
 		   + "</html>";
 
-		return s;
+		return (s);
 	}
 
 	public void error(String error)
@@ -284,22 +290,22 @@ public class Page
 
 	public OOF getOOF()
 	{
-		return this.oof;
+		return (this.oof);
 	}
 
 	public JASP getJASP()
 	{
-		return this.jasp;
+		return (this.jasp);
 	}
 
 	public String genClass()
 	{
-		return this.classCount++ % 2 == 0 ? "data1" : "data2";
+		return (this.classCount++ % 2 == 0 ? "data1" : "data2");
 	}
 
 	public GridInt getGridInt()
 	{
-		return this.gi;
+		return (this.gi);
 	}
 };
 

@@ -7,7 +7,8 @@
 ** kx509, and kxlist -p ...
 **
 ** Robert Budden
-** rbudden@psc.edu
+** rbudden@psc.edu - rmb265@psu.edu
+** Summer 2004 Pittsburgh Supercomputing Center
 -------------------------------------------------------------------
 */
 
@@ -23,21 +24,9 @@ XXX Things todo still:
 XXX Developement Notes:
 	1) currently only users with user account can use authenticate.
 		mod_fum requires a uid lookup from /etc/passwd to write
-		the x.509 certificates in /tmp. possibly try and find
-		a way to have the kdc give us a uid for users that do
-		not have local accounts...
+		the x.509 certificates in /tmp. 
 
-	2) A problem exists with X.509 certificates. The certificates are
-		created with the permissions of apache/gridfe. Therefore if
-		the user logs in, he will not have permissions to create a (or
-		use the existing) valid proxy!
-
-	3) Likewise (as stated above) if the user has already manually created
-		an X.509 certificate, the module does not have the required
-		permissions to read it! It will fail, saying the credentials
-		have expired...
-
-	3) Apache 2.X series support only! (1.X could be added, but is
+	2) Apache 2.X series support only! (1.X could be added, but is
 		currently not needed for this project) Version 1.X changed
 		enough functions, data types, etc. that it was not worth
 		the time to try and support both types at the moment.

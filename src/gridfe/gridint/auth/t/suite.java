@@ -14,7 +14,6 @@ public class suite
 {
 	public static void main(String[] args) throws Exception
 	{
-
 		/* GridInt Test Suite */
 		//GridInt gi = new GridInt(args[0]);
 		GridInt gi = new GridInt(BasicServices.getUserID());
@@ -30,7 +29,7 @@ public class suite
 		System.out.println("Issuer: "+ci.issuer);
 
 		/* GlobusAuth Test Suite */
-		/*
+/*
 		GlobusAuth ga = new GlobusAuth(BasicServices.getUserID());
 		ga.createCredential();
 
@@ -44,10 +43,10 @@ public class suite
 		System.out.print("\n\n");
 		System.out.print(ga.getCertNum());
 		System.out.println(ga.getProxyType());
-		*/
-		
+*/
+
 		/* KerbAuth Test Suite */
-		/*
+/*
 		Subject sub;
 		Set prin;
 		Set priv;
@@ -56,12 +55,12 @@ public class suite
 		//KerberosPrincipal[] p;
 		KerberosPrincipal p;
 		KerberosKey key;
-		
+
 		KerbAuth krb = new KerbAuth();
 		krb.login();
 
 		sub = krb.getSubject();
-	
+
 		System.out.println("---Subject----");
 		System.out.print(sub.toString());
 		System.out.println("\n---Principal----");
@@ -97,18 +96,18 @@ public class suite
 		System.out.println(Class.forName("javax.security.auth.Subject").getFields());
 
 		krb.logout();
-		*/
+*/
 
 		/* X509Auth Test Suite */
 /*
 		int uid = 6342;
 		X509Auth krb = new X509Auth("/tmp/x509up_u" + uid);
 		krb.instantiate();
-	
+
 		krb.checkValidity();
-		
+
 		System.out.println("X509 Certificate:");
 		System.out.print(krb.getCertificate());
 */
 	}
-};;
+};

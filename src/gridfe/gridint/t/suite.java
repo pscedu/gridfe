@@ -17,7 +17,6 @@ public class suite
 {
 	public static void main(String[] args) throws Exception
 	{
-
 		/* GridInt Test Suite */
 		//GridInt gi = new GridInt(BasicServices.getUserID());
 		GridInt gi = new GridInt(6342);
@@ -122,7 +121,7 @@ public class suite
 		System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
 
 		/* Use a GassInt to grab job output */
-		/*
+/*
 		GassInt gass = new GassInt(gi.getCredential(), j3_host, j3_port);
 		System.out.println("Starting Remote Gass Server");
 		gass.start();
@@ -130,10 +129,10 @@ public class suite
 		System.out.println("Attempting to open file: "+j3_out);
 		gass.open(j3_out);
 		System.out.println("Size: "+gass.getSize());
-		*/
+*/
 
 		/* Grab the job output */
-		/*
+/*
 		System.out.println("Reading file...");
 		String data = gass.read();
 		System.out.println(data);
@@ -141,7 +140,7 @@ public class suite
 		gass.close();
 		gass.shutdown();
 		System.out.println("Gass Server shutdown");
-		*/
+*/
 
 		String[] data;
 		System.out.println("Retrieving job data...");
@@ -160,21 +159,23 @@ public class suite
 
 		for(int i = 0; i < jobs.length; i++)
 		{
-			System.out.println("Name: " + jobs[0][i] + "\tStatus: " + jobs[1][i] + "\tRSL: " + jobs[2][i]);
+			System.out.println("Name: " + jobs[0][i] + "\tStatus: " + jobs[1][i] +
+					   "\tRSL: " + jobs[2][i]);
 		}
 
 		/* Logout - remove credentials */
 		//gi.logout();
 		//gi.logout("job.revive");
-	
-		/* - this shows that the gass server does terminate properly...
+
+		// this shows that the gass server does terminate properly...
+/*
 		if(gass.shutdown())
 			System.out.println("Shutdown completed");
 		else
 			System.out.println("Shutdown failed");
-		*/
+*/
 
-		/* 
+		/*
 		** XXX Wow! this is the only way i can get the test suite to terminate
 		** when using the GassInt code... seems like there is some kind of
 		** thread still running that needs terminated!

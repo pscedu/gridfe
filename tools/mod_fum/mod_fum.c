@@ -12,6 +12,7 @@
 -------------------------------------------------------------------
 */
 
+#define _GNU_SOURCE /* wow, gross */
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -395,7 +396,7 @@ mf_user_id_from_principal(const char *principal, char **uid)
 			mf_log("User not in /etc/passwd");
 			err = HTTP_UNAUTHORIZED;
 		} else {
-			if (asprintf(*uid, "%d", pw->pw_uid) == -1) {
+			if (asprintf(uid, "%d", pw->pw_uid) == -1) {
 				*uid = NULL;
 				mf_log("asprintf");
 				err = HTTP_INTERNAL_SERVER_ERROR;

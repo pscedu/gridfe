@@ -5,8 +5,9 @@ mod_fum Installation
 
 Requirements:
 =============
-1) Kerberos 5
-2) kx509
+1) Apache 2.X
+2) Kerberos 5
+3) kx509
 	When building kx509 the configuration option
 	--enable-libkx509 must be used.  mod_fum relies on the shared
 	library libkx509.so to be in LD_LIBRARY_PATH, or for libkx509.so
@@ -16,3 +17,29 @@ Requirements:
 
 	# cp libkx509.so /usr/lib
 	# ldconfig
+
+
+
+Building mod_fum:
+=================
+1) Type: 'make' to compile the module
+2) Then: 'make install' to compile & install (using apsx) into apache
+3) And: 'make clean' to remove extra stuff
+
+
+
+
+
+
+Apache Configuration:
+=====================
+1) Add the following to your <Directory> tag in your 'httpd.conf' file:
+
+	AuthName "GridFe Login"
+	AuthType Basic
+	SetHandler mod_fum_auth
+	Require Valid-User
+
+	# Use this for mod_ssl support (recommended!!)
+	SSLRequireSSL
+	SSLProtocol all -SSLv2

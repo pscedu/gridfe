@@ -85,7 +85,7 @@ public class GridJob extends RSLElement implements Serializable
 		** a function to extract the hostname...
 		*/
 //		if(!this.host.equals(BasicServices.getLocalhost()))
-		if(!this.host.equalsIgnoreCase("gridinfo.psc.edu"))
+		if(!this.host.equalsIgnoreCase("mugatu.psc.edu"))
 		{
 			/*
 			** If the job is remote, the output

@@ -80,8 +80,8 @@ public class suite
 		String j3_out = "gram.out.date";
 //		String j3_out = "/tmp/gram.out.date";
 		String j3_err = "gram.err";
-		String j3_host = "intel2.psc.edu";
-//		String j3_host = "mugatu.psc.edu";
+//		String j3_host = "intel2.psc.edu";
+		String j3_host = "mugatu.psc.edu";
 		String j3_name = "Date";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
@@ -178,6 +178,7 @@ public class suite
 			catch(Exception e)
 			{
 				data[i] += e.getMessage();
+				gi.stopRetrieve();
 			}
 		}
 

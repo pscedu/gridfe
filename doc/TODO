@@ -2,6 +2,7 @@ $Id$
 
 1. Remove Ping requirement before job submission.
 
+------------ most likely not needed anymore --------------------
 2. kdestroy needs to be called so that the TGT is removed before
 the next authentication.. otherwise /tmp/krb5cc_$UID will remain
 and the new TGT will be name /tmp/krb5cc_$UID_RANDOMFUBAR and auth
@@ -11,3 +12,15 @@ will fail.
 credential cache name. this way, we could possibly have mod_fum
 store the most recent CCName in this env. if this is done we may 
 not have to worry about calling kdestroy to destroy older tickets.
+------------------------------------------------------------------
+
+4. For gram jobs, there is already a way implemented to save the
+stdout paramter of the RSL string, but there also needs to be a way
+to save the current directory... this is important so that output
+files can be opened and read in... oooo, but wait, will this
+present a permissions problem with reading job data??? somehow we
+need to make sure that read permission is enabled to at least
+
+5. Add configuration to apache to not permit SSLv2... should be
+the command "SSLProtocol all -SSLv2" but figure out where it goes
+(this should be a real quick fix)

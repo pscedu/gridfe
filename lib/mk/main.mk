@@ -62,7 +62,7 @@ test: all $(addsuffix .class,$(basename ${TESTS}))
 
 clean:
 	@# XXX: test classes
-	rm -f ${CLASSES} .depend $(addsuffix .class,${TESTS})
+	rm -f ${CLASSES} .depend $(addsuffix .class,${TESTS}) ${PRIVCLASSES}
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\

@@ -36,7 +36,7 @@ public class RSLElement implements Serializable
 	public transient String stderr = null;
 
 	/* Default directory to HOME */
-	public transient String directory = null;
+	public transient String dir = null;
 
 	/*
 	** Build RSL Strings that have args, env variables, and
@@ -99,7 +99,7 @@ public class RSLElement implements Serializable
 			else if(param[i].equals("stderr"))
 				this.stderr = value[i];
 			else if(param[i].equals("directory"))
-				this.directory = value[i];
+				this.dir = value[i];
 		}
 	}
 

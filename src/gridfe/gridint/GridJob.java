@@ -155,7 +155,7 @@ public class GridJob implements Serializable
 		this.gi.setID(this.id);
 	}
 
-	/* Serializable Implementation */
+	/* Serializable Implementation (Default for now) */
 	private void writeObject(ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
@@ -165,11 +165,6 @@ public class GridJob implements Serializable
 		throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
-
-		/* DEBUG */
-		System.out.println("Deserialized: "+this.host);
-		System.out.println("Deserialized: "+this.rsl.toString());
-		System.out.println("Deserialized: "+this.id);
 	}
 
 

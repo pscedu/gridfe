@@ -1,11 +1,9 @@
 /* $Id$ */
 
 struct workq {
-	char *pkg;
+	char *buf;
 	struct workq *next;
 };
 
-extern struct workq *headq;
-
-void  pushq(char *);
-char *popq(void);
+void  pushq(struct workq **, char *);
+char *popq(struct workq **);

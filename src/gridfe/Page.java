@@ -220,27 +220,30 @@ public class Page
 											/* Netscape 4 may not like this. */
 			   +			     "z-index:10; visibility: hidden; \" "
 			   +			     "id=\"" + divName(m.getName()) + "\">"
-			   +				"<a href=\"" + r + m.getURL() + "\">"
+			   +				"<a href=\"" + r + m.getURL() + "\" "
+			   +				   "onmouseover=\"menuShow(this)\">"
 			   +					"<img src=\"" + r + "/img/buttons/"
 			   +						imageName(m.getName()) + ".png\" "
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"
-			   +			"</div>";
+			   +			"</div>"
+			   +			"<div onmouseout=\"menuHide(this)\">";
 			if (m.getItems() != null) {
-				// Sub-menu
+				/* Sub-menu */
 				for (Iterator j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
-					s +=	"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
-					   +	     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
-					   +		"<a href=\"" + r + url + "\">"
-					   +			"<img src=\"" + r + "/img/buttons/"
-					   +				imageName(name) + ".png\" "
-					   +			     "alt=\"" + name + "\" border=\"0\" />"
-					   +		"</a>"
-					   +	"</div>";
+					s +=		"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
+					   +		     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
+					   +			"<a href=\"" + r + url + "\">"
+					   +				"<img src=\"" + r + "/img/buttons/"
+					   +					imageName(name) + ".png\" "
+					   +				     "alt=\"" + name + "\" border=\"0\" />"
+					   +			"</a>"
+					   +		"</div>";
 				}
 			}
+			s +=			"</div>";
 		}
 
 							/* Sponsors */

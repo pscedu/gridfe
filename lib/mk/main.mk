@@ -43,7 +43,7 @@ depend:
 			> .depend || exit 1;					\
 	fi
 ifdef OBJS
-	mkdep ${CFLAGS} ${OBJS:.o=.c}
+	$(MKDEP) ${CFLAGS} ${OBJS:.o=.c}
 endif
 
 test: all ${TESTS}

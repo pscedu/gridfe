@@ -8,7 +8,7 @@ import jasp.Uid;
 public class CertFile
 {
 	/*
-	** Certificates are normally stored in /tmp/x509_u_!!!
+	** Certificates are normally stored in /tmp/x509up_u!!!
 	** where !!! is the userid
 	*/
 	private final String xdef = "/tmp/x509up_u";

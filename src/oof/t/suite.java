@@ -4,104 +4,171 @@ import jasp.*;
 import oof.*;
 
 public class suite {
+	public static void t(String desc, Object a, String b) {
+		System.out.println(desc + ":" + a);
+		if (!b.equals(a.toString())) {
+			System.out.println("Output does not match expected!");
+			System.out.println("expected: " + b);
+			System.exit(1);
+		}
+	}
+	
 	public static void main(String[] args) throws Exception {
 		JASP j = new JASP();
 		OOF o = new OOF(j, "xhtml");
 
-		System.out.println("br: " + o.br());
-		System.out.println("br: " + o.br(new Object[] { "clear", "right" }));
+		t("br", o.br(), "<br />");
+		t("br", o.br(new Object[] { "clear", "right" }), "<br clear=\"right\" />");
 
-		System.out.println("code: " + o.code("sdfsf"));
-		System.out.println("code: " + o.code(new Object[] { "class", "test" }, "sdfsf"));
+		t("code", o.code("sdfsf"), "<code></code>");
+		t("code", o.code(new Object[] { "class", "test" }, "sdfsf"),
+			"<code class=\"test\">sdfsf	</code>");
 
-		System.out.println("div: " + o.div("some content"));
-		System.out.println("div: " + o.div(new Object[] { "align", "center" }, "some content"));
-		System.out.println("div: " + o.div(new Object[] { "some content ", "and some more" }));
-		System.out.println("div: " + o.div(new Object[] { "align", "right" },
-						   new Object[] { "content, ", "content, ", "and more" }));
+		t("div", o.div(), "<div></div>");
+		t("div", o.div("some content"), "<div>some content</div>");
+		t("div", o.div(new Object[] { "align", "center" }, "some content"),
+			"<div align=\"center\">some content</div>");
+		t("div", o.div(new Object[] { "some content ", "and some more" }),
+			"<div>some content and some more</div>");
+		t("div", o.div(new Object[] { "align", "right" },
+		      	   new Object[] { "content, ", "content, ", "and more" }),
+			"<div align=\"right\">content, content, and more</div>");
 
-		System.out.println("div_start: " + o.div_start(new Object[] { "class", "foo" }));
-		System.out.println("div_start: " + o.div_start());
+		t("div_start", o.div_start(new Object[] { "class", "foo" }),
+			"<div class=\"foo\">");
+		t("div_start", o.div_start(), "<div>");
 
-		System.out.println("div_end: " + o.div_end());
+		t("div_end", o.div_end(), "</div>");
 
-		System.out.println("email: " + o.email("foo@bar.com"));
-		System.out.println("email: " + o.email("Foobar", "foo@bar.com"));
+		t("email", o.email("foo@bar.com"),
+			"<a href=\"mailto:foo@bar.com\">foo@bar.com</a>");
+		t("email", o.email("Foobar", "foo@bar.com"),
+			"<a href=\"foo@bar.com\">Foobar</a>");
 
-		System.out.println("emph: " + o.emph("some emphasized text"));
-		System.out.println("emph: " + o.emph(new Object[] { "class", "foo" }, "some emphasized text"));
-		System.out.println("emph: " + o.emph(new Object[] { "some ", "more ", "text" }));
+		t("emph", o.emph("some emphasized text"), "<em>some emphasized text</em>");
+		t("emph", o.emph(new Object[] { "class", "foo" }, "some emphasized text"),
+			"<em class=\"foo\">some emphasized text</em>");
+		t("emph", o.emph(new Object[] { "some ", "more ", "text" }),
+			"<em>some more text</em>");
 
-		System.out.println("fieldset: " + o.fieldset(new Object[] {
-							"field1: ", o.input(),
-							"field2: ", o.input()}));
+		t("fieldset", o.fieldset(new Object[] {
+				"field1: ", o.input(),
+				"field2: ", o.input()}),
+			"<fieldset>field1: <input />field2: <input /></fieldset>");
 
-		System.out.println("form: " + o.form(new Object[] { "method", "post", "action", "url" },
-						     new Object[] {
-							"field1: ", o.input(),
-							"field2: ", o.input()}));
-		System.out.println("form: " + o.form(new Object[] {
-							"field1: ", o.input(),
-							"field2: ", o.input()}));
+		t("form", o.form(new Object[] { "method", "post", "action", "url" },
+		      	     new Object[] {
+		      		"field1: ", o.input(),
+		      		"field2: ", o.input()}),
+			"<form method=\"post\" action=\"post\">" +
+				"field1: <input />field2: <input />" +
+			"</form>");
+		t("form", o.form(new Object[] {
+		      		"field1: ", o.input(),
+		      		"field2: ", o.input()}),
+			"<form>field1: <input />field2: <input /></form>");
 
-		System.out.println("form_start: " + o.form_start(new Object[] { "method", "get" }));
-		System.out.println("form_start: " + o.form_start());
+		t("form_start", o.form_start(new Object[] { "method", "get" }),
+			"<form method=\"get\">");
+		t("form_start", o.form_start(), "<form>");
 
-		System.out.println("form_end: " + o.form_end());
+		t("form_end", o.form_end(), "</form>");
 
-		System.out.println("header: " + o.header("bleh"));
-		System.out.println("header: " + o.header("bleh", "2"));
-		System.out.println("header: " + o.header(new Object[] { "size", "2" }, "bleh"));
+		t("header", o.header("bleh"), "<h>bleh</h>");
+		t("header", o.header("bleh", "2"), "<h2>bleh</h2>");
+		t("header", o.header(new Object[] { "size", "2" }, "bleh"),
+			"<h2>bleh</h2>");
 
-		System.out.println("hr: " + o.hr());
-		System.out.println("hr: " + o.hr(new Object[] { "noborder", "yes" }));
+		t("hr", o.hr(), "<hr />");
+		t("hr", o.hr(new Object[] { "noborder", "yes" }),
+			"<hr noborder=\"yes\" />");
 
-		System.out.println("img: " + o.img());
-		System.out.println("img: " + o.img(new Object[] { "src", "foo.jpg" }));
+		t("img", o.img(), "<img />");
+		t("img", o.img(new Object[] { "src", "foo.jpg" }),
+			"<img src=\"foo.jpg\" />");
 
-		System.out.println("input: " + o.input());
-		System.out.println("input: " + o.input(new Object[] { "type", "text", "name", "username" }));
+		t("input", o.input(), "<input />");
+		t("input", o.input(new Object[] { "type", "text", "name", "username" }),
+			"<input type=\"text\" name=\"username\" />");
 		/* XXX: select, textarea */
 
-		System.out.println("link: " + o.link("foo", "url"));
+		t("link", o.link("supername"), "<a name=\"supername\" />");
+		t("link", o.link("foo", "url"), "<a href=\"url\">foo</a>");
 
-		System.out.println("list: " + o.list(o.LIST_UN, new Object[] { "i1", "i2", "i3" }));
-		System.out.println("list: " + o.list(o.LIST_OD, new Object[] { "a", "b", "c" }));
+		t("list", o.list(o.LIST_UN, new Object[] { "i1", "i2", "i3" }),
+			"<ul><li>i1</li><li>i2</li><li>i3</li></ul>");
+		t("list", o.list(o.LIST_OD, new Object[] { "a", "b", "c" }),
+			"<ol><li>a</li><li>b</li><li>c</li></ol>");
 
-		System.out.println("list_start: " + o.list_start(o.LIST_UN));
-		System.out.println("list_end: " + o.list_end(o.LIST_OD));
+		t("list_start", o.list_start(o.LIST_UN), "<ul>");
+		t("list_end", o.list_end(o.LIST_OD), "</ol>");
 
-		System.out.println("list_item: " + o.list_item("sup"));
+		t("list_item", o.list_item("sup"), "<li>sup</li>");
 
-		System.out.println("pre: " + o.pre("some pre text"));
-		System.out.println("pre: " + o.pre(new Object[] { "class", "foo" }, "some pre text"));
+		t("pre", o.pre("some pre text"),
+			"<pre>some pre text</pre>");
+		t("pre", o.pre(new Object[] { "class", "foo" }, "some pre text"),
+			"<pre class\"foo\">some pre text</pre>");
 
-		System.out.println("span: " + o.span());
-		System.out.println("span: " + o.span(new Object[] { "some ", "text" }));
-		System.out.println("span: " + o.span(new Object[] { "class", "foo" },
-						     new Object[] { "more ", "text" }));
-		System.out.println("span: " + o.span(new Object[] { "class", "bleh" }, "even more text"));
+		t("span", o.span(), "<span />");
+		t("span", o.span(new Object[] { "some ", "text" }),
+			"<span>some text</span>");
+		t("span", o.span(new Object[] { "class", "foo" },
+		      	     new Object[] { "more ", "text" }),
+			"<span class=\"foo\">more text</span>");
+		t("span", o.span(new Object[] { "class", "bleh" }, "even more text"),
+			"<span class=\"bleh\">even more text</span>");
 
-		System.out.println("strong: " + o.strong());
-		System.out.println("strong: " + o.strong("str text"));
-		System.out.println("strong: " + o.strong(new Object[] { "attr", "val" }, "str text2"));
-		System.out.println("strong: " + o.strong(new Object[] { "attr", "val" },
-							 new Object[] { "str ", "text3" }));
+		t("strong", o.strong(), "<strong />");
+		t("strong", o.strong("str text"),
+			"<strong>str text</strong>");
+		t("strong", o.strong(new Object[] { "attr", "val" }, "str text2"),
+			"<strong attr=\"val\">str text2</strong>");
+		t("strong", o.strong(new Object[] { "attr", "val" },
+		      		 new Object[] { "str ", "text3" }),
+			"<strong attr=\"val\">str text3</strong>");
 
-		System.out.println("table: " + o.table(new Object[][] {
-							new Object[] { "r1c1", "r1c2" },
-							new Object[] { "r2c1", "r2c2" }}));
-		System.out.println("table: " + o.table(new Object[] { "border", "2", "cols",
-							new Object[][] {
-								new Object[] { "width", "1" },
-								new Object[] { "width", "3" }}},
-							new Object[][] {
-								new Object[] { "r1c1", "r1c2" },
-								new Object[] { "r2c1", "r2c2" }}));
-		System.out.println("table_start: " + o.table_start(new Object[] { "width", "500" }));
-		System.out.println("table_end: " + o.table_end());
-		System.out.println("table_row: " + o.table_row(new Object[][] {
-								new Object[] { "r1c1", "r1c2" },
-								new Object[] { "r2c1", "r2c2" }}));
+		t("table", o.table(new Object[][] {
+		      		new Object[] { "r1c1", "r1c2" },
+		      		new Object[] { "r2c1", "r2c2" }}),
+			"<table>" +
+				"<tr>" +
+					"<td>r1c1</td>" +
+					"<td>r1c2</td>" +
+				"</tr>" +
+				"<tr>" +
+					"<td>r2c1</td>" +
+					"<td>r2c2</td>" +
+				"</tr>" +
+			"</table>");
+		t("table", o.table(new Object[] { "border", "2", "cols",
+		      		new Object[][] {
+		      			new Object[] { "width", "1" },
+		      			new Object[] { "width", "3" }}},
+		      		new Object[][] {
+		      			new Object[] { "r1c1", "r1c2" },
+		      			new Object[] { "r2c1", "r2c2" }}),
+			"<table border=\"2\">" +
+				"<colgroup>" +
+					"<col width=\"1\" />" +
+					"<col width=\"3\" />" +
+				"</colgroup>" +
+				"<tr>" +
+					"<td>r1c1</td>" +
+					"<td>r1c2</td>" +
+				"</tr>" +
+				"<tr>" +
+					"<td>r2c1</td>" +
+					"<td>r2c2</td>" +
+				"</tr>" +
+			"</table>");
+		t("table_start", o.table_start(new Object[] { "width", "500" }),
+			"<table width=\"500\"></table>");
+		t("table_end", o.table_end(), "</table>");
+		t("table_row", o.table_row(new Object[][] {
+					new Object[] { "c1a", "c1b" },
+					new Object[] { "c2a", "c2b" }}),
+			"<tr><td>c1ac1b</td><td>c2ac2b</td></tr>"
+		);
 	}
 }

@@ -21,14 +21,6 @@ public class GridInt implements Serializable
 	private Uid uid;
 	private JobList list;
 
-	public static final int kJobName = 0;
-	public static final int kJobStatus = 1;
-	public static final int kJobRSL = 2;
-
-	public static final int OI_STDOUT = 0;
-	public static final int OI_STDERR = 1;
-	public static final int OI_MAX = 2;
-
 	public GridInt(String uid)
 	{
 		this.uid = new Uid(uid);
@@ -59,6 +51,7 @@ public class GridInt implements Serializable
 	{
 		this.logout(null);
 	}
+
 	public void logout(String file)
 	{
 		/*
@@ -133,7 +126,7 @@ public class GridInt implements Serializable
 		/* Seed = CertLife * Uid */
 		r = new Random(this.getCertInfo().time * this.uid.intValue());
 
-		/* XXX DEBUG: Pittsburgh Supercomputing Port Range */
+		/* XXX DEBUG: Default Pittsburgh Supercomputing Port Range */
 		if(min == 0 && max == 0)
 		{
 			min = 28000;
@@ -161,15 +154,10 @@ public class GridInt implements Serializable
 					host, port);
 
 		/* Start the Gass Server */
-		//this.gass.start();
-		try
-		{
-			this.gass.start_remote();
-		}
-		catch(Exception e)
-		{
-			throw new IOException("start_remote() failed.");
-		}
+		this.gass.start();
+
+		/* XXX - Remote Start Support Needed */
+		//this.gass.start_remote();
 	}
 
 	/* Setup file retrieval */
@@ -237,7 +225,7 @@ public class GridInt implements Serializable
 				len = (int)(left);
 
 			/* Read the data */
-			this.gass.read(str, len, 0);
+			this.gass.read(str, len);
 			data += str.toString();
 		}
 
@@ -255,33 +243,6 @@ public class GridInt implements Serializable
 	{
 		return this.list.get(name);
 	}
-
-//---This is most likely not needed anymore-------------------------------------
-	/* Get the data from the job list for html output */
-	public String[][] getJobListString()
-		throws GSSException
-	{
-		/*
-		** Format:
-		**
-		** String[][] = new String{{"job1", "job2", "job3"},
-		**			{"status1", "status2", "status3"},
-		**			{"rsl1", "rsl2", "rsl3"}};
-		*/
-		int len = this.list.size();
-		String[][] jobs = new String[len][3];
-
-		/* NOTE: this is reverse order than submitted! */
-		for(int i = 0; i < len; i++)
-		{
-			jobs[i][kJobName] = this.list.get(i).getName();
-			jobs[i][kJobStatus] = this.list.get(i).getStatusAsString();
-			jobs[i][kJobRSL] = this.list.get(i).toString();
-		}
-
-		return jobs;
-	}
-//-----------------------------------------------------------------------------
 
 	/* Get the raw JobList class */
 	public JobList getJobList()
@@ -310,15 +271,4 @@ public class GridInt implements Serializable
 		in.defaultReadObject();
 		this.revive();
 	}
-
-	//-----------------------------------------DEBUG
-	public GSSCredential getCredential()
-	{
-		return this.gss.getGSSCredential();
-	}
-	public GlobusAuth getGlobusAuth()
-	{
-		return this.ga;
-	}
-	//-----------------------------------------DEBUG
 };

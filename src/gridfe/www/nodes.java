@@ -7,14 +7,16 @@ import oof.*;
 
 public class nodes
 {
-	public static String main(Page page)
+	public static String main(Page p)
 		throws Exception
 	{
-		OOF oof = page.getOOF();
+		OOF oof = p.getOOF();
+		String s = "";
 
-		return	page.header("Node Availibility") +
-				oof.p("Node availibility test page.") +
-				page.footer();
+		s += p.header("Node Availibility")
+		   + oof.p("Node availibility test page.")
+		   + p.footer();
+		return (s);
 	}
 };
 

@@ -90,7 +90,16 @@ public class GridInt implements Serializable
 	{
 		job.init(this.gss.getGSSCredential());
 		job.run();
+
+		/* Set default job name if none specified */
+		if(job.getName() == null)
+			job.setName(new String("Job-"+this.list.size()));
+		
+		/* Add job to list */
 		this.list.push(job);
+
+		/* Register name in Map */
+		//XXX - ADD MAP
 	}
 
 	/* Cancel Job and remove from Job List */
@@ -122,10 +131,10 @@ public class GridInt implements Serializable
 	*/
 	public String[] getJobData(GridJob job)
 	{
-		String data[] = {"No Output Available!", "No Error Output!"};
+		String data[] = {"No Output Available.", "No Error Output."};
 
 		/* Is the job output local or remote? */
-		//if(job.remote())
+//		if(job.remote())
 		if(false && (job.stdout != null || job.stderr != null))
 		{
 			/*
@@ -151,9 +160,8 @@ public class GridInt implements Serializable
 		Random r;
 		int port;
 		int active = 0;
-		String stdout = null;
-		String stderr = null;
-		String directory = null;
+		String dir[] = {null, null};
+		String file[] = {job.stdout, job.stderr};
 
 		/* Seed = CertLife * Uid */
 		r = new Random(
@@ -174,12 +182,24 @@ public class GridInt implements Serializable
 
 		/*
 		** Determine if directory needs prepended to output.
-		** If stdout string starts with a '/' or '~' then
-		** the user has explicitly stated the path.
+		** If std(out/err) string starts with a '/' or '~'
+		** then the user has explicitly stated the path.
 		** If directory does not start with '/' then it
 		** needs to default to "~".
-		**
-		** -----------------------------------------------------
+		*/
+		if(job.stdout != null)
+		{
+			dir[0] = (job.stdout.charAt(0) != '/') ? "~/" : "";
+			dir[0] += (job.dir != null) ? job.dir : "";
+		}
+
+		if(job.stderr != null)
+		{
+			dir[1] = (job.stderr.charAt(0) != '/') ? "~/" : "";
+			dir[1] += (job.dir != null) ? job.dir : "";
+		}
+
+		/* ----------------------------------------------------- 
 		**
 		** Unfortunately GRAM assumes directories start from
 		** ~/ and if ~/dir is specified GRAM cannot expand the ~
@@ -192,51 +212,44 @@ public class GridInt implements Serializable
 		** and directory accordingly.
 		*/
 
-		if(job.directory.charAt(0) != '/')
-			directory = "~/" + job.directory;
-		else
-			directory = job.directory;
-
-		//XXX - this needs to be cleaner somehow!!!
 		if(job.stdout != null && job.stdout.charAt(0) != '/' &&
 			job.stdout.charAt(0) != '~')
-				stdout = directory + "/" + job.stdout;
-		else
-			stdout = job.stdout;
+				file[0] = new String(dir[0] + "/" + job.stdout);
 
 		if(job.stderr != null && job.stderr.charAt(0) != '/' &&
 			job.stderr.charAt(0) != '~')
-				stderr = directory + "/" + job.stderr;
-		else
-			stderr = job.stderr;
+				file[1] = new String(dir[1] + "/" + job.stderr);
+
+/*		if(file[0] != null && file[0].charAt(0) != '/' &&
+			file[0].charAt(0) != '~')
+				file[0] = new String(dir[0] + "/" + file[0]);
+
+		if(file[1] != null && file[1].charAt(0) != '/' &&
+			file[1].charAt(0) != '~')
+				file[1] = new String(dir[1] + "/" + file[1]);
+*/
 
 
-		/* Read stdout/stderr and then shutdown */
-		try
+		/* Read stdout/stderr */
+		for(int i = 0; i < 2; i++)
 		{
-			/* start the gass server */
-			gass.start();
-			active = 1;
-
-			gass.open(stdout);
-			data[0] = gass.read();
-			gass.close();
-
 			try
 			{
-				gass.open(stderr);
-				data[1] = gass.read();
+				/* Start the Gass Server */
+				if(active != 1)
+				{
+					gass.start();
+					active = 1;
+				}
+	
+				gass.open(file[i]);
+				data[i] = gass.read();
 				gass.close();
 			}
 			catch(Exception e)
 			{
-				data[1] += " Exception: "+e.getMessage();
+				data[i] += " Exception: "+e.getMessage();
 			}
-
-		}
-		catch(Exception e)
-		{
-			data[0] += " Exception: "+e.getMessage();
 		}
 
 		/* Make sure we terminate the gass server */
@@ -244,12 +257,17 @@ public class GridInt implements Serializable
 			gass.shutdown();
 	}
 
-	/* Get a Job from the list */
-	//DEBUG
+	/* Get a Job from the list by index */
 	public GridJob getJob(int index)
 	{
 		return this.list.get(index);
 	}
+
+	/* Get a job from the list by it's name */
+//	public GridJob getJob(String name)
+//	{
+
+//	}
 
 	/*
 	** TODO: elegant way to get status of jobs and retrieve

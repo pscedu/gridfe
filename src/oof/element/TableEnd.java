@@ -3,5 +3,5 @@ package oof.element;
 
 import oof.element.*;
 
-class  extends ELEMENT {
+class TableEnd extends END {
 };

@@ -131,37 +131,74 @@ public class GridInt implements Serializable
 	*/
 	public String[] getJobData(GridJob job)
 	{
-		String data[] = {"No Output Available.", "No Error Output."};
+		String data[] = {"Stdout not specified.","Stderr not specified."};
+		int remote;
 
-		/* Is the job output local or remote? */
-//		if(job.remote())
-		if(false && (job.stdout != null || job.stderr != null))
+		remote = job.remote();
+
+		/*
+		** XXX when remote output is implemented there needs to 
+		** be a way to specify that getLocalJobData() should only
+		** retrieve stdout or stderr or both, depending...
+		*/
+
+		/* Make sure they asked for output at all! */
+		if(job.stdout != null || job.stderr != null)
 		{
-			/*
-			** Currently we cannot get remote output due to weird
-			** stdout/stderr problems with setting up a remote GASS
-			** Server
-			*/
-			data[0] = "Remote stdout retrieval not supported yet!";
-			data[1] = "Remote stderr retrieval not supported yet!";
-		}
-		else if(job.stdout != null || job.stderr != null)
-		{
-			/* Get local data if either stdout/stderr was set */
-			this.getLocalJobData(job, data);
+			if(remote > 0 && remote < 3)
+			{
+				/*
+				** Currently we cannot get remote output due to
+				** weird stdout/stderr problems with setting up
+				** a remote GASS Server
+				*/
+				data[remote - 1] = "Remote data output not supported yet!";
+			}
+			else if (remote == 3)
+			{
+				data[0] = "Remote data output not supported yet!";
+				data[1] = "Remote data output not supported yet!";
+			}
+
+			/* Make sure there is a local output to retrieve */
+			if(remote != 3)
+			{
+				/* Get stdout/stderr or both */
+				this.getLocalJobData(job, data, job.remote());
+			}
 		}
 
 		return data;
 	}
 
-	private void getLocalJobData(GridJob job, String[] data)
+	private void getLocalJobData(GridJob job, String[] data, int which)
 	{
 		GassInt gass;
 		Random r;
 		int port;
-		int active = 0;
 		String dir[] = {null, null};
 		String file[] = {job.stdout, job.stderr};
+		int start;
+		int end;
+
+		/*
+		** 'which' data to retrieve Remotely:
+		** 3 - Both 
+		** 2 - Stderr (corresponds to data[1])
+		** 1 - Stdout (corresponds to data[0])
+		** 0 - Neither (Retrieve Both locally)
+		*/
+		switch(which)
+		{
+			case 3: /* This should never happen */ return;
+
+			/* 2 & 1 may seem logically reversed, be careful */
+			case 2: start = 0; end = 1; break;
+			case 1: start = 1; end = 2; break;
+
+			case 0: start = 0; end = 2; break;
+			default: which = 0; start = 0; end = 2; break;
+		}
 
 		/* Seed = CertLife * Uid */
 		r = new Random(
@@ -188,12 +225,19 @@ public class GridInt implements Serializable
 		catch(Exception e)
 		{
 			/* Flag Error, Return */
-			data[0] = e.getMessage();
-			data[1] = e.getMessage();
+			if(which != 0)
+				data[start] += e.getMessage();
+			else
+			{
+				data[0] += e.getMessage();
+				data[1] += e.getMessage();
+			}
+
+			// XXX I hate having returns like this... better way?
 			return;
 		}
 
-		for(int i = 0; i < 2; i++)
+		for(int i = start; i < end; i++)
 		{
 
 			/*
@@ -205,8 +249,8 @@ public class GridInt implements Serializable
 			*/
 			if(file[i] != null)
 			{
-				dir[i] = (file[i].charAt(0) != '/') ? "~/" : "";
-				dir[i] += (job.dir != null) ? job.dir : "";
+				dir[i] = (file[i].charAt(0) != '/') ? "~" : "";
+				dir[i] += (job.dir != null) ? "/" + job.dir : "";
 			}
 
 			/* 
@@ -225,7 +269,7 @@ public class GridInt implements Serializable
 			{
 				file[i] = new String(dir[i] + "/" + file[i]);
 			}
-
+			
 			/* Read stdout/stderr */
 			try
 			{

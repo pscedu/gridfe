@@ -227,8 +227,8 @@ public class Page
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"
 			   +			"</div>"
-			   +			"<div onmouseout=\"menuHide(this.previousSibling)\" "
-			   +			     "onmouseover=\"menuShow(this.previousSibling)\">";
+			   +			"<div onmouseout=\"menuHide(getNeighbor(this))\" "
+			   +			     "onmouseover=\"menuShow(getNeighbor(this))\">";
 			if (m.getItems() != null) {
 				/* Sub-menu */
 				for (Iterator j = m.getItems().iterator();

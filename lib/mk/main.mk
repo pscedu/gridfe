@@ -1,10 +1,6 @@
 # $Id$
 
 all:
-	@for i in ${CLASSES}; do						\
-		echo "${JAVAC} ${JFLAGS} $$i";					\
-		${JAVAC} ${JFLAGS} $$i.java || exit 1;				\
-	done
 	@# XXX: make recursion factorable
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
@@ -17,11 +13,12 @@ all:
 			echo "<=== ${DIRPREFIX}" | sed 's!/$$!!';		\
 		fi;								\
 	done
-
-test:
-	@for i in ${TESTS}; do	\
-		echo $i;	\
+	@for i in ${CLASSES}; do						\
+		echo "${JAVAC} ${JFLAGS} $$i";					\
+		${JAVAC} ${JFLAGS} $$i.java || exit 1;				\
 	done
+
+test: all
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -32,4 +29,7 @@ test:
 		if [ -n "${DIRPREFIX}" ]; then					\
 			echo "<=== ${DIRPREFIX}" | sed 's!/$$!!';		\
 		fi;								\
+	done
+	@for i in ${TESTS}; do							\
+		echo $i;							\
 	done

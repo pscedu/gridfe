@@ -4,13 +4,10 @@ SYSROOT = ../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-KRB_PREFIX = /usr/kerberos
-HTTPD_PREFIX = /usr/include/httpd
-
 MODULE = mod_fum
 TARGET = ${MODULE}.so
 OBJS = ${MODULE}.o
-CFLAGS += -Wall -g -I${KX509_PREFIX} -I${APR_PREFIX} -I${KRB_PREFIX}/include -I${HTTPD_PREFIX}
+CFLAGS += -Wall -g -I${KX509_PREFIX} -I${APR_PREFIX} -I${KRB_PREFIX}/include
 LIBS = -lcrypto -L${KRB_PREFIX}/lib -lkrb5 -L${KX509_PREFIX} -lkx509
 CLEAN = ${MODULE}.lo ${MODULE}.la ${MODULE}.slo .libs
 

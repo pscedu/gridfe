@@ -266,7 +266,11 @@ public class Page
 		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
-		   +				this.oof.header(title, new String("3"));
+		   +				this.oof.header(new Object[] {
+								"value", title,
+								"size", "3",
+								"style", "margin-top:0px"
+							});
 		return (s);
 	}
 

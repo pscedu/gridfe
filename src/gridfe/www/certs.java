@@ -6,6 +6,7 @@ import gridfe.*;
 import gridfe.gridint.*;
 import gridfe.gridint.auth.*;
 import oof.*;
+import jasp.*;
 
 public class certs
 {
@@ -19,7 +20,8 @@ public class certs
 //		int uid = page.getUserID();
 
 		// DEBUG - use p.getGridInt() later;
-		GridInt gi = new GridInt(uid);
+		//GridInt gi = new GridInt(uid);
+		GlobusAuth ga = new GlobusAuth(new Uid(uid));
 		s += p.header("gijoe") + "badabadba!" + p.footer();
 /*
 		if (gi == null)

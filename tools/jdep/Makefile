@@ -3,6 +3,7 @@
 TARGET = jdep
 OBJS = jdep.o q.o xalloc.o lbuf.o
 SRCS = jdep.c q.c xalloc.c lbuf.c
+CFLAGS = -Wall -g
 
 all: ${TARGET}
 
@@ -17,3 +18,5 @@ clean:
 
 depend:
 	mkdep ${SRCS}
+
+test:

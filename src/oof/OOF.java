@@ -15,54 +15,54 @@ public class OOF {
 
 	/* Core Elements. */
 	public ELEMENT br() {
-		return new Break(new Object[] {},		new Object[] {});
+		return new Break(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT br(Object[] attrs) {
-		return new Break(attrs,				new Object[] {});
+		return new Break(attrs, new Object[] {});
 	}
 
 	public ELEMENT code() {
-		return new Code(new Object[] {},		new Object[] {});
+		return new Code(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT code(Object[] os) {
-		return new Code(new Object[] {},		os);
+		return new Code(new Object[] {}, os);
 	}
 	public ELEMENT code(Object o) {
-		return new Code(new Object[] {},		new Object[] {o});
+		return new Code(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT code(Object[] attrs, Object o) {
-		return new Code(attrs,				new Object[] {o});
+		return new Code(attrs, new Object[] {o});
 	}
 	public ELEMENT code(Object[] attrs, Object[] os) {
-		return new Code(attrs,				os);
+		return new Code(attrs, os);
 	}
 
 	public ELEMENT div() {
-		return new Division(new Object[] {},		new Object[] {});
+		return new Division(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT div(Object o) {
-		return new Division(new Object[] {},		new Object[] {o});
+		return new Division(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT div(Object[] os) {
-		return new Division(new Object[] {},		os);
+		return new Division(new Object[] {}, os);
 	}
 	public ELEMENT div(Object[] attrs, Object o) {
-		return new Division(attrs,			new Object[] {o});
+		return new Division(attrs, new Object[] {o});
 	}
 	public ELEMENT div(Object[] attrs, Object[] os) {
-		return new Division(attrs,			os);
+		return new Division(attrs, os);
 	}
 
 	public ELEMENT email() {
-		return new Email(new Object[] {},		new Object[] {});
+		return new Email(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT email(String addr) {
-		ELEMENT e = new Email(new Object[] {addr},	new Object[] {});
+		ELEMENT e = new Email(new Object[] {addr}, new Object[] {});
 		e.addr = addr;
 		return e;
 	}
 	public ELEMENT email(String title, String addr) {
-		ELEMENT e = new Email(new Object[] {title},	new Object[] {});
+		ELEMENT e = new Email(new Object[] {title}, new Object[] {});
 		e.addr = addr;
 		return e;
 	}
@@ -76,101 +76,101 @@ public class OOF {
 */
 
 	public ELEMENT emph() {
-		return new Emphasis(new Object[] {},		new Object[] {});
+		return new Emphasis(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT emph(Object[] os) {
-		return new Emphasis(new Object[] {},		os);
+		return new Emphasis(new Object[] {}, os);
 	}
 	public ELEMENT emph(Object o) {
-		return new Emphasis(new Object[] {},		new Object[] {o});
+		return new Emphasis(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT emph(Object[] attrs, Object o) {
-		return new Emphasis(attrs,			new Object[] {o});
+		return new Emphasis(attrs, new Object[] {o});
 	}
 	public ELEMENT emph(Object[] attrs, Object[] os) {
-		return new Emphasis(attrs,			os);
+		return new Emphasis(attrs, os);
 	}
 
 	public ELEMENT fieldset() {
-		return new Fieldset(new Object[] {}, 		new Object[] {});
+		return new Fieldset(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT fieldset(Object o) {
-		return new Fieldset(new Object[] {},		new Object[] {o});
+		return new Fieldset(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT fieldset(Object[] os) {
-		return new Fieldset(new Object[] {},		os);
+		return new Fieldset(new Object[] {}, os);
 	}
 	public ELEMENT fieldset(Object[] attrs, Object o) {
-		return new Fieldset(attrs,			new Object[] {o});
+		return new Fieldset(attrs, new Object[] {o});
 	}
 	public ELEMENT fieldset(Object[] attrs, Object[] os) {
-		return new Fieldset(attrs,			os);
+		return new Fieldset(attrs, os);
 	}
 
 	public ELEMENT form() {
-		return new Form(new Object[] {},		new Object[] {});
+		return new Form(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT form(Object[] os) {
-		return new Form(new Object[] {},		os);
+		return new Form(new Object[] {}, os);
 	}
 	public ELEMENT form(Object o) {
-		return new Form(new Object[] {},		new Object[] {o});
+		return new Form(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT form(Object[] attrs, Object o) {
-		return new Form(attrs,				new Object[] {o});
+		return new Form(attrs, new Object[] {o});
 	}
 	public ELEMENT form(Object[] attrs, Object[] os) {
-		return new Form(attrs,				os);
+		return new Form(attrs, os);
 	}
 
 	public ELEMENT header() {
-		return new Header(new Object[] {},	 	new Object[] {});
+		return new Header(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT header(Object o) {
-		return new Header(new Object[] {},	 	new Object[] {o});
+		return new Header(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT header(Object o, Object size) {
 		return new Header(new Object[] { "size", size }, new Object[] {o});
 	}
 	public ELEMENT header(Object[] os) {
-		return new Header(new Object[] {},		os);
+		return new Header(new Object[] {}, os);
 	}
 	public ELEMENT header(Object[] attrs, Object o) {
-		return new Header(attrs,			new Object[] {o});
+		return new Header(attrs, new Object[] {o});
 	}
 	public ELEMENT header(Object[] attrs, Object[] os) {
-		return new Header(attrs,			os);
+		return new Header(attrs, os);
 	}
 
 	public ELEMENT hr() {
-		return new HorizontalRuler(new Object[] {},	new Object[] {});
+		return new HorizontalRuler(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT hr(Object[] attrs) {
-		return new HorizontalRuler(attrs,		new Object[] {});
+		return new HorizontalRuler(attrs, new Object[] {});
 	}
 
 	public ELEMENT img() {
-		return new Image(new Object[] {},		new Object[] {});
+		return new Image(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT img(Object[] attrs) {
-		return new Image(attrs,				new Object[] {});
+		return new Image(attrs, new Object[] {});
 	}
 
 	public ELEMENT input() {
-		return new Input(new Object[] {},		new Object[] {});
+		return new Input(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT input(Object[] attrs) {
-		return new Input(attrs,				new Object[] {});
+		return new Input(attrs, new Object[] {});
 	}
 
 	public ELEMENT link() {
-		return new Link(new Object[] {},		new Object[] {});
+		return new Link(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT link(String name) {
-		return new Link(new Object[] { "name", name },	new Object[] {});
+		return new Link(new Object[] { "name", name }, new Object[] {});
 	}
 	public ELEMENT link(String title, String href) {
-		return new Link(new Object[] { "href", href },	new Object[] { title });
+		return new Link(new Object[] { "href", href }, new Object[] { title });
 	}
 /*
 	public ELEMENT link(Object[] attrs) {
@@ -179,58 +179,58 @@ public class OOF {
 */
 
 	public ELEMENT list() {
-		return new List(new Object[] {},		new Object[] {});
+		return new List(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT list(int type) {
-		return new List(new Object[] { "type", type },	new Object[] {});
+		return new List(new Object[] { "type", type }, new Object[] {});
 	}
 	public ELEMENT list(Object[] os) {
-		return new List(new Object[] {},		os);
+		return new List(new Object[] {}, os);
 	}
 	public ELEMENT list(int type, Object[] os) {
-		return new List(new Object[] { "type", type },	os);
+		return new List(new Object[] { "type", type }, os);
 	}
 
 	public ELEMENT list_item() {
-		return new ListItem(new Object[] {},		new Object[] {});
+		return new ListItem(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT list_item(Object o) {
-		return new ListItem(new Object[] {},		new Object[] {o});
+		return new ListItem(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT list_item(Object[] os) {
-		return new ListItem(new Object[] {},		os);
+		return new ListItem(new Object[] {}, os);
 	}
 
 	public ELEMENT p() {
-		return new Paragraph(new Object[] {},		new Object[] {});
+		return new Paragraph(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT p(Object o) {
-		return new Paragraph(new Object[] {},		new Object[] {o});
+		return new Paragraph(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT p(Object[] os) {
-		return new Paragraph(new Object[] {},		os);
+		return new Paragraph(new Object[] {}, os);
 	}
 	public ELEMENT p(Object[] attrs, Object o) {
-		return new Paragraph(attrs,			new Object[] {o});
+		return new Paragraph(attrs, new Object[] {o});
 	}
 	public ELEMENT p(Object[] attrs, Object[] os) {
-		return new Paragraph(attrs,			os);
+		return new Paragraph(attrs, os);
 	}
 
 	public ELEMENT pre() {
-		return new Preformatted(new Object[] {},	new Object[] {});
+		return new Preformatted(new Object[] {}, new Object[] {});
 	}
 	public ELEMENT pre(Object o) {
-		return new Preformatted(new Object[] {},	new Object[] {o});
+		return new Preformatted(new Object[] {}, new Object[] {o});
 	}
 	public ELEMENT pre(Object[] os) {
-		return new Preformatted(new Object[] {},	os);
+		return new Preformatted(new Object[] {}, os);
 	}
 	public ELEMENT pre(Object[] attrs, Object o) {
-		return new Preformatted(attrs,			new Object[] {o});
+		return new Preformatted(attrs, new Object[] {o});
 	}
 	public ELEMENT pre(Object[] attrs, Object[] os) {
-		return new Preformatted(attrs,			os);
+		return new Preformatted(attrs, os);
 	}
 
 	public ELEMENT span() {

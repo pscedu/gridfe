@@ -26,13 +26,13 @@ struct pathqe {
 	struct pathqe	*pq_next;
 };
 
-static		int    exists(const char *);
-static		off_t  mkdep(FILE *, const char *, struct pathqe *);
-static		void   freeq(struct pathqe *);
-static		void   push(struct pathqe **, const char *);
-static		void   shift(FILE *, off_t);
-static const	char  *find(const char *, struct pathqe *);
-static __dead	void   usage(void);
+static		int   exists(const char *);
+static		void  mkdep(FILE *, const char *, struct pathqe *);
+static		void  freeq(struct pathqe *);
+static		void  push(struct pathqe **, const char *);
+static		void  shift(FILE *, off_t);
+static const	char *find(const char *, struct pathqe *);
+static __dead	void  usage(void);
 
 int
 main(int argc, char *argv[])
@@ -68,10 +68,8 @@ main(int argc, char *argv[])
 
 	if ((fp = fopen(".depend", "rw")) == NULL)
 		err(EX_NOINPUT, "open .depend"); /* XXX */
-	while (*argv != NULL) {
-		off = mkdep(fp, *argv, pathqh);
-		shift(fp, off);
-	}
+	while (*argv != NULL)
+		mkdep(fp, *argv, pathqh);
 	freeq(pathqh);
 	(void)fclose(fp);
 	exit(EXIT_SUCCESS);
@@ -114,7 +112,7 @@ shift(FILE *fp, off_t off)
 	}
 }
 
-static off_t
+static void
 mkdep(FILE *depfp, const char *s, struct pathqe *incpqh)
 {
 	struct pathqe *incqh, *incq;
@@ -168,15 +166,18 @@ mkdep(FILE *depfp, const char *s, struct pathqe *incpqh)
 	fseek(depfp, 0, SEEK_SET);
 
 	pos = ftell(depfp);
+	fseek(depfp, 0, SEEK_END);
 	for (incq = incqh; incq != NULL; inqc = inqc->pq_next) {
 		/* Find full path. */
 		if ((path = find(s, incpqh)) != NULL) {
-			shift += printf(depfp);
+			printf(depfp, "\t%s", path);
 		}
 	}
+	(void)printf(depfp, "\n");
 	freeq(incqh);
-	fseek(depfp, pos, SEEK_SET);
 
+	fseek(depfp, pos, SEEK_SET);
+	shift(fp, off);
 	return (shift);
 }
 

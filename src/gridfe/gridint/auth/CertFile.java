@@ -2,11 +2,10 @@
 
 package gridfe.gridint.auth;
 
-import jasp.Uid;
+import jasp.*;
 
 /* Class to Encapsulate the Location for the X.509 Certificate */
-public class CertFile
-{
+public class CertFile {
 	/*
 	** Certificates are normally stored in /tmp/x509up_u!!!
 	** where !!! is the userid
@@ -21,27 +20,24 @@ public class CertFile
 	**
 	** XXX - put this stuff in some configuration
 	** file to be read in... kinda nasty hard coded
-	** the way it is for developement purposes!
+	** the way it is for development purposes!
 	*/
-	//private final String xdef = "/tmp/x509up_fum_u";
-	//private final String kdef = "/tmp/krb5cc_fum_";
+	// private final String xdef = "/tmp/x509up_fum_u";
+	// private final String kdef = "/tmp/krb5cc_fum_";
 
 	private String xfile;
 	private String kfile;
 
-	public CertFile(Uid uid)
-	{
+	public CertFile(Uid uid) {
 		this.xfile = this.xdef + uid.intValue();
 		this.kfile = this.kdef + uid.intValue();
 	}
 	
-	public String getX509()
-	{
-		return this.xfile;
+	public String getX509() {
+		return (this.xfile);
 	}
 
-	public String getKrbTkt()
-	{
-		return this.kfile;
+	public String getKrbTkt() {
+		return (this.kfile);
 	}
-}
+};

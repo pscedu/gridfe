@@ -61,8 +61,7 @@ public class GridInt implements Serializable
 		** 3) GridInt serialize file
 		*/
 		CertFile cf = new CertFile(this.uid);
-		String[] list = new String[]
-		{
+		String[] list = new String[] {
 			cf.getX509(),
 			cf.getKrbTkt(),
 			file
@@ -70,11 +69,9 @@ public class GridInt implements Serializable
 		int ln = (file == null) ? 2 : 3;
 		File fp;
 
-		for(int i = 0; i < ln; i++)
-		{
+		for (int i = 0; i < ln; i++) {
 			fp = new File(list[i]);
-
-			if(fp.exists())
+			if (fp.exists())
 				fp.delete();
 		}
 	}
@@ -88,30 +85,28 @@ public class GridInt implements Serializable
 
 		/* Set default job name if none specified */
 		/* XXX: throw exception instead. */
-		if(job.getName() == null)
+		if (job.getName() == null)
 			job.setName("Job-" + this.list.size());
 
 		/* Add job to list */
 		this.list.push(job);
 	}
 
-	/* Cancel Job and remove from Job List */
+	/* Cancel job and remove from job list */
 	public boolean jobCancel(GridJob job)
 		throws GramException, GSSException
 	{
 		job.cancel();
-		return this.list.remove(job);
+		return (this.list.remove(job));
 	}
 
-	/* Required after Deserialization */
+	/* Required after deserialization */
 	public void revive()
-		throws MalformedURLException, GSSException, GlobusCredentialException
+		throws MalformedURLException, GSSException,
+		       GlobusCredentialException
 	{
-		/* must authenticate first! */
 		this.auth();
-
-		for(int i = 0; i < this.list.size(); i++)
-		{
+		for (int i = 0; i < this.list.size(); i++) {
 			this.list.get(i).revive(this.gss.getGSSCredential());
 		}
 	}
@@ -125,22 +120,21 @@ public class GridInt implements Serializable
 
 		/*
 		** If min/max are equal, use specific port 
-		** otherwise, random...
+		** otherwise, random.
 		*/
-		if(min != max)
-		{
+		if (min != max) {
 			/* Seed = CertLife * Uid */
-			r = new Random(this.getCertInfo().time * this.uid.intValue());
+			r = new Random(this.getCertInfo().time *
+			    this.uid.intValue());
 
 			/*
 			** Randomly Generate a Port between
 			** our MIN/MAX Port Boundary using
 			** LCM (Linear Congruent Method)
-			** XXX - configuration for this??
+			** XXX - configuration for this?
 			*/
 			port = r.nextInt((max - min)) + min + 1;
-		}
-		else
+		} else
 			port = min;
 
 		/* Start with the random port */
@@ -153,13 +147,13 @@ public class GridInt implements Serializable
 	{
 		/* Create a GASS Server to connect to */
 		this.gass = new GassInt(this.gss.getGSSCredential(),
-					host, port);
+		    host, port);
 
 		/* Start the Gass Server */
 		this.gass.start();
 
 		/* XXX - Remote Start Support Needed */
-		//this.gass.start_remote();
+		// this.gass.start_remote();
 	}
 
 	/* Setup file retrieval */
@@ -175,14 +169,11 @@ public class GridInt implements Serializable
 	{
 		String data = "";
 
-		/* XXX Remote Fetch */
-		if(job.remote(file))
-		{
+		if (job.remote(file)) {
+			/* XXX Remote Fetch */
 			throw new IOException("Remote Output not supported yet.");
-		}
-		/* Local Fetch */
-		else
-		{
+		} else {
+			/* Local Fetch */
 			/* Start Gass Server (0,0 = random port) */
 			this.startGass(min, max, job.getHost());
 		}
@@ -205,7 +196,6 @@ public class GridInt implements Serializable
 		this.gass.shutdown();
 	}
 
-
 	/* File (Chunk of 'len' bytes, 'len < 1' read all) */
 	public String retrieve(int len, int off)
 		throws IOException
@@ -221,54 +211,52 @@ public class GridInt implements Serializable
 		**
 		** XXX - this is messed up how the size of the file
 		** is of type long and the length to read must be an
-		** int... (precision problems possible??)
+		** int. (precision problems possible?)
 		*/
-		if(len > left)
-			len = (int)(left);
+		if (len > left)
+			len = (int)left;
 
 		/* If there is still data */
-		if(left > 0)
-		{
+		if (left > 0) {
 			/* If len < 1 read the rest otherwise read len */
-			if(len < 1)
+			if (len < 1)
 				len = (int)(left);
 
 			/* Read the data */
 			this.gass.read(str, len);
 			data += str.toString();
 		}
-
-		return data;
+		return (data);
 	}
 
-	/* Get a Job from the list by index */
+	/* Get a job from the list by index */
 	public GridJob getJob(int index)
 	{
-		return this.list.get(index);
+		return (this.list.get(index));
 	}
 
 	/* Get a job from the list by it's name */
 	public GridJob getJob(String name)
 	{
-		return this.list.get(name);
+		return (this.list.get(name));
 	}
 
 	/* Get the raw JobList class */
 	public JobList getJobList()
 	{
-		return this.list;
+		return (this.list);
 	}
 
-	/* Get Certificate Information */
+	/* Get certificate information */
 	public CertInfo getCertInfo()
 	{
-		return this.ga.getCertInfo();
+		return (this.ga.getCertInfo());
 	}
 
 	/* Implement Serializable using revive() */
 	private void readObject(ObjectInputStream in)
 		throws IOException, ClassNotFoundException,
-			GSSException, GlobusCredentialException
+		       GSSException, GlobusCredentialException
 	{
 		in.defaultReadObject();
 		this.revive();

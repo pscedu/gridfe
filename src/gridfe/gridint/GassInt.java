@@ -1,4 +1,5 @@
 /* $Id$ */
+
 package gridfe.gridint;
 
 import java.io.*;
@@ -27,9 +28,9 @@ public class GassInt extends RemoteGassServer
 		this.host = host;
 		this.gss = gss;
 		this.options = GassServer.CLIENT_SHUTDOWN_ENABLE |
-				RemoteGassServer.TILDE_EXPAND_ENABLE |
-				RemoteGassServer.USER_EXPAND_ENABLE |
-				GassServer.READ_ENABLE;
+		    RemoteGassServer.TILDE_EXPAND_ENABLE |
+		    RemoteGassServer.USER_EXPAND_ENABLE |
+		    GassServer.READ_ENABLE;
 	}
 
 	/* Overload start */
@@ -38,7 +39,7 @@ public class GassInt extends RemoteGassServer
 	{
 /*
 		//This is additions after hacked CoG code, where the file RemoteGassServer.java
-		//was modified to allow additional customization... However, this still FUBAR.
+		//was modified to allow additional customization. However, this still FUBAR.
 		
 		int success = 0;
 		int n = 0;
@@ -53,10 +54,10 @@ public class GassInt extends RemoteGassServer
 	}
 
 	/*
-	** XXX - there has to be a way to succesfully start a remote gass server!
+	** XXX - there has to be a way to succesfully start a remote gass server
 	** Event the CoG API for RemoteGassServer fails.
 	*/
-	/* Manually remote start a server - this fails for some reason though, more FUBAR! */
+	/* Manually remote start a server - this fails for some reason though, more FUBAR */
 /*
 	public void start_remote()
 		throws GramException, GSSException
@@ -66,12 +67,12 @@ public class GassInt extends RemoteGassServer
 */
 		/* Build a gridjob that starts the gass server */
 /*
-		j.setRSL(new String[] {"executable", "stdout", "stderr"},
-		new String[] {"$GLOBUS_LOCATION/bin/globus-gass-server",
-		"/tmp/gram.stdout", "/tmp/gram.stderr"},
+		j.setRSL(new String[] { "executable", "stdout", "stderr" },
+		    new String[] { "$GLOBUS_LOCATION/bin/globus-gass-server",
+			"/tmp/gram.stdout", "/tmp/gram.stderr" },
 		new String("arguments"),
-//		new String[] {"-p", Integer.toString(this.port),"-c", "-r", "&"});
-		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
+//		new String[] { "-p", Integer.toString(this.port),"-c", "-r", "&" });
+		new String[] { "-p", Integer.toString(this.port),"-c", "-r" });
 
 		j.init(this.gss);
 		j.run();
@@ -92,7 +93,7 @@ public class GassInt extends RemoteGassServer
 
 		/* Create a secure input stream */
 		this.fin = new GassInputStream(this.gss, auth, this.host,
-						this.port, file);
+		    this.port, file);
 	}
 
 	/* Read len bytes from the open stream */
@@ -102,29 +103,26 @@ public class GassInt extends RemoteGassServer
 		int read = 0;
 
 		/* Read from offset = 0, to len */
-		while(read < len)
-		{
+		while (read < len) {
 			/* Create a new buf that is proper size */
 			byte[] tmp = new byte[len - read];
 			read += this.fin.read(tmp, 0, len - read);
 			buf.append(new String(tmp));
 		}
-
-		return read;
+		return (read);
 	}
 
 	/* Get the size of the file opened by the GassInputStream */
 	public long getSize()
 	{
-		return this.fin.getSize();
+		return (this.fin.getSize());
 	}
 
 	/* Close the stream */
 	public void close()
 		throws IOException
 	{
-		if(this.fin != null)
-		{
+		if (this.fin != null) {
 			this.fin.close();
 			this.fin = null;
 		}

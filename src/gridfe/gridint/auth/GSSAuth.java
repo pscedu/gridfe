@@ -10,18 +10,15 @@ import org.ietf.jgss.*;
 import org.ietf.jgss.GSSCredential.*;
 import org.ietf.jgss.GSSException.*;
 
-public class GSSAuth
-{
+public class GSSAuth {
 	private GlobusCredential gc = null;
 	private GSSCredential gss = null;
 
-	public GSSAuth(GlobusAuth ga)
-	{
+	public GSSAuth(GlobusAuth ga) {
 		this.gc = ga.getCredential();
 	}
 
-	public GSSAuth(GlobusCredential gc)
-	{
+	public GSSAuth(GlobusCredential gc) {
 		this.gc = gc;
 	}
 
@@ -38,36 +35,32 @@ public class GSSAuth
 		** thing as pre alpha is beyond me...
 		*/
 		this.gss = new GlobusGSSCredentialImpl(this.gc,
-				GSSCredential.INITIATE_AND_ACCEPT);
+		    GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
 	/*
 	** Generic Private Data Interfaces
 	*/
-
-	public GlobusCredential getGlobusCredential()
-	{
-		return this.gc;
+	public GlobusCredential getGlobusCredential() {
+		return (this.gc);
 	}
 
-	public GSSCredential getGSSCredential()
-	{
-		return this.gss;
+	public GSSCredential getGSSCredential() {
+		return (this.gss);
 	}
 
 	/*
 	** GSSCredential Methods
 	*/
-
 	public GSSName getName()
 		throws GSSException
 	{
-		return this.gss.getName();
+		return (this.gss.getName());
 	}
 
 	public int getRemainingLifetime()
 		throws GSSException
 	{
-		return this.gss.getRemainingLifetime();
+		return (this.gss.getRemainingLifetime());
 	}
 };

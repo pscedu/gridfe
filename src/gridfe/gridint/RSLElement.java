@@ -32,7 +32,7 @@ public class RSLElement implements Serializable
 	*/
 	private transient StringBuffer data;
 
-	/* Stdout and Stderr default to null */
+	/* stdout and stderr default to null */
 	public transient String stdout = null;
 	public transient String stderr = null;
 
@@ -43,37 +43,32 @@ public class RSLElement implements Serializable
 	** Build RSL Strings that have args, env variables, and
 	** standard parameters.
 	*/
-	public void setRSL(String[] param, String[] value)
-	{
+	public void setRSL(String[] param, String[] value) {
 		this.gParam = (String[])param.clone();
 		this.gValue = (String[])value.clone();
 	}
 
-	/* this one is internal only! */
-	private void setRSL(String param, String[] key, String[] value)
-	{
+	private void setRSL(String param, String[] key, String[] value) {
 		this.kParam = param;
 		this.kKey = (String[])key.clone();
 		this.kValue = (String[])value.clone();
 	}
 
-	public void setRSL(String[] gp, String[] gv, String vp, String[] vv)
-	{
+	public void setRSL(String[] gp, String[] gv, String vp,
+	    String[] vv) {
 		this.setRSL(gp, gv);
 		this.vParam = vp;
 		this.vValue = (String[])vv.clone();
 	}
 
 	public void setRSL(String[] gp, String[] gv, String kp, String[] kk,
-				String[] kv)
-	{
+	    String[] kv) {
 		this.setRSL(gp, gv);
 		this.setRSL(kp, kk, kv);
 	}
 
 	public void setRSL(String[] gp, String[] gv, String vp, String[] vv,
-				String kp, String[] kk, String[] kv)
-	{
+	    String kp, String[] kk, String[] kv) {
 		this.setRSL(gp, gv, vp, vv);
 		this.setRSL(kp, kk, kv);
 	}
@@ -82,24 +77,22 @@ public class RSLElement implements Serializable
 	** Change whether it's Multi, Conjunct, or Disjunct
 	** (default is conjunct, see request type above...)
 	*/
-	public void setRequestType(String s)
-	{
+	public void setRequestType(String s) {
 		this.req = s;
 	}
 
 	/* Generic build for "(param=value)" */
-	private void buildGenerics(String[] param, String[] value)
-	{
-		for(int i = 0; i < param.length; i++)
-		{
-			this.data.append(b+param[i]+m+q+value[i]+q+e);
+	private void buildGenerics(String[] param, String[] value) {
+		for(int i = 0; i < param.length; i++) {
+			this.data.append(b + param[i] + m + q +
+			    value[i] + q + e);
 
 			/* Save some parameters to retrieve job output/err */
-			if(param[i].equals("stdout"))
+			if (param[i].equals("stdout"))
 				this.stdout = value[i];
-			else if(param[i].equals("stderr"))
+			else if (param[i].equals("stderr"))
 				this.stderr = value[i];
-			else if(param[i].equals("directory"))
+			else if (param[i].equals("directory"))
 				this.dir = value[i];
 		}
 	}
@@ -108,17 +101,16 @@ public class RSLElement implements Serializable
 	** Build in the form of '(param="arg1" "arg2")'
 	** Example: (arguments="arg1" "arg number 2");
 	*/
-	private void buildVarArgs(String param, String[] value)
-	{
+	private void buildVarArgs(String param, String[] value) {
 		int i;
-		this.data.append(b+param+m);
+		this.data.append(b + param + m);
 
-		/* Quote all args to be safe! */
+		/* Quote all args to be safe */
 		for(i = 0; i < value.length - 1; i++)
-			this.data.append(q+value[i]+q+s);
+			this.data.append(q + value[i] + q + s);
 
 		/* Manually add last one to avoid extra " )" */
-		this.data.append(q+value[i]+q);
+		this.data.append(q + value[i] + q);
 		this.data.append(e);
 	}
 
@@ -126,28 +118,28 @@ public class RSLElement implements Serializable
 	** Build in the form of "(param=(key1 value1)(key2 value2))"
 	** Example: (environment=(MANPATH /usr/man)(EDITOR vi));
 	*/
-	private void buildKeyPairs(String param, String[] key, String[] value)
-	{
+	private void buildKeyPairs(String param, String[] key,
+	    String[] value) {
 		this.data.append(b+param+m);
 
-		/* Quote all args to be safe! */
-		for(int i = 0; i < key.length; i++)
-			this.data.append(b+key[i]+s+q+value[i]+q+e);
-
+		/* Quote all args to be safe */
+		for (int i = 0; i < key.length; i++)
+			this.data.append(b + key[i] + s + q + value[i] +
+			    q + e);
 		this.data.append(e);
 	}
 
-	public void build()
-	{
+	public void build() {
 		this.data = new StringBuffer(this.req);
 
 		/* Build those that are not empty */
-		if(this.gParam != null)
+		if (this.gParam != null)
 			this.buildGenerics(this.gParam, this.gValue);
-		if(this.vParam != null)
+		if (this.vParam != null)
 			this.buildVarArgs(this.vParam, this.vValue);
-		if(this.kParam != null)
-			this.buildKeyPairs(this.kParam, this.kKey, this.kValue);
+		if (this.kParam != null)
+			this.buildKeyPairs(this.kParam, this.kKey,
+			    this.kValue);
 	}
 
 	/* Serializable Implementation */
@@ -166,12 +158,10 @@ public class RSLElement implements Serializable
 		this.build();
 	}
 
-	public String toString()
-	{
-		/* make sure it's been built first! */
-		if(this.data == null)
+	public String toString() {
+		/* make sure it's been built first */
+		if (this.data == null)
 			this.build();
-
-		return this.data.toString();
+		return (this.data.toString());
 	}
 };

@@ -9,14 +9,12 @@ import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
 import org.ietf.jgss.*;
 
-public class GlobusAuth
-{
+public class GlobusAuth {
 	private GlobusCredential gc = null;
 	private Uid uid;
 	private CertFile file;
 
-	public GlobusAuth(Uid uid)
-	{
+	public GlobusAuth(Uid uid) {
 		this.file = new CertFile(uid);
 	}
 
@@ -27,23 +25,17 @@ public class GlobusAuth
 		this.gc = new GlobusCredential(this.file.getX509());
 	}
 
-	public GlobusCredential getCredential()
-	{
-		return this.gc;
+	public GlobusCredential getCredential() {
+		return (this.gc);
 	}
 
 	/* Certificate Information Record */
-	public CertInfo getCertInfo()
-	{
+	public CertInfo getCertInfo() {
 		CertInfo ci =
-		new CertInfo( this.gc.getSubject(),
-				this.gc.getProxyType(),
-				this.gc.getIssuer(),
-				this.gc.getStrength(),
-				this.gc.getIdentity(),
-				this.gc.getTimeLeft(),
-				this.file.getX509(),
-				this.file.getKrbTkt());
-		return ci;
+		new CertInfo(this.gc.getSubject(), this.gc.getProxyType(),
+		    this.gc.getIssuer(), this.gc.getStrength(),
+		    this.gc.getIdentity(), this.gc.getTimeLeft(),
+		    this.file.getX509(), this.file.getKrbTkt());
+		return (ci);
 	}
 };

@@ -3,8 +3,7 @@
 package gridfe.gridint.auth;
 
 /* Certificate Information */
-public class CertInfo
-{
+public class CertInfo {
 	public int type;
 	public int key;
 	public long time;
@@ -14,10 +13,8 @@ public class CertInfo
 	public String xfile;
 	public String kfile;
 	
-	CertInfo(String sub, int type, String issuer, 
-		int key, String ident, long time,
-		String xfile, String kfile)
-	{
+	CertInfo(String sub, int type, String issuer, int key,
+	    String ident, long time, String xfile, String kfile) {
 		this.sub = sub; 
 		this.type = type;
 		this.issuer = issuer;
@@ -27,4 +24,4 @@ public class CertInfo
 		this.xfile = xfile;
 		this.kfile = kfile;
 	}
-}
+};

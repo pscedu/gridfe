@@ -14,30 +14,25 @@ public class GridJob extends RSLElement implements Serializable
 	private String id;
 	private String name;
 
-	public GridJob(String host)
-	{
+	public GridJob(String host) {
 		this.host = host;
 		this.id = "No job submitted";
 	}
 
-	public void setHost(String host)
-	{
+	public void setHost(String host) {
 		this.host = host;
 	}
 
-	public String getHost()
-	{
-		return this.host;
+	public String getHost() {
+		return (this.host);
 	}
 
-	/* User specified Job names, for retrieval */
-	public void setName(String name)
-	{
+	/* User specified job names, for retrieval */
+	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return this.name;
 	}
 
@@ -45,9 +40,8 @@ public class GridJob extends RSLElement implements Serializable
 	** setRSL Wrappers are inherited from RSLElement.java
 	*/
 
-	/* Internal methods to be called by GridInt ONLY! */
-	public void init(GSSCredential gss)
-	{
+	/* Internal methods to be called by GridInt ONLY */
+	public void init(GSSCredential gss) {
 		this.gi = new GramInt(gss, this.host);
 	}
 
@@ -74,19 +68,17 @@ public class GridJob extends RSLElement implements Serializable
 	}
 
 	/* Check if the file location is remote or local */
-	public boolean remote(String file)
-	{
+	public boolean remote(String file) {
 		/* Job submitted to remote machine */
 		boolean remote = false;
 
 		/*
 		** XXX - Check for host to be localhost
 		** This hard coded until BasicServices has
-		** a function to extract the hostname...
+		** a function to extract the hostname.
 		*/
-//		if(!this.host.equals(BasicServices.getLocalhost()))
-		if(!this.host.equalsIgnoreCase("mugatu.psc.edu"))
-		{
+//		if (!this.host.equals(BasicServices.getHostname()))
+		if (!this.host.equalsIgnoreCase("mugatu.psc.edu")) {
 			/*
 			** If the job is remote, the output
 			** is automatically remote whether it
@@ -94,24 +86,22 @@ public class GridJob extends RSLElement implements Serializable
 			**
 			** XXX - if it is not local submitted it
 			** could be a job submitted to intel2 with output
-			** going to rachel... need a way to extract the
-			** proper host, etc...
+			** going to rachel. need a way to extract the
+			** proper host, etc.
 			*/
 			remote = true;
 		}
 
 		/* Check for starting 'http:' or 'https:' */
-		if(file != null)
-			if(file.startsWith("http:/") ||
-			   file.startsWith("https:/"))
+		if (file != null)
+			if (file.startsWith("http:/") ||
+			    file.startsWith("https:/"))
 				remote = true;
-		
-		return remote;
+		return (remote);
 	}
 
 	/* Convert GRAM stdout, and directory to a GASS filename */
-	public String convert(String file)
-	{
+	public String convert(String file) {
 		String dir = null;
 
 		/*
@@ -121,8 +111,7 @@ public class GridJob extends RSLElement implements Serializable
 		** If directory does not start with '/' then it
 		** needs to default to "~".
 		*/
-		if(file != null)
-		{
+		if (file != null) {
 			dir = (file.charAt(0) != '/') ? "~" : "";
 			dir += (this.dir != null) ? "/" + this.dir : "";
 		}
@@ -138,32 +127,29 @@ public class GridJob extends RSLElement implements Serializable
 		** Therefore we have to manually adjust stdout, stderr
 		** and directory accordingly.
 		*/
-		if(file != null && file.charAt(0) != '/' &&
-			file.charAt(0) != '~')
-		{
+		if (file != null && file.charAt(0) != '/' &&
+		    file.charAt(0) != '~') {
 			file = dir + "/" + file;
 		}
-
-		return file;
+		return (file);
 	}
 
-	/* GramInt Wrappers */
+	/* GramInt wrappers */
 	public int getStatus()
 		throws GSSException
 	{
-		return this.gi.getStatus();
+		return (this.gi.getStatus());
 	}
 
 	public String getStatusAsString()
 		throws GSSException
 	{
-		return this.gi.getStatusAsString();
+		return (this.gi.getStatusAsString());
 	}
 
-	/* Id is saved when job is submitted */
-	public String getIDAsString()
-	{
-		return this.id;
+	/* ID is saved when job is submitted */
+	public String getIDAsString() {
+		return (this.id);
 	}
 
 	/*

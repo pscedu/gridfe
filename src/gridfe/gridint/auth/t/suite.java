@@ -16,12 +16,18 @@ public class suite
 	{
 
 		/* GridInt Test Suite */
-		GridInt gi = new GridInt(args[0]);
-		gi.authenticate();
+		//GridInt gi = new GridInt(args[0]);
+		GridInt gi = new GridInt(BasicServices.getUserID());
+		gi.auth();
 		//System.out.println(gi.getIssuer());
-		System.out.println(gi.getRemainingLifetime());
-		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
-		System.out.println(gi.getGlobusAuth().getSubject());
+		//System.out.println(gi.getRemainingLifetime());
+		//System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
+		//System.out.println(gi.getGlobusAuth().getSubject());
+		CertInfo ci;
+		ci = gi.getCertInfo();
+		System.out.println("Remaining Lifetime: "+ci.time);
+		System.out.println("Subject: "+ci.sub);
+		System.out.println("Issuer: "+ci.issuer);
 
 		/* GlobusAuth Test Suite */
 		/*

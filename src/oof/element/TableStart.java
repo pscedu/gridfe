@@ -1,10 +1,15 @@
 /* $Id$ */
 package oof.element;
 
+import oof.*;
 import oof.element.*;
 
 public class TableStart extends START {
-	public TableStart(Object[] attrs) {
-		super(attrs);
+	public TableStart(OOF oof, Object[] attrs) {
+		super(oof, attrs);
+	}
+
+	public String toString() {
+		return this.oof.__getFilter().build(this);
 	}
 };

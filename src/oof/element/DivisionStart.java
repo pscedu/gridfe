@@ -1,9 +1,15 @@
 /* $Id$ */
 package oof.element;
 
+import oof.*;
 import oof.element.*;
 
 public class DivisionStart extends START {
-	public DivisionStart()			{ super(new Object[] {}); }
-	public DivisionStart(Object[] attrs)	{ super(attrs); }
+	public DivisionStart(OOF oof, Object[] attrs) {
+		super(oof, attrs);
+	}
+
+	public String toString() {
+		return this.oof.__getFilter().build(this);
+	}
 };

@@ -1,9 +1,15 @@
 /* $Id$ */
 package oof.element;
 
+import oof.*;
 import oof.element.*;
 
 public class DivisionEnd extends END {
-	public DivisionEnd()			{ super(new Object[] {}); }
-	public DivisionEnd(Object[] attrs)	{ super(attrs); }
+	public DivisionEnd(OOF oof) {
+		super(oof);
+	}
+
+	public String toString() {
+		return this.oof.__getFilter().build(this);
+	}
 };

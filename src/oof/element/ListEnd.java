@@ -1,10 +1,15 @@
 /* $Id$ */
 package oof.element;
 
+import oof.*;
 import oof.element.*;
 
 public class ListEnd extends END {
-	public ListEnd(Object[] attrs) {
-		super(attrs);
+	public ListEnd(OOF oof, Object[] attrs) {
+		super(oof, attrs);
+	}
+
+	public String toString() {
+		return this.oof.__getFilter().build(this);
 	}
 };

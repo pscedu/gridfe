@@ -152,6 +152,8 @@ public class GridInt implements Serializable
 		/* Loop and grab all data from all files */
 		for(int i = 0; i < OI_MAX; i++)
 		{
+			data[i] += this.retrieve(job, file[i], 64, 0);
+			data[i] += this.retrieve(job, file[i], 64, 0);
 			data[i] += this.retrieve(job, file[i], 0, 0);
 
 			/* Test multiple reads */

@@ -78,6 +78,7 @@ int mf_main(const char *principal, const char *password)
 	mf_krb5_init(&kinst);
 	mf_kinit_set_defaults(&kprefs);
 	mf_kinit_set_uap(&kprefs, principal, password);
+	//mf_kinit_setup(&kinst, &kprefs, principal, password);
 	mf_kinit_setup(&kinst, &kprefs);
 
 	mf_kinit(&kinst, &kprefs);
@@ -412,8 +413,12 @@ static void mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err; 
 
+	/* Initial defaults and principal/password setup */
+	//mf_kinit_set_defaults(&kprefs);
+	//mf_kinit_set_uap(&kprefs, principal, password);
+	
 	/* Establish context and read CC */
-	mf_krb5_init(kinst);
+	//mf_krb5_init(kinst);
 
 	/*
 	** Generate a full principal name

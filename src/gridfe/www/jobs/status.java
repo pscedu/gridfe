@@ -14,8 +14,10 @@ public class status
 		OOF oof = p.getOOF();
 		String s = "";
 
+		/*
 		GridInt gi = p.getGridInt();
 		JobList list = gi.getJobList();
+		*/
 
 		s += p.header("Job Status")
 		   + oof.p("Job status test page.")

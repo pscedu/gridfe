@@ -7,11 +7,13 @@ import gridfe.gridint.*;
 import gridfe.gridint.auth.*;
 import oof.*;
 import jasp.*;
+import org.ietf.jgss.GSSException;
+import org.globus.gsi.GlobusCredentialException;
 
 public class certs
 {
 	public static String main(Page p)
-		throws Exception
+		throws OOFException
 	{
 		OOF oof = p.getOOF();
 		String s = "";
@@ -21,7 +23,16 @@ public class certs
 
 		// DEBUG - use p.getGridInt() later;
 		//GridInt gi = new GridInt(uid);
-		GlobusAuth ga = new GlobusAuth(new Uid(uid));
+		try
+		{
+			GlobusAuth ga = new GlobusAuth(new Uid(uid));
+			ga.createCredential();
+		}
+		catch(Exception e)
+		{
+			s += oof.p("who wants a body massage");
+		}
+
 		s += p.header("gijoe") + "badabadba!" + p.footer();
 /*
 		if (gi == null)

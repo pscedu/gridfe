@@ -155,7 +155,13 @@ public class suite
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);
 
+		/* Get the job list and len */
+		String[][] jobs = gi.getJobList();
 
+		for(int i = 0; i < jobs.length; i++)
+		{
+			System.out.println("Name: " + jobs[0][i] + "\tStatus: " + jobs[1][i] + "\tRSL: " + jobs[2][i]);
+		}
 
 		/* Logout - remove credentials */
 		//gi.logout();
@@ -173,6 +179,7 @@ public class suite
 		** when using the GassInt code... seems like there is some kind of
 		** thread still running that needs terminated!
 		*/
+		System.out.println("\n");
 		System.exit(0);
 		return;
 	}

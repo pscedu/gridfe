@@ -6,47 +6,80 @@
 
 package gridint;
 
+import gridint.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
 public class GramInt //implements GramJobListener
 {
 	private String host;
-	private String rsl;
+	//private String rsl;
+	private RSLElement rsl;
 	private GramJob job = null;
 	private boolean batch = false;
 	private GSSCredential gss;
+
+	/* Randomized Job Output filename */
+	private String jOut;
+
 
 	public GramInt(GSSCredential gss)
 	{
 		this.gss = gss;
 	}
+
 	public GramInt(GSSCredential gss, String host)
 	{
 		this.gss = gss;
 		this.host = host;
 	}
 
+	public GramInt(GSSCredential gss, String host, RSLElement rsl)
+	{
+		this.gss = gss;
+		this.host = host;
+		this.rsl = rsl;
+	}
+
+	/*
+	public GramInt(GSSCredential gss, String host, String rsl)
+	{
+		this.gss = gss;
+		this.host = host;
+		this.rsl = rsl;
+	}
+	*/
+
 	public void setHost(String host)
 	{
 		this.host = host;
 	}
 
+	/*
 	public void setRsl(String rsl)
 	{
+		this.rsl = rsl;
+	}
+	*/
+
+	public void setRsl(RSLElement rsl)
+	{
+		//this.rsl = rsl.toString();
 		this.rsl = rsl;
 	}
 
 	/*
 	** globus-job-submit & globus-job-run
 	*/
-	public void jobSubmit(String host, String rsl) throws GramException, GSSException
+	//public void jobSubmit(String host, String rsl) throws GramException, GSSException
+	public void jobSubmit(String host, RSLElement rsl) throws GramException, GSSException
 	{
 		this.batch = true;
 		this.gramRequest(host, rsl);
 	}
 
-	public void jobSubmit(String rsl) throws GramException, GSSException
+	//public void jobSubmit(String rsl) throws GramException, GSSException
+	public void jobSubmit(RSLElement rsl) throws GramException, GSSException
 	{
 		this.batch = true;
 		this.gramRequest(this.host, rsl);
@@ -78,13 +111,15 @@ public class GramInt //implements GramJobListener
 	}
 */
 
-	private void gramRequest(String host, String rsl) throws GramException, GSSException
+//	private void gramRequest(String host, String rsl) throws GramException, GSSException
+	private void gramRequest(String host, RSLElement rsl) throws GramException, GSSException
 	{
 		/* Make sure the host is there */
 		Gram.ping(this.gss, host);
 
 		/* Create and process Job */
-		this.job = new GramJob(this.gss, rsl);
+		//this.job = new GramJob(this.gss, rsl);
+		this.job = new GramJob(this.gss, rsl.toString());
 		this.job.request(host, this.batch);
 
 		/*
@@ -101,7 +136,7 @@ public class GramInt //implements GramJobListener
 		return this.job.getStatus();
 	}
 
-	public String getStatusString()
+	public String getStatusAsString()
 	{
 		return this.job.getStatusAsString();
 	}
@@ -110,6 +145,15 @@ public class GramInt //implements GramJobListener
 	public void cancel() throws GramException, GSSException
 	{
 		this.job.cancel();
+	}
+
+	/* 
+	** Job Id as String 
+	** this will be used to tag job output files
+	*/
+	public String getIDAsString()
+	{
+		return this.job.getIDAsString();
 	}
 
 	public GramJob getJob()

@@ -11,6 +11,7 @@ import java.lang.reflect.*;
 import java.lang.Integer;
 import jasp.*;
 import java.io.*;
+import java.lang.ref.*;
 
 public class suite
 {
@@ -68,45 +69,41 @@ public class suite
 //		System.out.println(gri.getIDAsString());
 //		System.out.println("Stdout: " + gri.getStdout());
 
-		GridJob j;
-		boolean deserialized = false;
+		/* Create a new job */
+		System.out.println("Creating New Job...");
 
-		try
-		{
-			/* Test Deserialization */
-			FileInputStream fin = new FileInputStream("job.revive");
-			ObjectInputStream in = new ObjectInputStream(fin);
+		GridJob j = new GridJob("mugatu.psc.edu");
+		j.setRSL(new String[] {"executable", "stdout"},
+			new String[] {"/bin/sleep", "gram.out"},
+			new String("arguments"),
+			new String[] {"30s"});
 
-			System.out.println("Deserializing Job...");
-			j = (GridJob)(in.readObject());
-
-			in.close();
-			deserialized = true;
-			
-			/* switch these to resubmit/revive job */
-			j.revive(gi.getGSSAuth().getGSSCredential());
-			//gi.jobSubmit(j);
-		}
-		catch(IOException e)
-		{
-
-			/* Create a new job if a previous one doesn't exist */
-			System.out.println("Creating New Job...");
-
-			j = new GridJob("mugatu.psc.edu");
-			j.setRSL(new String[] {"executable", "stdout"},
-				new String[] {"/bin/sleep", "gram.out"},
-				new String("arguments"),
-				new String[] {"30s"});
-
-			gi.jobSubmit(j);
-		}
+		/* Submit the job to GRAM */
+		System.out.println("Submiting Job...");
+		gi.jobSubmit(j);
 
 		/* Test Serialization */
+		System.out.println("Serializing Job...");
 		FileOutputStream fout = new FileOutputStream("job.revive");
 		ObjectOutputStream out = new ObjectOutputStream(fout);
 		out.writeObject(j);
 		out.close();
+
+		/* Implicitly get rid of this object! */
+		System.out.println("Removing Instance of Job...");
+		WeakReference r = new WeakReference(j);
+		r.clear();
+		j = null;
+
+		/* Test Deserialization */
+		System.out.println("Deserializing Job...");
+		FileInputStream fin = new FileInputStream("job.revive");
+		ObjectInputStream in = new ObjectInputStream(fin);
+
+		j = (GridJob)(in.readObject());
+
+		in.close();
+		j.revive(gi.getGSSAuth().getGSSCredential());
 
 		/* 
 		** Revival Test
@@ -117,27 +114,13 @@ public class suite
 		GridJob j2 = new GridJob();
 		j2.revive(j.getHost(), j.getIDAsString(), gi.getGSSAuth().getGSSCredential(), j.getRSL());
 
-		/* If running deserialized, the wait till finished */
-		if(deserialized)
+		do
 		{
-			do
-			{
-				System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
-				System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
-				Thread.sleep(800);
-	
-			}while(j.getStatus() != -1);
-		}
-		/* If running a new job, output a few, then quit to test deserialization */
-		else
-		{
-			for(int i = 0; i < 5; i++)
-			{
-				System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
-				System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
-				Thread.sleep(800);
-			}
-		}
+			System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
+			System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());
+			Thread.sleep(800);
+
+		}while(j.getStatus() != -1);
 
 		System.out.println("J: "+j.getStatus()+" : "+j.getStatusAsString());
 		System.out.println("J2: "+j2.getStatus()+" : "+j2.getStatusAsString());

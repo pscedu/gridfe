@@ -1,12 +1,14 @@
 /* $Id$ */
 
+import gridint.*;
 import jasp.*;
-import oof.*;
 import javax.servlet.http.*;
+import oof.*;
 
 public class Page {
 	private OOF  oof;
 	private JASP jasp;
+	private GridInt gi;
 	private int classCount;
 	private HttpServletRequest req;
 	private HttpServletResponse res;
@@ -15,10 +17,11 @@ public class Page {
 	final static Object CCDESC = (Object)"desc";
 
 	Page(HttpServletRequest req, HttpServletResponse res) {
-		/* XXX: load jasp prefs from resource. */
 		this.jasp = new JASP();
+		this.gi = new GridInt(0/* XXX: get kerb uid */);
 
 		try {
+			/* XXX: load oof prefs from resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
 			this.error(e.toString());
@@ -27,6 +30,10 @@ public class Page {
 		this.classCount = 1;
 		this.req = req;
 		this.res = res;
+	}
+
+	public GridInt getGridInt() {
+		return this.gi;
 	}
 
 	public String header(String title) {

@@ -79,7 +79,7 @@ public class suite
 		/* job to test output permission */
 		String j3_out = "gram.out.date";
 		//String j3_out = "/tmp/gram.out.date";
-		String j3_err = "gram123.out";
+		String j3_err = "gram.err";
 		String j3_host = "intel2.psc.edu";
 		//String j3_host = "mugatu.psc.edu";
 		String j3_name = "Date";
@@ -98,7 +98,7 @@ public class suite
 		System.out.println("Submiting Job...");
 		gi.jobSubmit(j);
 		gi.jobSubmit(j2);
-//		gi.jobSubmit(j3);
+		gi.jobSubmit(j3);
 
 		/* Print the job id string */
 		System.out.println("j - id string: "+j.getIDAsString());
@@ -168,18 +168,18 @@ public class suite
 		System.out.println("Gass Server shutdown");
 */
 
-/*		String[] data;
+		String[] data;
 		System.out.println("Retrieving job data...");
 //		j3 = gi.getJob(2);
 		j3 = gi.getJob(j3_name);
-		System.out.println("J3: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
+//		System.out.println("J3: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
 		System.out.println(j3);
 		System.out.println(j3.stdout);
 		System.out.println(j3.stderr);
 		data = gi.getJobData(j3);
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);
-*/
+
 		/* Get the job list and len */
 		String[][] jobs = gi.getJobListString();
 

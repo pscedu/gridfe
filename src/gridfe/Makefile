@@ -1,6 +1,6 @@
 # $Id$
 
-CLASSES += Page.class
+CLASSES += Page.class GridFE.class
 
 SYSROOT = ..
 

@@ -18,8 +18,6 @@ public class GramInt
 	private GramJob job = null;
 	private boolean batch = false;
 	private GSSCredential gss;
-
-	/* Randomized Job Output filename */
 	private String jOut;
 
 	public GramInt(GSSCredential gss)
@@ -80,10 +78,6 @@ public class GramInt
 	private void gramRequest(String host, RSLElement rsl)
 		throws GramException, GSSException
 	{
-		//DEBUG
-		if(host == null)
-			System.out.println("host is null");
-
 		/* Make sure the host is there */
 		Gram.ping(this.gss, host);
 
@@ -159,7 +153,6 @@ public class GramInt
 	public void setID(String id)
 		throws MalformedURLException
 	{
-		System.out.println("GramInt: " + id);
 		this.job.setID(id);
 	}
 
@@ -176,17 +169,5 @@ public class GramInt
 	public GramJob getJob()
 	{
 		return this.job;
-	}
-
-	/* DEBUG */
-	public void createJob()
-	{
-		/* DEBUG */
-		if(this.gss == null)
-			System.out.println("GramInt: GSS NULL");
-		if(this.rsl == null)
-			System.out.println("GramInt: RSL NULL");
-
-		this.job = new GramJob(this.gss, this.rsl.toString());
 	}
 }

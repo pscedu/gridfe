@@ -109,18 +109,6 @@ public class GridInt implements Serializable
 		return this.list.get(x).getStatus();
 	}
 
-	/* DEBUG */
-	public GlobusAuth getGlobusAuth()
-	{
-		return this.ga;
-	}
-
-	/* DEBUG */
-	public GSSAuth getGSSAuth()
-	{
-		return this.gss;
-	}
-
 	/*
 	** TODO: - later there need to be lots more
 	** functions for obtaining certificate information

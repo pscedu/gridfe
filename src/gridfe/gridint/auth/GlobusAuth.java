@@ -52,7 +52,7 @@ public class GlobusAuth
 	}
 
 	public void createCredential()
-		throws GlobusCredentialException//, GSSException
+		throws GlobusCredentialException
 	{
 		this.gc = new GlobusCredential(file);
 	}
@@ -61,7 +61,6 @@ public class GlobusAuth
 	** Generic Private Data Interfaces
 	*/
 
-	//public GlobusCredential getGlobusCredential()
 	public GlobusCredential getCredential()
 	{
 		return this.gc;

@@ -81,9 +81,6 @@ public class GridJob implements Serializable
 	{
 		this.gi.jobSubmit(this.rsl);
 		this.id = new String(this.gi.getIDAsString());
-
-		/* DEBUG */
-		System.out.println("GridJob.run():" + this.id);
 	}
 
 	public void cancel()

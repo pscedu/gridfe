@@ -28,8 +28,6 @@ public abstract class ELEMENT implements Startable, Endable {
 		this.children.addFirst(o);
 	}
 
-	abstract public String toString();
-
 	public void addAttribute(String key, String val) {
 		this.attrs.add((Object)key);
 		this.attrs.add((Object)val);

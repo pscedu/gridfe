@@ -1,13 +1,13 @@
 /* $Id$ */
 package gridfe.gridint;
 
-import org.globus.gsi.gssapi.auth.*;
-import org.globus.io.gass.server.*;
-import org.globus.io.gass.client.*;
-import org.globus.io.streams.*;
-import org.globus.gram.*;
-import org.ietf.jgss.*;
 import java.io.*;
+import org.globus.gram.*;
+import org.globus.gsi.gssapi.auth.*;
+import org.globus.io.gass.client.*;
+import org.globus.io.gass.server.*;
+import org.globus.io.streams.*;
+import org.ietf.jgss.*;
 
 public class GassInt extends RemoteGassServer
 {
@@ -26,7 +26,7 @@ public class GassInt extends RemoteGassServer
 		this.port = port;
 		this.host = host;
 		this.gss = gss;
-		this.options = GassServer.CLIENT_SHUTDOWN_ENABLE | 
+		this.options = GassServer.CLIENT_SHUTDOWN_ENABLE |
 				RemoteGassServer.TILDE_EXPAND_ENABLE |
 				RemoteGassServer.USER_EXPAND_ENABLE |
 				GassServer.READ_ENABLE;
@@ -36,7 +36,7 @@ public class GassInt extends RemoteGassServer
 	public void start()
 		throws GassException, IOException
 	{
-		/*
+/*
 		int success = 0;
 		int n = 0;
 
@@ -44,12 +44,12 @@ public class GassInt extends RemoteGassServer
 					new String[] {"\"28000 28255\"", "\"28000 28255\""});
 		super.RBudden_set_port(0);
 		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
-		*/
+*/
 
 		super.setOptions(this.options);
 
 		super.start(host);
-		/*
+/*
 		while(success == 0 && n++ < 10)
 		{
 			try
@@ -65,11 +65,11 @@ public class GassInt extends RemoteGassServer
 				success = 0;
 			}
 		}
-		*/
+*/
 	}
 
 	/* Manually remote start a server - this fails for some reason though */
-	/*
+/*
 	public void start_remote()
 		throws GramException, GSSException
 	{
@@ -83,9 +83,9 @@ public class GassInt extends RemoteGassServer
 		j.init(this.gss);
 		j.run();
 	}
-	*/
+*/
 
-	/* 
+	/*
 	** Inherited Methods (needed from RemoteGassServer):
 	** shutdown()
 	*/
@@ -106,8 +106,8 @@ public class GassInt extends RemoteGassServer
 	public int read(StringBuffer buf, int len)
 		throws IOException
 	{
-		int read = 0; 
-		
+		int read = 0;
+
 		/* Read from offset = 0, to len */
 		while(read < len)
 		{
@@ -116,7 +116,7 @@ public class GassInt extends RemoteGassServer
 
 			read += this.fin.read(tmp, 0, len - read);
 
-			buf.append(new String(tmp));
+			buf.append(tmp);
 		}
 
 		return read;
@@ -131,7 +131,7 @@ public class GassInt extends RemoteGassServer
 		StringBuffer buf = new StringBuffer("");
 		this.read(buf, len);
 
-		return new String(buf.toString());
+		return buf.toString();
 	}
 
 	/* Get the size of the file opened by the GassInputStream */
@@ -146,5 +146,4 @@ public class GassInt extends RemoteGassServer
 	{
 		this.fin.close();
 	}
-
 };

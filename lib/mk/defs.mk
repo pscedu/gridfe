@@ -21,3 +21,4 @@ JDEP = ${SYSROOT}/tools/jdep/jdep
 KX509_PREFIX = /usr/local/kx509/src/lib
 APR_PREFIX = /usr/include/apr-0
 APXS = /usr/sbin/apxs
+KRB_PREFIX = /usr/kerberos

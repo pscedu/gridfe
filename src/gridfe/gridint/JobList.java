@@ -43,7 +43,6 @@ public class GridJobList implements Serializable
 
 	public GridJob get(int index)
 	{
-		/* wow... this doesn't cast automatically? */
 		return (GridJob)(this.list.get(index));
 	}
 
@@ -55,5 +54,10 @@ public class GridJobList implements Serializable
 	public int size()
 	{
 		return this.list.size();
+	}
+
+	public void clear()
+	{
+		this.list.clear();
 	}
 }

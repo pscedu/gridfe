@@ -54,9 +54,11 @@ public class suite
 			new String("arguments"),
 			new String[] {"15s"});
 
-		/* test output permission */
+		/* job to test output permission */
 		String j3_out = new String("/tmp/gram.out.date");
-		String j3_host = new String("intel2.psc.edu");
+		//String j3_host = new String("intel2.psc.edu");
+		String j3_host = new String("mugatu.psc.edu");
+		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
 		j3.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/date", j3_out});
@@ -66,7 +68,7 @@ public class suite
 		System.out.println("Submiting Job...");
 		gi.jobSubmit(j);
 		gi.jobSubmit(j2);
-	//	gi.jobSubmit(j3);
+		gi.jobSubmit(j3);
 
 		/* Print the job id string */
 		System.out.println("j - id string: "+j.getIDAsString());
@@ -109,24 +111,23 @@ public class suite
 		System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
 
 		/* Use a GassInt to grab job output */
-	/*
-		GassInt gass = new GassInt(gi.getCredential(), j3_host, 28003);
+		GassInt gass = new GassInt(gi.getCredential(), j3_host, j3_port);
 		System.out.println("Starting Remote Gass Server");
 		gass.start();
-		gass.start_remote();
+		//gass.start_remote();
 		System.out.println("Attempting to open file: "+j3_out);
 		gass.open(j3_out);
 		System.out.println("Size: "+gass.getSize());
-	*/
+
 		/* Grab the job output */
-	/*	System.out.println("Reading file...");
+		System.out.println("Reading file...");
 		String data = gass.read();
 		System.out.println(data);
 
 		gass.close();
 		gass.shutdown();
 		System.out.println("Gass Server shutdown");
-	*/
+	
 		/* - this shows that the gass server does terminate properly...
 		if(gass.shutdown())
 			System.out.println("Shutdown completed");

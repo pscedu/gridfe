@@ -257,8 +257,10 @@ public class Page
 		   +				"</a>"
 		   +				"<br /><br />"
 		   +			"</div>"
-		   +			"<div style=\"width: 700px; margin-left: 413px;\">"
-		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" /><br />"
+		   +			"<div style=\"width: 700px; margin-left: 413px; font-size:1px;\">"
+		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
+		   +			"</div>"
+		   +			"<div style=\"background-color: #ffffff; width: 626px; text-align: center;\">"
 		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">";

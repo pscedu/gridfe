@@ -17,11 +17,11 @@ public class certs
 
 		s += oof.p("Test Cert Page");
 
-/*
 		int uid = 6342;
 //		int uid = page.getUserID();
-		CertInfo ci = null;
-
+//		CertInfo ci = new CertInfo("Subject",1,"Issuer", 512, "Ident", 12345,
+//									"x509", "krb_tkt");
+		CertInfo ci;
 //		ci = p.getGridInt().getCertInfo();
 
 		GridInt gi = null;
@@ -29,11 +29,6 @@ public class certs
 		{
 			gi = new GridInt(uid);
 			ci = gi.getCertInfo();
-		}
-		catch(Exception e)
-		{
-			s += oof.p(e.getMessage());
-		}
 
 		long tmp;
 		long sec = ci.time;
@@ -49,10 +44,14 @@ public class certs
 				   days + " days, " +
 				   hours + " hours, " +
 				   min + " mins)";
-*/
+		}
+		catch(Exception e)
+		{
+			s += oof.p(e.getMessage());
+		}
 
-		return (s);
 /*
+
 		s += p.header("Certificate Management")
 		   + oof.table(
 				new Object[] {},
@@ -161,9 +160,8 @@ public class certs
 				}
 		     )
 		   + p.footer();
-
-		return (s);
 */
+		return (s);
 	}
 };
 

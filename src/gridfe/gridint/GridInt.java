@@ -50,6 +50,28 @@ public class GridInt implements Serializable
 		this.gss.createCredential();
 	}
 
+	/* XXX Cleanup and destroy credentials */
+	//public void logout(String file)
+	public void logout()
+	{
+		CertFile cf = new CertFile(this.uid);
+
+		/* remove krb5 tkt and X.509 cert */
+		System.out.println(cf.getX509());
+		File fp = new File(cf.getX509());
+		if(fp.exists())
+			fp.delete();
+
+		System.out.println(cf.getKrbTkt());
+		fp = new File(cf.getKrbTkt());
+		if(fp.exists())
+			fp.delete();
+
+		/* remove the serialize file */
+		//File fp = new File(file);
+		//fp.delete();
+	}
+
 	/* globus-job-submit equivalent */
 	public void jobSubmit(GridJob job)
 		throws GramException, GSSException

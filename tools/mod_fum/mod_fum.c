@@ -602,7 +602,9 @@ mf_valid_cred(char *principal)
 		mf_log("uid failed (%d)", err);
 		return (0);
 	}
-	if ((tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid)) != NULL) {
+	tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid);
+	free(uid);
+	if (tkt_cache != NULL) {
 		if (mf_krb5_init(&ki, tkt_cache) != OK)
 			return (0);
 

@@ -7,16 +7,16 @@ public class HTMLElement {
 	private JASP jasp;
 	private String name;
 	private String value;
-	private List[] attrs;
-	private List[] styles;
+	private List attrs;
+	private List styles;
 
-	HTMLElement(JASP jasp, String name, String value) {
+	public HTMLElement(JASP jasp, String name, String value) {
 		this.jasp  = jasp;
 		this.name  = name;
 		this.value = value;
 	}
 
-	HTMLElement(JASP jasp, String name) {
+	public HTMLElement(JASP jasp, String name) {
 		this.jasp = jasp;
 		this.name = name;
 	}
@@ -73,4 +73,9 @@ public class HTMLElement {
 class Attribute {
 	public String name;
 	public String value;
+
+	public Attribute(String name, String value) {
+		this.name  = name;
+		this.value = value;
+	}
 }

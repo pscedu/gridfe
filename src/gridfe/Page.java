@@ -149,7 +149,7 @@ public class Page {
 	public String header(String title)
 	  throws OOFException {
 		String s, name, url;
-		String r = this.webroot;
+		String sr = this.servroot, wr = this.webroot;
 		Menu m;
 		int y;
 
@@ -178,15 +178,15 @@ public class Page {
 		  +	 		"<title>GridFE - " + this.jasp.escapeHTML(title) + "</title>"
 		  +			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
 		  +			"<link rel=\"stylesheet\" type=\"text/css\" "
-		  +				"href=\"" + r + "/lib/main.css\" media=\"screen\">"
-		  +			"<script type=\"text/javascript\" src=\"" + r + "/lib/Global.js\"></script>"
+		  +				"href=\"" + wr + "/lib/main.css\" media=\"screen\">"
+		  +			"<script type=\"text/javascript\" src=\"" + wr + "/lib/Global.js\"></script>"
 		  +			this.addScript(
-		   				"include('" + r + "/lib/Browser.js');" +
-		   				"include('" + r + "/lib/util.js');")
+		   				"include('" + wr + "/lib/Browser.js');" +
+		   				"include('" + wr + "/lib/util.js');")
 		  +			this.addScript(this.buildMenu())
 		  +			this.addScript(
 		   				/* This must be loaded last. */
-		   				"include('" + r + "/lib/main.js');")
+		   				"include('" + wr + "/lib/main.js');")
 		  +		"</head>"
 		  +		"<body>"
 		  +			"<div class=\"bg\" style=\"width: 826px;\">"
@@ -195,7 +195,7 @@ public class Page {
 		   					/* PSC logo. */
 		  +					"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
 		  +						"<a href=\"http://www.psc.edu/\">"
-		  +							"<img src=\"" + r + "/img/psc.png\" "
+		  +							"<img src=\"" + wr + "/img/psc.png\" "
 		  +							     "alt=\"[Pittsburgh Supercomputing Center]\" "
 		  +							     "border=\"0\" />"
 		  +						"</a>"
@@ -209,10 +209,10 @@ public class Page {
 											/* Netscape 4 may not like this. */
 			   +			     "z-index:10; visibility: hidden; \" "
 			   +			     "id=\"" + divName(m.getName()) + "\">"
-			   +				"<a href=\"" + r + m.getURL() + "\" "
+			   +				"<a href=\"" + sr + m.getURL() + "\" "
 			   +				   "onmouseover=\"menuShow(this.parentNode)\" "
 			   +				   "onmouseout=\"menuHide(this.parentNode)\">"
-			   +					"<img src=\"" + r + "/img/buttons/"
+			   +					"<img src=\"" + wr + "/img/buttons/"
 			   +						imageName(m.getName()) + ".png\" "
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
 			   +				"</a>"
@@ -224,10 +224,10 @@ public class Page {
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
 					s +=		"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
 					   +		     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
-					   +			"<a href=\"" + r + url + "\" "
+					   +			"<a href=\"" + sr + url + "\" "
 					   +			   "onmouseover=\"menuShow(objGet('" + divName(m.getName()) + "'))\" "
 					   +			   "onmouseout=\"menuHide(objGet('" + divName(m.getName()) + "'))\">"
-					   +				"<img src=\"" + r + "/img/buttons/"
+					   +				"<img src=\"" + wr + "/img/buttons/"
 					   +					imageName(name) + ".png\" "
 					   +				     "alt=\"" + name + "\" border=\"0\" />"
 					   +			"</a>"
@@ -239,19 +239,19 @@ public class Page {
 							/* Sponsors */
 		s +=				"<br />"
 		   +				"<a href=\"http://www-unix.globus.org/cog/\">"
-		   +					"<img src=\"" + r + "/img/cog-toolkit.png\" border=\"0\" />"
+		   +					"<img src=\"" + wr + "/img/cog-toolkit.png\" border=\"0\" />"
 		   +				"</a>"
 		   +				"<a href=\"\">"
-		   +					"<img src=\"" + r+ "/img/globus-toolkit.png\" border=\"0\" />"
+		   +					"<img src=\"" + wr+ "/img/globus-toolkit.png\" border=\"0\" />"
 		   +				"</a>"
 		   +				"<br /><br />"
 		   +			"</div>"
 		   +			"<div style=\"width: 700px; margin-left: 413px\">"
-		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
+		   +				"<img src=\"" + wr + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px; "
 		   +			  "text-align: center; padding-left: 113px; padding-top:1px;\">"
-		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
+		   +				"<img src=\"" + wr + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
 		   +				this.oof.header(new Object[] {
@@ -304,6 +304,10 @@ public class Page {
 
 	public String getServRoot() {
 		return (this.servroot);
+	}
+
+	public String getWebRoot() {
+		return (this.webroot);
 	}
 };
 

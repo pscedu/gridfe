@@ -1,5 +1,7 @@
 /* $Id$ */
 
+package www;
+
 import oof.*;
 
 public class login

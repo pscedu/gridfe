@@ -75,9 +75,13 @@ public class GridJob extends RSLElement implements Serializable
 		/* Job submitted to remote machine */
 		boolean remote = false;
 
-		/* XXX - Check for host to be localhost */
-//		if(this.host.equals(BasicServices.getLocalhost()))
-		if(this.host.equalsIgnoreCase("gridinfo.psc.edu"))
+		/*
+		** XXX - Check for host to be localhost
+		** This hard coded until BasicServices has
+		** a function to extract the hostname...
+		*/
+//		if(!this.host.equals(BasicServices.getLocalhost()))
+		if(!this.host.equalsIgnoreCase("gridinfo.psc.edu"))
 		{
 			/*
 			** If the job is remote, the output
@@ -173,7 +177,7 @@ public class GridJob extends RSLElement implements Serializable
 		this.gi.setID(this.id);
 	}
 
-	/* Serializable Implementation */
+	/* Serializable Implementation (this can actually be ommited) */
 	private void writeObject(ObjectOutputStream out)
 		throws IOException
 	{

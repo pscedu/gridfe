@@ -13,6 +13,7 @@ public class GridJob extends RSLElement implements Serializable
 	private String host;
 	private transient GramInt gi;
 	private String id;
+	private String name;
 
 	public GridJob(String host)
 	{
@@ -23,6 +24,17 @@ public class GridJob extends RSLElement implements Serializable
 	public void setHost(String host)
 	{
 		this.host = new String(host);
+	}
+
+	/* User specified Job names, for retrieval */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public String getName()
+	{
+		return this.name;
 	}
 
 	/*

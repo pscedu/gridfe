@@ -78,6 +78,9 @@ public class GridJob implements Serializable
 	{
 		this.gi.jobSubmit(this.rsl);	
 		this.id = new String(this.gi.getIDAsString());
+		
+		/* DEBUG */
+		System.out.println("GridJob.run():"+this.id);
 	}
 
 	public void cancel() throws GramException, GSSException
@@ -130,14 +133,19 @@ public class GridJob implements Serializable
 
 	/*
 	** Revive allows a GridJob (and hence a GramJob) to be
-	** recreated the saved values (similar to serialization).
+	** recreated from saved values (similar to serialization).
 	*/
+
+	/* This revive to be called manually for testing or even cloning jobs */
 	public void revive(String host, String id, GSSCredential gss, RSLElement rsl) throws MalformedURLException
 	{
 		this.host = host;
 		this.rsl = rsl;
+		this.id = id;
 		this.revive(gss);
 	}
+
+	/* This revive should be called after a deserialization */
 	public void revive(GSSCredential gss) throws MalformedURLException
 	{
 		/* Revive GridJob private data */
@@ -147,17 +155,24 @@ public class GridJob implements Serializable
 		/* Revive GramInt and it's private data */
 		this.gi = new GramInt(gss, this.host, this.rsl);
 		this.gi.createJob();
-		this.gi.setID(id);
+		this.gi.setID(this.id);
 	}
 
 	/* Serializable Implementation */
-	private void writeObject(ObjectOutputStream out)
+	private void writeObject(ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 	}
+
 	private void readObject(ObjectInputStream in)
+		throws IOException, ClassNotFoundException
 	{
-		in.defaultWriteObject();
+		in.defaultReadObject();
+
+		/* DEBUG */
+		System.out.println(this.host);
+		System.out.println(this.rsl.toString());
+		System.out.println(this.id);
 	}
 
 

@@ -153,7 +153,7 @@ public class GramInt
 
 	public void setID(String id) throws MalformedURLException
 	{
-		System.out.println("GridInt: "+id);
+		System.out.println("GramInt: "+id);
 		this.job.setID(id);
 	}
 

@@ -25,7 +25,7 @@ public class GridInt
 		this.uid = new Uid(uid);
 	}
 
-	public void authenticate() throws GSSException, GlobusCredentialException
+	public void auth() throws GSSException, GlobusCredentialException
 	{
 		this.ga = new GlobusAuth(this.uid);
 		this.ga.createCredential();

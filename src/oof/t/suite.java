@@ -77,7 +77,7 @@ public class suite {
 		System.out.println("pre: " + o.pre(new Object[] { "class", "foo" }, "some pre text"));
 
 		System.out.println("span: " + o.span());
-		System.out.println("span: " + o.span(new Object[] { "some ", "text" });
+		System.out.println("span: " + o.span(new Object[] { "some ", "text" }));
 		System.out.println("span: " + o.span(new Object[] { "class", "foo" },
 						     new Object[] { "more ", "text" }));
 		System.out.println("span: " + o.span(new Object[] { "class", "bleh" }, "even more text"));

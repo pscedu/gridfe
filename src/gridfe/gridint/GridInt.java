@@ -118,4 +118,9 @@ public class GridInt implements Serializable
 	{
 		return this.gss.getRemainingLifetime();
 	}
+
+	public GSSName getName() throws GSSException
+	{
+		return this.gss.getName();
+	}
 };

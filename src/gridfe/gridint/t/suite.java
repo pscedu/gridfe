@@ -25,7 +25,7 @@ public class suite
 		System.out.println(gi.getRemainingLifetime());
 //		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());
 //		System.out.println(gi.getGlobusAuth().getSubject());
-		System.out.println(gi.getGSSAuth().getName());
+		System.out.println(gi.getName());
 
 		/* RSLElement Test */
 //		RSLElement r;

@@ -82,8 +82,22 @@ public class GramInt
 		Gram.ping(this.gss, host);
 
 		/* Create and process Job */
-		this.job = new GramJob(this.gss, rsl.toString());
+		//this.job = new GramJob(this.gss, rsl.toString());
+		this.job = this.createJob(rsl);
 		this.job.request(host, this.batch);
+	}
+
+	/* Used to internally rebuild a Gram Job */
+	public void createJob()
+	{
+		this.job = new GramJob(this.gss, this.rsl.toString());
+	}
+
+	/* Used internally for gramRequest */
+	private GramJob createJob(RSLElement rsl)
+	{
+		this.job = new GramJob(this.gss, rsl.toString());
+		return this.job;
 	}
 
 	/* globus-job-status */

@@ -179,8 +179,6 @@ public class Page
 		  +						"<br /><br />"
 		  +					"</div>";
 
-		return (s);
-
 		// Menu
 		Menu m;
 		String name, url;

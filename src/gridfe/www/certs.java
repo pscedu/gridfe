@@ -15,56 +15,30 @@ public class certs
 		OOF oof = p.getOOF();
 		String s = "";
 
-		s += p.header("Cert Page");
-		s += oof.p("Test Cert Page");
-
 		int uid = 6342;
 //		int uid = page.getUserID();
-//		CertInfo ci = new CertInfo("Subject",1,"Issuer", 512, "Ident", 12345,
-//									"x509", "krb_tkt");
-		CertInfo ci;
-//		ci = p.getGridInt().getCertInfo();
 
-		GridInt gi;
-		try
-		{
-			gi = new GridInt(uid);
-			gi.auth();
-			ci = gi.getCertInfo();
+		// DEBUG - use p.getGridInt() later;
+		GridInt gi = new GridInt(uid);
+		gi.auth();
+		
+		CertInfo ci;
+		ci = gi.getCertInfo();
 
 		long tmp;
 		long sec = ci.time;
-/*		long days = (sec / (tmp = 24*60*60));
+		long days = (sec / (tmp = 24*60*60));
 		sec -= days * tmp;
 		long hours = (sec / (tmp = 60*60));
 		sec -= hours * tmp;
 		long min = (sec / 60);
 		sec -= min * 60;
 
-
 		String lifetime;
 		lifetime = ci.time + " (" +
 				   days + " days, " +
 				   hours + " hours, " +
 				   min + " mins)";
-*/
-		}
-/*
-		catch(java.lang.reflect.InvocationTargetException t)
-		{
-			s += oof.p("Invocation Target Exception (wtf?): " +
-						t.getTargetException().getMessage());
-		}
-*/
-		catch(Exception e)
-		{
-			s += oof.p("Exception Caught!");
-		}
-
-		s += p.footer();
-
-
-/*
 
 		s += p.header("Certificate Management")
 		   + oof.table(
@@ -148,7 +122,7 @@ public class certs
 						},
 						new Object[] {
 							"class", p.genClass(),
-							"value", new Integer(ci.type)
+							"value", ci.type + ""
 						}
 					},
 					new Object[][] {
@@ -174,7 +148,7 @@ public class certs
 				}
 		     )
 		   + p.footer();
-*/
+
 		return (s);
 	}
 };

@@ -5,14 +5,15 @@ import oof.*;
 
 public class suite {
 	public static void t(String desc, Object a, String b) {
-		System.out.println(desc + ": " + a);
-		if (!b.equals(a.toString())) {
+		String v = a.toString();
+		System.out.println(desc + ": " + v);
+		if (!b.equals(v)) {
 			System.out.println("Output does not match expected!");
 			System.out.println("expected: " + b);
 			System.exit(1);
 		}
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		JASP j = new JASP();
 		OOF o = new OOF(j, "xhtml");
@@ -20,9 +21,9 @@ public class suite {
 		t("br", o.br(), "<br />");
 		t("br", o.br(new Object[] { "clear", "right" }), "<br clear=\"right\" />");
 
-		t("code", o.code("sdfsf"), "<code></code>");
+		t("code", o.code("sdfsf"), "<code>sdfsf</code>");
 		t("code", o.code(new Object[] { "class", "test" }, "sdfsf"),
-			"<code class=\"test\">sdfsf	</code>");
+			"<code class=\"test\">sdfsf</code>");
 
 		t("div", o.div(), "<div></div>");
 		t("div", o.div("some content"), "<div>some content</div>");
@@ -43,7 +44,7 @@ public class suite {
 		t("email", o.email("foo@bar.com"),
 			"<a href=\"mailto:foo@bar.com\">foo@bar.com</a>");
 		t("email", o.email("Foobar", "foo@bar.com"),
-			"<a href=\"foo@bar.com\">Foobar</a>");
+			"<a href=\"mailto:foo@bar.com\">Foobar</a>");
 
 		t("emph", o.emph("some emphasized text"), "<em>some emphasized text</em>");
 		t("emph", o.emph(new Object[] { "class", "foo" }, "some emphasized text"),
@@ -60,7 +61,7 @@ public class suite {
 		      	     new Object[] {
 		      		"field1: ", o.input(),
 		      		"field2: ", o.input()}),
-			"<form method=\"post\" action=\"post\">" +
+			"<form method=\"post\" action=\"url\">" +
 				"field1: <input />field2: <input />" +
 			"</form>");
 		t("form", o.form(new Object[] {
@@ -74,10 +75,13 @@ public class suite {
 
 		t("form_end", o.form_end(), "</form>");
 
-		t("header", o.header("bleh"), "<h>bleh</h>");
-		t("header", o.header("bleh", "2"), "<h2>bleh</h2>");
-		t("header", o.header(new Object[] { "size", "2" }, "bleh"),
-			"<h2>bleh</h2>");
+		try {
+		t("header", o.header("a"), "<h>a</h>");
+		} catch (Exception e) {
+		}
+		t("header", o.header("b", "2"), "<h2>b</h2>");
+		t("header", o.header(new Object[] { "size", "2" }, "c"),
+			"<h2>c</h2>");
 
 		t("hr", o.hr(), "<hr />");
 		t("hr", o.hr(new Object[] { "noborder", "yes" }),

@@ -1,9 +1,13 @@
 $Id$
 
 1. Remove Ping requirement before job submission.
-2. kdestroy needs to be called so that the TGT is
-removed before the next authentication.. otherwise
-/tmp/krb5cc_$UID will remain and the new TGT will
-be name /tmp/krb5cc_$UID_RANDOMFUBAR and auth will
-fail
 
+2. kdestroy needs to be called so that the TGT is removed before
+the next authentication.. otherwise /tmp/krb5cc_$UID will remain
+and the new TGT will be name /tmp/krb5cc_$UID_RANDOMFUBAR and auth
+will fail.
+
+3. auth should check  getenv("KRB5CCNAME") for a default kerberos
+credential cache name. this way, we could possibly have mod_fum
+store the most recent CCName in this env. if this is done we may 
+not have to worry about calling kdestroy to destroy older tickets.

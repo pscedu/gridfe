@@ -46,22 +46,30 @@ public class suite
 		j.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/sleep", "gram.out"},
 			new String("arguments"),
-			new String[] {"10s"});
+//			new String[] {"10s"});
+			new String[] {"2s"});
 
 		GridJob j2 = new GridJob("mugatu.psc.edu");
 		j2.setRSL(new String[] {"executable"},
 			new String[] {"/bin/sleep"},
 			new String("arguments"),
-			new String[] {"15s"});
+//			new String[] {"15s"});
+			new String[] {"5s"});
 
 		/* job to test output permission */
-		String j3_out = new String("gram.out.date");
-		//String j3_host = new String("intel2.psc.edu");
-		String j3_host = new String("mugatu.psc.edu");
+		String j3_out = "gram.out.date";
+		//String j3_out = "/tmp/gram.out.date";
+		//String j3_host = "intel2.psc.edu";
+		String j3_err = "gram.out";
+		String j3_host = "mugatu.psc.edu";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
-		j3.setRSL(new String[] {"executable", "stdout", "directory"},
-			new String[] {"/bin/date", j3_out, "gram_jobs"});
+//		j3.setRSL(new String[] {"executable", "stdout", "directory"},
+//			new String[] {"/bin/date", j3_out, "gram_jobs"});
+//		j3.setRSL(new String[] {"executable", "stdout", "stderr"},
+//			new String[] {"/bin/date", j3_out, j3_err});
+		j3.setRSL(new String[] {"executable", "stdout", "directory", "stderr"},
+			new String[] {"/bin/date", j3_out, "gram_jobs", j3_err});
 
 		/* Submit the job to GRAM */
 		System.out.println("RSL: " + j3);

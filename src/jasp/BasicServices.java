@@ -39,4 +39,18 @@ public class BasicServices
 
 		return uid;
 	}
+
+	public static String lcfirst(String s)
+	{
+		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
+
+	public static String stripSpace(String s)
+	{
+		String t = "";
+		for (int i = 0; i < s.length(); i++)
+			if (!s.substring(i, 1).equals(" "))
+				t += s.substring(i, 1);
+		return t;
+	}
 }

@@ -138,8 +138,10 @@ public class GridInt implements Serializable
 		 * above us provide an error message.
 		 */
 		data = new String[OI_MAX];
-		data[OI_STDOUT] = "Error: standard output improperly specified.";
-		data[OI_STDERR] = "Error: standard error improperly specified.";
+//		data[OI_STDOUT] = "Error: standard output improperly specified.";
+//		data[OI_STDERR] = "Error: standard error improperly specified.";
+		data[OI_STDOUT] = "";
+		data[OI_STDERR] = "";
 
 		/* Grab Job Outputs Locally or Remotely */
 		file = new String[OI_MAX];
@@ -149,27 +151,49 @@ public class GridInt implements Serializable
 
 		/* Loop and grab data */
 		for(int i = 0; i < OI_MAX; i++)
-		{
-			/* Remote Fetch */
-			if(job.remote(file[i]))
-				data[i] = "Remote Output not supported yet.";
-			else
-			{
-				/* Start Gass Server (0,0 = random port) */
-				this.startGass(0,0, job.getHost());
-
-				/* Read the data */
-				data[i] = this.retrieveLocal(job, file[i], 0);
-
-				/* Stop Gass Server */
-				this.stopGass();
-			}
-		}
+			data[i] += this.retrieve(job, file[i], 0);
 
 
 		return data;
 	}
 //---------------------------------------------------------------------------------
+	
+	/* Grab the job's stdout in chucks of len (all if len<1) */
+	public String retrieveStdout(GridJob job, int len)
+		throws GassException, IOException
+	{
+		return this.retrieve(job, job.stdout, len);
+	}
+	
+	/* Grab the job's stderr in chucks of len (all if len<1) */
+	public String retrieveStderr(GridJob job, int len)
+		throws GassException, IOException
+	{
+		return this.retrieve(job, job.stderr, len);
+	}
+	
+	public String retrieve(GridJob job, String file, int len)
+		throws GassException, IOException
+	{
+		String data = "";
+
+		/* Remote Fetch */
+		if(job.remote(file))
+			data += "Remote Output not supported yet.";
+		else
+		{
+			/* Start Gass Server (0,0 = random port) */
+			this.startGass(0,0, job.getHost());
+
+			/* Read the data */
+			data += this.retrieveLocal(job, file, len);
+
+			/* Stop Gass Server */
+			this.stopGass();
+		}
+
+		return data;
+	}
 
 
 	/* Data retrieval Functions */

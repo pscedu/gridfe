@@ -12,7 +12,7 @@ public class index
 	{
 		OOF oof = page.getOOF();
 
-		return	page.header("Error") +
+		return	page.header("Welcome") +
 				oof.p("Welcome to the portal.") +
 				oof.p("Welcome to the portal.") +
 				oof.p("Welcome to the portal.") +

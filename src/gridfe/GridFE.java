@@ -37,8 +37,6 @@ public class GridFE extends HttpServlet
 
 	/* XXX: make nestable. */
 	final DelegationHandler[] dtab = new DelegationHandler[] {
-		new DelegationHandler("",		gridfe.www.index.class),
-		new DelegationHandler("/",		gridfe.www.index.class),
 		new DelegationHandler("/certs",		gridfe.www.certs.class),
 		new DelegationHandler("/jobs/output",	gridfe.www.jobs.output.class),
 		new DelegationHandler("/jobs/status",	gridfe.www.jobs.status.class),
@@ -48,6 +46,7 @@ public class GridFE extends HttpServlet
 		new DelegationHandler("/rls/addres",	gridfe.www.rls.addres.class),
 		new DelegationHandler("/rls/rmcat",	gridfe.www.rls.rmcat.class),
 		new DelegationHandler("/rls/search",	gridfe.www.rls.search.class)
+		new DelegationHandler("/",		gridfe.www.index.class),
 	};
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -98,6 +97,10 @@ public class GridFE extends HttpServlet
 				break;
 			}
 		}
+
+		/* ``/'' is optional for index page. */
+		if (uri.equals(p.getServRoot())
+			handler = gridfe.www.index.class;
 
 		if (handler == null)
 			handler = gridfe.www.notfound.class;

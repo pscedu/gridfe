@@ -7,8 +7,9 @@ include ${SYSROOT}/lib/mk/defs.mk
 MODULE = mod_fum
 TARGET = ${MODULE}.so
 OBJS = ${MODULE}.o
-CFLAGS += -Wall -g -I${KX509_PREFIX} -I${APR_PREFIX} -I${KRB_PREFIX}/include
-LIBS = -lcrypto -L${KRB_PREFIX}/lib -lkrb5 -L${KX509_PREFIX} -lkx509
+CFLAGS += -Wall -g -I${KX509_PREFIX} -I${APR_PREFIX}
+CFLAGS += -I${HTTPD_PREFIX} -I${KRB_PREFIX}/include
+LIBS = -lcrypto -L${KRB_PREFIX}/lib -lkrb5 -lkx509
 CLEAN = ${MODULE}.lo ${MODULE}.la ${MODULE}.slo .libs
 
 TESTS += driver

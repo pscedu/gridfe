@@ -313,20 +313,20 @@ static int mf_kxlist(const char *tkt_cache)
 			/* Obtain proper kx509 credentials */
 			err = mf_kxlist_setup(&kinst);
 
-			if(err == OK)
+			if(err != OK)
+				goto RET;
+
+			/* Perform Crypto & write Certficate */
+			name = mf_dstrcat(kX509DefaultFile, uid);
+
+			if(!name)
 			{
-				/* Perform Crypto & write Certficate */
-				name = mf_dstrcat(kX509DefaultFile, uid);
-
-				if(!name)
-				{
-					err = HTTP_INTERNAL_SERVER_ERROR;
-					goto RET;
-				}
-
-				err = mf_kxlist_crypto(&kinst, name);
-				mf_krb5_free(&kinst);
+				err = HTTP_INTERNAL_SERVER_ERROR;
+				goto RET;
 			}
+
+			err = mf_kxlist_crypto(&kinst, name);
+			mf_krb5_free(&kinst);
 		}
 	}
 	else
@@ -795,26 +795,14 @@ static int mf_valid_user(const char *principal, const char *password)
 			/* If this succeeds, then the user/pass is correct */
 			if(err == OK)
 				valid = 1;
-
-			//DEBUG
 			else
 				mf_err("bad authentication", err);
 		}
 		else
 			mf_err("mf_kinit_setup failed", err);
 
-		//DEBUG
-		mf_err("blah", 1);
-		
 		mf_kinit_cleanup(&kinst);
-
-		//DEBUG
-		mf_err("blah2", 1);
-
 		mf_krb5_free(&kinst);
-		
-		//DEBUG
-		mf_err("blah3", 1);
 	}
 	else
 		mf_err("krb5_init failed", err);

@@ -20,6 +20,10 @@ public class GridInt implements Serializable
 	private Uid uid;
 	private JobList list;
 
+	public static final int OI_STDOUT = 0;
+	public static final int OI_STDERR = 1;
+	public static final int OI_MAX = 2;
+
 	public GridInt(String uid)
 	{
 		this.uid = new Uid(uid);
@@ -85,9 +89,10 @@ public class GridInt implements Serializable
 		job.run();
 
 		/* Set default job name if none specified */
+		/* XXX: throw exception instead. */
 		if(job.getName() == null)
-			job.setName(new String("Job-"+this.list.size()));
-		
+			job.setName("Job-" + this.list.size());
+
 		/* Add job to list */
 		this.list.push(job);
 	}
@@ -116,8 +121,16 @@ public class GridInt implements Serializable
 	/* Get the job output (stdout/stderr) */
 	public String[] getJobData(GridJob job)
 	{
-		String data[] = {"Stdout not specified.","Stderr not specified."};
+		String data[];
 		int remote;
+
+		/*
+		 * XXX: wrap into constants; let the layer
+		 * above us provide an error message.
+		 */
+		data = new String[OI_MAX];
+		data[OI_STDOUT] = "Error: standard output not specified.";
+		data[OI_STDERR] = "Error: standard error not specified.";
 
 		remote = job.remote();
 
@@ -135,8 +148,8 @@ public class GridInt implements Serializable
 			}
 			else if (remote == 3)
 			{
-				data[0] = "Remote data output not supported yet!";
-				data[1] = "Remote data output not supported yet!";
+				data[OI_STDOUT] = "Remote data output not supported yet!";
+				data[OI_STDERR] = "Remote data output not supported yet!";
 			}
 
 			/* Make sure there is a local output to retrieve */
@@ -163,7 +176,7 @@ public class GridInt implements Serializable
 
 		/*
 		** 'which' data to retrieve Remotely:
-		** 3 - Both 
+		** 3 - Both
 		** 2 - Stderr (corresponds to data[1])
 		** 1 - Stdout (corresponds to data[0])
 		** 0 - Neither (Retrieve Both locally)
@@ -181,8 +194,7 @@ public class GridInt implements Serializable
 		}
 
 		/* Seed = CertLife * Uid */
-		r = new Random(
-			this.getCertInfo().time * this.uid.intValue() );
+		r = new Random(this.getCertInfo().time * this.uid.intValue());
 
 		/*
 		** Randomly Generate a Port between
@@ -191,7 +203,7 @@ public class GridInt implements Serializable
 		*/
 		final int MIN = 28000;
 		final int MAX = 28255 + 1;
-		port = r.nextInt((MAX-MIN)) + MIN;
+		port = r.nextInt((MAX - MIN)) + MIN;
 
 		/* Create a GASS Server to connect to */
 		gass = new GassInt(this.gss.getGSSCredential(),
@@ -233,7 +245,7 @@ public class GridInt implements Serializable
 				dir[i] += (job.dir != null) ? "/" + job.dir : "";
 			}
 
-			/* 
+			/*
 			** Unfortunately GRAM assumes directories start from
 			** ~/ and if ~/dir is specified GRAM cannot expand the ~
 			**
@@ -249,7 +261,7 @@ public class GridInt implements Serializable
 			{
 				file[i] = new String(dir[i] + "/" + file[i]);
 			}
-			
+
 			/* Read stdout/stderr */
 			try
 			{

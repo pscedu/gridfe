@@ -1,34 +1,14 @@
 $Id$
 
-1. Remove Ping requirement before job submission.
+---- GridFE ----
 
------------- most likely not needed anymore --------------------
-2. kdestroy needs to be called so that the TGT is removed before
-the next authentication.. otherwise /tmp/krb5cc_$UID will remain
-and the new TGT will be name /tmp/krb5cc_$UID_RANDOMFUBAR and auth
-will fail.
-
-3. auth should check  getenv("KRB5CCNAME") for a default kerberos
-credential cache name. this way, we could possibly have mod_fum
-store the most recent CCName in this env. if this is done we may 
-not have to worry about calling kdestroy to destroy older tickets.
-------------------------------------------------------------------
-
-4. POSSIBLY A BIG PROBLEM HERE!!!!!
-For gram jobs, there is already a way implemented to save the
-stdout paramter of the RSL string, but there also needs to be a way
-to save the current directory... this is important so that output
-files can be opened and read in... oooo, but wait, will this
-present a permissions problem with reading job data??? somehow we
-need to make sure that read permission is enabled on the output files,
-unless the files will be saved as apache, in which case we need to chmod
-and possibly chown to set the proper user settings (on exit)...
-
-5. Add configuration to apache to not permit SSLv2... should be
+1. Add configuration to apache to not permit SSLv2... should be
 the command "SSLProtocol all -SSLv2" but figure out where it goes
 (this should be a real quick fix)
 
-6. Find out whether modfum needs to do anything special with ap_malloc
-variables... supposedly apache does it's own garbage collection, but
-do the variables need to be set to NULL so that it knows it can get
-rid of them?? (kinda like java??? remove all references to them)
+2. Add timestamp to submitted jobs...
+
+---- OTHER ----
+
+1. Write up documentation on what was completed while i was here.
+(Mod_fum, Gridint/*)

@@ -129,9 +129,8 @@ public class Page
 
 	public String header(String title)
 	{
+
 		this.addMenu("Main", "/", null);
-return "test";
-/*
 		this.addMenu("Jobs", "/jobs",
 			new Object[] {
 				"Submit", "/jobs/submit",

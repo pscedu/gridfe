@@ -33,7 +33,7 @@ public class UserMap {
 			}
 			br.close();
 		} catch (Exception e) {
-			return null;
+			return (null);
 		}
 		return (null);
 	}
@@ -50,7 +50,7 @@ public class UserMap {
 
 			switch (c) {
 			case '"':
-				for (; i < line.length(); i++) {
+				for (i++; i < line.length(); i++) {
 					c = line.charAt(i);
 					if (c == '"')
 						break;
@@ -60,7 +60,7 @@ public class UserMap {
 			case ' ':
 			case 't':
 				/* Skip space. */
-				for (; i < line.length(); i++) {
+				for (i++; i < line.length(); i++) {
 					c = line.charAt(i);
 					if (c != ' ' && c != '\t')
 						break;

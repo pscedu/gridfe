@@ -2,11 +2,13 @@
 
 var MENU_INIT_INTV = 40
 var MENU_INIT_SHIFT = 5
+var MI_NAME = 0
+var MI_SUBMENU = 1
 
 function moveMenu() {
 	var s, x
 	for (var i in menus) {
-		var o = objGet(menus[i])
+		var o = objGet(menus[i][MI_NAME])
 		if (o != null && o.style != null) {
 			var y = objGetTop(o) + MENU_INIT_SHIFT
 			objSetTop(o, y)

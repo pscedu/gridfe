@@ -5,7 +5,7 @@ import oof.*;
 import oof.element.*;
 
 public class TableRow extends ELEMENT implements Startable, Endable {
-	private Object[][] cells;
+	public Object[][] cells;
 	public TableRow(OOF oof, Object[][] oss) throws OOFBadElementFormException {
 		super(oof, new Object[] {}, new Object[] {});
 		this.cells = oss;

@@ -1,0 +1,50 @@
+CoG 2.0-Pre Alpha Installation
+==============================
+
+CoG 2.0-Pre Alpha is required to build GridFe due to bugs
+in CoG version 1.1 that were unable to be worked around.
+
+Requirements:
+=============
+
+CoG 2.0-Pre Alpha can be obtained through cvs with the
+following commands:
+
+cvs -d:pserver:anonymous@cvs.globus.org:/home/dsl/cog/CVS login
+cvs -d:pserver:anonymous@cvs.globus.org:/home/dsl/cog/CVS checkout cog
+cvs -d:pserver:anonymous@cvs.globus.org:/home/dsl/cog/CVS checkout -r jglobus-jgss jglobus
+   
+(see http://www-unix.globus.org/cog/java/2.0/main.html)
+
+
+Building:
+=========
+(This assumes CoG cvs checkout located at /usr/java/cog-2.0)
+
+1) Change to the Cog directory
+
+[localhost]$ cd /usr/java/cog-2.0/cog
+
+2) Modify classpath env variable to include necessary .jar files:
+	a. rt.jar 	(/usr/java/j2sdk1.4.2_05/jre/lib/rt.jar)
+	b. ldapsec.jar	(/usr/java/j2sdk1.4.2_05/jre/lib/ext/ldapsec.jar)
+	c. ant.jar 	(/usr/share/java/ant.jar)
+
+3) Build CoG (without jglobus src! it's not needed)
+
+[localhost]$  ant && ant dist && ant jar
+
+
+Setup:
+======
+
+Now that CoG is built make note the paths for the following files
+needed in 'mk.defs' file for GridFe:
+
+a. puretls.jar
+b. cryptix32.jar
+c. cryptix-asn1.jar
+d. cog-jglobus.jar
+
+NOTE: Easy solution to create 'lib' directory in /usr/java/cog-2.0
+and symlink the above files there before modifying 'mk.defs'

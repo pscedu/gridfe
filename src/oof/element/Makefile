@@ -1,5 +1,9 @@
 # $Id$
 
+SYSROOT = ../../..
+
+include ${SYSROOT}/lib/mk/defs.mk
+
 CLASSES += Break.class Code.class DivisionEnd.class Division.class
 CLASSES += DivisionStart.class Element.class ELEMENT.class Email.class
 CLASSES += Emphasis.class Endable.class END.class Fieldset.class
@@ -9,9 +13,6 @@ CLASSES += ListEnd.class ListItem.class List.class ListStart.class
 CLASSES += Paragraph.class Preformatted.class Span.class Startable.class
 CLASSES += START.class Strong.class Table.class TableCell.class
 CLASSES += TableEnd.class TableRow.class TableStart.class
-
-SYSROOT = ../../..
-
-include ${SYSROOT}/lib/mk/defs.mk
+TARGET = ${CLASSES}
 
 include ${MAINMK}

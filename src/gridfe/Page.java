@@ -101,6 +101,7 @@ public class Page
 		for (i = this.getMenus().iterator();
 		     i.hasNext() && (m = (NavigationMenu)i.next()) != null; ) {
 			t += " [ '" + m.getName() + "', ";
+/*
 			if (m.getItems() != null) {
 				t += "menu" + m.getName();
 				p = "var menu" + m.getName() + " = [";
@@ -116,6 +117,7 @@ public class Page
 			} else {
 				t += "null";
 			}
+*/
 			t += " ]";
 			if (i.hasNext())
 				t += ",";

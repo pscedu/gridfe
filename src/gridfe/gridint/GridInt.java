@@ -235,38 +235,7 @@ public class GridInt implements Serializable
 
 		for(int i = start; i < end; i++)
 		{
-
-			/*
-			** Determine if directory needs prepended to output.
-			** If std(out/err) string starts with a '/' or '~'
-			** then the user has explicitly stated the path.
-			** If directory does not start with '/' then it
-			** needs to default to "~".
-			*/
-//			if(file[i] != null)
-//			{
-//				dir[i] = (file[i].charAt(0) != '/') ? "~" : "";
-//				dir[i] += (job.dir != null) ? "/" + job.dir : "";
-//			}
-
-			/*
-			** Unfortunately GRAM assumes directories start from
-			** ~/ and if ~/dir is specified GRAM cannot expand the ~
-			**
-			** GASS on the other hand seems to assume a full path
-			** and support ~ expansion via the TILDE_EXPAND_ENABLE
-			** option.
-			**
-			** Therefore we have to manually adjust stdout, stderr
-			** and directory accordingly.
-			*/
-//			if(file[i] != null && file[i].charAt(0) != '/' &&
-//				file[i].charAt(0) != '~')
-//			{
-//				file[i] = dir[i] + "/" + file[i];
-//			}
 			file[i] = job.convert(file[i]);
-			System.out.println("File: "+file[i]);
 
 			/* Read stdout/stderr */
 			try
@@ -324,6 +293,7 @@ public class GridInt implements Serializable
 	}
 //-----------------------------------------------------------------------------
 
+	/* Get the raw JobList class */
 	public JobList getJobList()
 	{
 		return this.list;

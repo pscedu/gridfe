@@ -72,6 +72,7 @@ public class GridJob implements Serializable
 		this.gi.setHost(this.host);
 	}
 
+	/* Submit the job and save the id string */
 	public void run()
 		throws GramException, GSSException
 	{
@@ -79,6 +80,7 @@ public class GridJob implements Serializable
 		this.id = new String(this.gi.getIDAsString());
 	}
 
+	/* cancel the job and dispose of gramint instance */
 	public void cancel()
 		throws GramException, GSSException
 	{
@@ -146,7 +148,7 @@ public class GridJob implements Serializable
 		this.revive(gss);
 	}
 
-	/* This revive should be called after a deserialization */
+	/* This revive should be called ONLY after a deserialization */
 	public void revive(GSSCredential gss)
 		throws MalformedURLException
 	{

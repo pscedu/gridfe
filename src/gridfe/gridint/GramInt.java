@@ -44,9 +44,7 @@ public class GramInt
 		this.rsl = rsl;
 	}
 
-	/*
-	** globus-job-submit & globus-job-run
-	*/
+	/* globus-job-submit */
 	public void jobSubmit(String host, RSLElement rsl)
 		throws GramException, GSSException
 	{
@@ -71,6 +69,7 @@ public class GramInt
 		this.gramRequest(this.host, this.rsl);
 	}
 
+	/* submit a request to the GRAM server */
 	private void gramRequest(String host, RSLElement rsl)
 		throws GramException, GSSException
 	{
@@ -78,18 +77,17 @@ public class GramInt
 		Gram.ping(this.gss, host);
 
 		/* Create and process Job */
-		//this.job = new GramJob(this.gss, rsl.toString());
 		this.job = this.createJob(rsl);
 		this.job.request(host, this.batch);
 	}
 
-	/* Used to internally rebuild a Gram Job */
+	/* Used to internally to rebuild a Gram Job */
 	public void createJob()
 	{
 		this.job = new GramJob(this.gss, this.rsl.toString());
 	}
 
-	/* Used internally for gramRequest */
+	/* Used internally to build a gramRequest */
 	private GramJob createJob(RSLElement rsl)
 	{
 		this.job = new GramJob(this.gss, rsl.toString());
@@ -127,6 +125,7 @@ public class GramInt
 		return status;
 	}
 
+	/* Get the job status in human readable form */
 	public String getStatusAsString()
 		throws GSSException
 	{

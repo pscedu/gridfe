@@ -14,11 +14,15 @@ public class HTMLElement {
 		this.jasp  = jasp;
 		this.name  = name;
 		this.value = value;
+		this.attrs  = new LinkedList();
+		this.styles = new LinkedList();
 	}
 
 	public HTMLElement(JASP jasp, String name) {
 		this.jasp = jasp;
 		this.name = name;
+		this.attrs  = new LinkedList();
+		this.styles = new LinkedList();
 	}
 
 	public String build() {

@@ -145,7 +145,7 @@ public class Page
 				"Add Resource",			"/rls/addres"
 			});
 		this.addMenu("Node Availibility", "/nodes", null);
-
+return "test";
 		String r = this.root;
 
 		String s;

@@ -15,23 +15,29 @@ void usage(void);
 int
 main(int argc, char *argv[])
 {
-	krb5_inst kinst;
-	krb5_prefs kprefs;
 	void *h;
 	void (*init)(const char*, const char*);
+	char *username, *password;
 
-	if (argc != 2 && argc != 3)
+	if (argc == 1) {
+		username = getenv("USER");
+		password = NULL;
+	} else if (argc == 2) {
+		username = argv[1];
+		password = NULL;
+	} else if (argc == 3) {
+		username = argv[1];
+		password = argv[2];
+	} else
 		usage();
 
 	if ((h = dlopen(_PATH_MOD_FUM, RTLD_LAZY)) == NULL)
 		errx(1, "%s: %s", _PATH_MOD_FUM, dlerror());
 	if ((init = dlsym(h, "mf_main")) == NULL)
-		errx(1, "dlsym: %s: %s", "", dlerror());
+		errx(1, "dlsym: %s: %s", "mf_main", dlerror());
 
-	(*init)(argv[1], argv[2]);
-
+	(*init)(username, password);
 	dlclose(h);
-	
 	exit(0);
 }
 
@@ -39,6 +45,7 @@ void
 usage(void)
 {
 	extern char *__progname;
-	fprintf(stderr, "usage: %s user pw\n", __progname);
+
+	fprintf(stderr, "usage: %s username [password]\n", __progname);
 	exit(1);
 }

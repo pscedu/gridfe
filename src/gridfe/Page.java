@@ -55,7 +55,7 @@ public class Page
 	Page(HttpServletRequest req, HttpServletResponse res)
 	{
 		this.jasp = new JASP();
-		this.gi = new GridInt(0/* XXX: get kerb uid */);
+		//this.gi = new GridInt(0/* XXX: get kerb uid */);
 
 		try {
 			/* XXX: load oof prefs from resource. */

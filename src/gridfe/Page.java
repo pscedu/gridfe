@@ -266,7 +266,7 @@ public class Page
 		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
-		   +				this.oof.header(title);
+		   +				this.oof.header(title, new Integer(3));
 		return (s);
 	}
 

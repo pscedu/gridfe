@@ -1,9 +1,9 @@
 /* $Id$ */
 /*
-** file: GridInt.java
-** purpose: Wrapper around authentication to kerberos
-**		and grid computers...
-*/
+ * file: GridInt.java
+ * purpose: Wrapper around authentication to kerberos
+ *		and grid computers...
+ */
 
 package gridint.auth;
 
@@ -12,8 +12,8 @@ import javax.security.auth.login.*;
 import java.util.Set;
 
 /*
-** KerbInt - handle the Kerberos authentication
-*/
+ * KerbInt - handle the Kerberos authentication
+ */
 public class KerbAuth
 {
 	protected Subject subject;
@@ -26,9 +26,9 @@ public class KerbAuth
 	public KerbAuth() throws LoginException
 	{
 		/*
-		** Read the "krb5" configuration
-		** entry from the JAAS file...
-		*/
+		 * Read the "krb5" configuration
+		 * entry from the JAAS file...
+		 */
 		krb5 = new LoginContext("krb5");	
 	}
 

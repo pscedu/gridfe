@@ -27,12 +27,12 @@ public class X509Auth
 	}
 
 	/*
-	** Instantiate an X509 Certificate...
-	** certificate is obtained through
-	** the locally stored X509 cert which
-	** is usually in /tmp/x509up_u++++
-	** where ++++ is the user's UID
-	*/
+	 * Instantiate an X509 Certificate...
+	 * certificate is obtained through
+	 * the locally stored X509 cert which
+	 * is usually in /tmp/x509up_u++++
+	 * where ++++ is the user's UID
+	 */
 	public void instantiate() throws CertificateException, IOException
 	{
 		InputStream iStream;
@@ -54,8 +54,8 @@ public class X509Auth
 	}
 
 	/*
-	** X509Certificate Wrappers 
-	*/
+	 * X509Certificate Wrappers 
+	 */
 
 	public void checkValidity() throws CertificateException
 	{

@@ -62,6 +62,7 @@ static char* mf_dstrcpy(const char*);
 static void mf_dstrfree(char*);
 static char* mf_dstrslice(const char*, int, int);
 static char* mf_dstrcat(const char*, const char*);
+int do_kx509(int, char**);
 
 /*
 ** mod_fum main... should be called by Apache
@@ -266,9 +267,7 @@ static void mf_kx509(const char *tkt_cache)
 	char *argv[3];
 	int argc;
 	int err;
-	void *h;
 	int i;
-	int (*do_kx509)(int, char **);
 
 	/* setup kx509 as would be called from command line */
 	argv[0] = mf_dstrcpy("kx509");
@@ -276,16 +275,8 @@ static void mf_kx509(const char *tkt_cache)
 	argv[2] = mf_dstrcpy(tkt_cache);
 	argc = 3;
 
-	/* dynamic load of libkx509.so */
-	if((h = dlopen(LIBKX509_PATH, RTLD_LAZY)) == NULL)
-		mf_err(dlerror(),1, TODO);
-	
-	if((do_kx509 = dlsym(h, "do_kx509")) == NULL)
-		mf_err(dlerror(),1, TODO);
-
 	/* simply run kx509 */
-	err = (*do_kx509)(argc, argv);
-	dlclose(h);
+	err = do_kx509(argc, argv);
 
 	if(err != KX509_STATUS_GOOD) 
 		mf_err("kx509 failed", err, TODO);

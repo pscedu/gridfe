@@ -11,17 +11,25 @@ public class CertFile
 	** Certificates are normally stored in /tmp/x509_u_!!!
 	** where !!! is the userid
 	*/
-	private final String def = "/tmp/x509up_u";
-	private String file;
+	private final String xdef = "/tmp/x509up_u";
+	private final String kdef = "/tmp/krb5cc_";
+	private String xfile;
+	private String kfile;
 
 	public CertFile(Uid uid)
 	{
-		this.file = this.def + uid.intValue();
+		this.xfile = this.xdef + uid.intValue();
+		this.kfile = this.kdef + uid.intValue();
+	}
+	
+	public String getX509()
+	{
+		return this.xfile;
 	}
 
-	public String toString()
+	public String getKrbTkt()
 	{
-		return this.file;
+		return this.kfile;
 	}
 }
 

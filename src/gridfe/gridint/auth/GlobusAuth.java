@@ -24,7 +24,7 @@ public class GlobusAuth
 	public void createCredential()
 		throws GlobusCredentialException
 	{
-		this.gc = new GlobusCredential(this.file.toString());
+		this.gc = new GlobusCredential(this.file.getX509());
 	}
 
 	public GlobusCredential getCredential()

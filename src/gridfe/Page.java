@@ -20,15 +20,18 @@ class NavigationMenu
 		this.name = name;
 		this.url = url;
 		this.items = new LinkedList();
-		for (int i = 0; i < items.length; i++)
-			this.items.add(items[i]);
+		if (items != null)
+			for (int i = 0; i < items.length; i++)
+				this.items.add(items[i]);
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return this.name;
 	}
 
-	public String getURL() {
+	public String getURL()
+	{
 		return this.url;
 	}
 
@@ -46,7 +49,7 @@ public class Page
 	private int classCount;
 	private HttpServletRequest req;
 	private HttpServletResponse res;
-	private LinkedList nav;
+	private LinkedList menus;
 	private String root;
 
 	/* CSS class desc */
@@ -69,14 +72,14 @@ public class Page
 		}
 	}
 
-	private void registerNavigationMenu(String name, String url, Object[] sub)
+	private void addMenu(String name, String url, Object[] items)
 	{
-		this.nav.add(new NavigationMenu(name, url, sub));
+		this.menus.add(new NavigationMenu(name, url, items));
 	}
 
-	private LinkedList getNavigationMenus()
+	private LinkedList getMenus()
 	{
-		return this.nav;
+		return this.menus;
 	}
 
 	private String addScript(String code)
@@ -89,18 +92,18 @@ public class Page
 			+ "</script>";
 	}
 
-	public String buildMenuCode()
+	public String buildMenu()
 	{
 		String name, url, p, t = "var menus = [";
 		NavigationMenu m;
 		Iterator i, j;
-		for (i = this.getNavigationMenus().iterator();
+
+		for (i = this.getMenus().iterator();
 		     i.hasNext() && (m = (NavigationMenu)i.next()) != null; ) {
 			t += " [ '" + m.getName() + "', ";
 			if (m.getItems() != null) {
 				t += "menu" + m.getName();
-				p = "";
-				p += "var menu" + m.getName() + " = [";
+				p = "var menu" + m.getName() + " = [";
 				for (j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
@@ -123,25 +126,24 @@ public class Page
 
 	public String header(String title)
 	{
-/*
-		this.registerNavigationMenu("Main", "/", null);
-		this.registerNavigationMenu("Jobs", "/jobs",
+		this.addMenu("Main", "/", null);
+		this.addMenu("Jobs", "/jobs",
 			new Object[] {
 				"Submit", "/jobs/submit",
 				"Status", "/jobs/status",
 				"Output", "/jobs/output"
 			});
-		this.registerNavigationMenu("Certificate Management", "/certs", null);
-		this.registerNavigationMenu("Grid FTP", "/ftp", null);
-		this.registerNavigationMenu("Replica Locator", "/rls",
+		this.addMenu("Certificate Management", "/certs", null);
+		this.addMenu("Grid FTP", "/ftp", null);
+		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalogue",	"/rls/add-catalogue",
 				"Remove Catalogue",	"/rls/remove-catalogue",
 				"Search Catalogues",	"/rls/search",
 				"Add Resource",		"/rls/add-resource"
 			});
-		this.registerNavigationMenu("Node Availibility", "/nodes", null);
-*/
+		this.addMenu("Node Availibility", "/nodes", null);
+
 		String r = this.root;
 
 		String s = new String("");
@@ -155,7 +157,7 @@ public class Page
 		   +		this.addScript(
 		   			"include('" + r + "/lib/Browser.js');" +
 		   			"include('" + r + "/lib/util.js');")
-//		   +		this.addScript(this.buildMenuCode())
+		   +		this.addScript(this.buildMenu())
 		   +		this.addScript(
 		   			// This must be loaded last.
 		   			"include('" + r + "/lib/main.js');")

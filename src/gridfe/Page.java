@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
+import org.bouncycastle.util.encoders.*;
 
 class Menu {
 	private String name;
@@ -65,10 +66,17 @@ public class Page {
 		this.classCount = 1;
 
 		try {
+			Base64 enc = new Base64();
+
+			/*
+			 * Reparse authorization because getRemoteUser() doesn't
+			 * work.
+			 */
+			String combo = new String(
+			  enc.decode((String)req.getAttribute("authorization")));
+			String[] auth = combo.split(":");
+			String kuid = auth[0];
 			UserMap m = new UserMap();
-			String kuid = req.getRemoteUser();
-			if (kuid == null)
-				throw new Exception("Please supply your username and password");
 			String uid = m.kerberosToSystem(kuid);
 			this.gi = new GridInt(BasicServices.getUserID(uid));
 /*
@@ -78,7 +86,7 @@ public class Page {
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
-			this.error(e + ":" + e.getMessage());
+			this.error(e.getMessage());
 		}
 	}
 
@@ -291,10 +299,6 @@ public class Page {
 //			System.exit(1);
 		} catch (Exception e) {
 		}
-	}
-
-	public void error(Exception e) {
-		this.error(e.toString() + ": " + e.getMessage());
 	}
 
 	public OOF getOOF() {

@@ -5,61 +5,7 @@
 ** kx509, and kxlist -p ...
 */
 
-//#include"mod_fum.h"
-#include<stdio.h>
-#include<krb5.h>
-#include<time.h>
-
-/* Error Wrappers if running standalone */
-#define MF_STANDALONE 1
-#ifndef MF_STANDALONE
-#define mf_err(x,y,z) ap_log_error(APLOG_MARK,APLOG_EMERG,z,x ": Err %d", y)
-#define mf_warn(x,y,z) ap_log_error(APLOG_MARK,APLOG_WARN,z,x ": Err %d", y)
-#else
-#include<err.h>
-#define mf_err(x,y,z) errx(1,"%s: Err %d  on line %d in %s",x,y,__LINE__,__FILE__)
-#define mf_warn(x,y,z) warnx(1,"%s: Err %d on line %d in %s",x,y,__LINE__,__FILE__)
-#endif
-
-/* Kerberos 5 Instance */
-typedef struct
-{
-	krb5_context context;
-	krb5_ccache cache;
-	krb5_principal principal;
-	krb5_creds credentials;
-
-	/* XXX this might not be needed */
-	char *name;
-	
-}krb5_inst, *krb5_inst_ptr;
-
-/* Kerberos 5 Prefences */
-typedef struct
-{
-	/*
-	** XXX only implementing what
-	** we currently need... add support
-	** for more krb5 options later
-	*/
-	krb5_deltat lifetime;
-	krb5_deltat starttime;
-	//krb5_deltat remaintime;
-	int forwardable;
-	int proxiable;
-	//char *name;
-	char *sname;
-	char *pname;
-	char *password;
-	
-}krb5_prefs, *krb5_prefs_ptr;
-
-/* Prototypes */
-void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs);
-void mf_kinit_set_uap(krb5_prefs_ptr kprefs, char *principal, char *password);
-void mf_kinit_set_defaults(krb5_prefs_ptr kprefs);
-void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs);
-void mf_kinit_cleanup(krb5_inst_ptr k5);
+#include"mod_fum.h"
 
 /* Standalone Test */
 #ifdef MF_STANDALONE
@@ -87,7 +33,6 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err;
 	krb5_get_init_creds_opt opt;
-	//krb5_keytab keytab = 0;
 
 	mf_kinit_setup(k5, kprefs);
 
@@ -100,13 +45,7 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 	krb5_get_init_creds_opt_set_tkt_life(&opt, kprefs->lifetime);
 	krb5_get_init_creds_opt_set_address_list(&opt, NULL);
 
-	/* Get the initial credentials */
-	/* this credentials already stored in keytab...
-	err = krb5_get_init_creds_keytab(k5->context, &k5->credentials,
-					k5->principal, keytab,
-					kprefs->starttime,
-					kprefs->sname, &opt);
-	*/
+	/* Create credentials from give password, or prompt for password */
 	err = krb5_get_init_creds_password(k5->context, &k5->credentials,
 						k5->principal, kprefs->password,
 						krb5_prompter_posix, NULL, 0,
@@ -137,11 +76,9 @@ void mf_kinit_set_uap(krb5_prefs_ptr kprefs, char *principal, char *password)
 
 void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 {
-	kprefs->proxiable = 1;
-	kprefs->forwardable = 0;
-
-	/* 8 hrs. default */
-	kprefs->lifetime = 28800;
+	kprefs->proxiable = kProxiable;
+	kprefs->forwardable = kForwardable;
+	kprefs->lifetime = kLifetime;
 }
 
 /*
@@ -175,7 +112,6 @@ void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 	if(err)
 		mf_err("create principal failed", err, TODO);
 	
-	/* XXX Not sure if this is needed or not.. we will see */
 	/*
 	** Take the principal name we were given and parse it
 	** into the appropriate form for authentication protocols
@@ -183,9 +119,6 @@ void mf_kinit_setup(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 	err = krb5_parse_name(k5->context, kprefs->pname, &k5->principal);
 	if(err)
 		mf_err("parse_name failed", err, TODO);
-	err = krb5_unparse_name(k5->context, k5->principal, &k5->name);
-	if(err)
-		mf_err("unparse_name failed", err, TODO);
 }
 
 /*
@@ -195,8 +128,6 @@ void mf_kinit_cleanup(krb5_inst_ptr k5)
 {
 	if(&k5->credentials)
 		krb5_free_cred_contents(k5->context, &k5->credentials);
-	if(k5->name)
-		krb5_free_unparsed_name(k5->context, k5->name);
 	if(k5->principal)
 		krb5_free_principal(k5->context, k5->principal);
 	if(k5->cache)

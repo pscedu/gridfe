@@ -17,9 +17,7 @@ public class suite
 {
 	public static void main(String[] args) throws Exception
 	{
-		/* GridInt Test Suite */
 		GridInt gi = new GridInt(BasicServices.getUserID());
-		//GridInt gi = new GridInt(6342);
 		gi.auth();
 
 		CertInfo ci;
@@ -130,21 +128,19 @@ public class suite
 		in.close();
 
 		/* Monitor job status */
-		do
-		{
+		do {
 			System.out.print("J1: "+gi.getJob("J1").getStatus());
 			System.out.println(" : "+gi.getJob(0).getStatusAsString());
 			System.out.print("J2: "+gi.getJob("J2").getStatus());
 			System.out.println(" : "+gi.getJob(1).getStatusAsString());
 			Thread.sleep(600);
-
-		}while(gi.getJob(0).getStatus() != -1 || gi.getJob(1).getStatus() != -1);
+		} while (gi.getJob(0).getStatus() != -1 ||
+		    gi.getJob(1).getStatus() != -1);
 
 		System.out.print("J1: "+gi.getJob("J1").getStatus());
 		System.out.println(" : "+gi.getJob(0).getStatusAsString());
 		System.out.print("J2: "+gi.getJob("J2").getStatus());
 		System.out.println(" : "+gi.getJob(1).getStatusAsString());
-
 
 		/* Use a GassInt to grab job output */
 
@@ -156,13 +152,11 @@ public class suite
 		/* Data Retrieval (Read a few chunks, then the rest */
 		String[] data = {"", ""};
 		String[] file = {j3.stdout, j3.stderr};
-		for(int i = 0; i < 2; i++)
-		{
+		for (int i = 0; i < 2; i++) {
 			int tlen = 32;
 			int toff = 0;
 
-			try
-			{
+			try {
 				/* Start with port range or specific port */
 				gi.startRetrieve(j3, file[i], 28000, 28255);
 //				gi.startRetrieve(j3, file[i], 28001);
@@ -174,9 +168,7 @@ public class suite
                         	data[i] += gi.retrieve(0, toff);
 				
 				gi.stopRetrieve();
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				data[i] += e.getMessage();
 				gi.stopRetrieve();
 			}
@@ -187,8 +179,7 @@ public class suite
 
 		/* Get the job list and len */
 		JobList jl = gi.getJobList();
-		for(int i = 0; i < jl.size(); i++)
-		{
+		for (int i = 0; i < jl.size(); i++) {
 			GridJob job = jl.get(i);
 			System.out.print("Name: "+job.getName());
 			System.out.print("\tStatus: "+job.getStatusAsString());
@@ -207,12 +198,19 @@ public class suite
 			System.out.println("Shutdown failed");
 */
 
-		/*
-		** XXX Wow! this is the only way i can get the test suite to terminate
-		** when using the GassInt code... seems like there is some kind of
-		** thread still running that needs terminated!
-		*/
 		System.out.println("\n");
+
+		UserMap m = new UserMap();
+		String id = "yanovich";
+
+		System.out.println("Kerberos ID: " + id);
+		System.out.println("System UID: " + m.kerberosToSystem(id));
+
+		/*
+		 * XXX this seems like the only way the test suite will terminate
+		 * when using the GassInt code.  Seems like there is some kind of
+		 * thread still running that needs terminated.
+		 */
 		System.exit(0);
 		return;
 	}

@@ -10,7 +10,7 @@ public class logout {
 		GridInt gi = page.getGridInt();
 
 		gi.auth();
-		gi.logout();
+		//gi.logout();
 
 		s =	page.header("Logout") +
 			oof.p("You have successfully logged out.") +

@@ -128,6 +128,8 @@ public class Page
 
 	public String header(String title)
 	{
+return "test";
+/*
 		this.addMenu("Main", "/", null);
 		this.addMenu("Jobs", "/jobs",
 			new Object[] {
@@ -145,8 +147,8 @@ public class Page
 				"Add Resource",			"/rls/addres"
 			});
 		this.addMenu("Node Availibility", "/nodes", null);
-return "test";
-/*		String r = this.root;
+
+		String r = this.root;
 
 		String s;
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"

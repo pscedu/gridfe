@@ -1,16 +1,20 @@
 /* $Id$ */
+
 import jasp.*;
 import oof.*;
+import javax.servlet.http.*;
 
 public class Page {
 	private OOF  oof;
 	private JASP jasp;
 	private int classCount;
+	private HttpServletRequest req;
+	private HttpServletResponse res;
 
 	/* CSS class desc */
 	final static Object CCDESC = (Object)"desc";
 
-	Page() {
+	Page(HttpServletRequest req, HttpServletResponse res) {
 		/* XXX: load jasp prefs from resource. */
 		this.jasp = new JASP();
 
@@ -21,6 +25,8 @@ public class Page {
 		}
 		
 		this.classCount = 1;
+		this.req = req;
+		this.res = res;
 	}
 
 	public String header(String title) {

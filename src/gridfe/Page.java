@@ -62,6 +62,7 @@ public class Page
 		this.res = res;
 		this.root = "/gridfe";
 		this.jasp = new JASP();
+		this.menus = new LinkedList();
 
 		try {
 			// this.gi = new GridInt(0/* XXX: get kerb uid */);

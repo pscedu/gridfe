@@ -206,6 +206,7 @@ mod_fum_main(const char *principal, const char *password)
 	if ((err = mf_user_id_from_principal(principal, &uid)) != 0)
 		return (err);
 	if ((tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid)) == NULL) {
+		free(uid);
 		mf_log("tkt_cache is NULL");
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	}
@@ -329,23 +330,21 @@ mf_kxlist_setup(struct krb5_inst *ki)
 
 	/* The primary principal will be for the client */
 	if ((err = krb5_cc_get_principal(ki->ki_ctx, ki->ki_cache,
-	    &screds.client)) != KRB5KDC_ERR_NONE) {
+	    &screds.client)) != 0) {
 		mf_log("get client principal failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
 	/* Now obtain one for the server */
 	if ((err = krb5_sname_to_principal(ki->ki_ctx, KX509_HOSTNAME,
-	     KX509_SERVNAME, KRB5_NT_UNKNOWN, &screds.server)) !=
-	    KRB5KDC_ERR_NONE) {
+	     KX509_SERVNAME, KRB5_NT_UNKNOWN, &screds.server)) != 0) {
 		mf_log("get server principal failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
 
 	/* Retrieve the kx509 credentials, search by service name only */
 	if ((err = krb5_cc_retrieve_cred(ki->ki_ctx, ki->ki_cache,
-	     KRB5_TC_MATCH_SRV_NAMEONLY, &screds, &ki->ki_cred)) !=
-	    KRB5KDC_ERR_NONE) {
+	     KRB5_TC_MATCH_SRV_NAMEONLY, &screds, &ki->ki_cred)) != 0) {
 		mf_log("unable to retrieve kx509 credential (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -452,10 +451,9 @@ mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 	krb5_get_init_creds_opt_set_address_list(&opt, NULL);
 
 	/* Create credentials from given password */
-	err = krb5_get_init_creds_password(ki->ki_ctx, &ki->ki_cred,
-	    ki->ki_prin, (char *)(kp->kp_pw), krb5_prompter_posix,
-	    NULL, 0, NULL, &opt);
-	if (err != KRB5KDC_ERR_NONE) {
+	if ((err = krb5_get_init_creds_password(ki->ki_ctx, &ki->ki_cred,
+	     ki->ki_prin, (char *)(kp->kp_pw), krb5_prompter_posix,
+	     NULL, 0, NULL, &opt)) != 0) {
 		mf_log("get initial credentials failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -463,7 +461,7 @@ mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 
 	/* Initialize the cache file */
 	if ((err = krb5_cc_initialize(ki->ki_ctx, ki->ki_cache,
-	     ki->ki_prin)) != KRB5KDC_ERR_NONE) {
+	     ki->ki_prin)) != 0) {
 		/*
 		 * In testing, this is thrown with the error -1765328188
 		 * when there are already credentials created and mod_fum
@@ -475,7 +473,7 @@ mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 
 	/* Store the credential */
 	if ((err = krb5_cc_store_cred(ki->ki_ctx, ki->ki_cache,
-	     &ki->ki_cred)) != KRB5KDC_ERR_NONE) {
+	     &ki->ki_cred)) != 0) {
 		mf_log("store credentials failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -494,7 +492,7 @@ mf_krb5_init(struct krb5_inst *ki, const char *tkt_cache)
 	ki->ki_init = 0;
 
 	/* Initialize application context */
-	if ((err = krb5_init_context(&ki->ki_ctx)) != KRB5KDC_ERR_NONE) {
+	if ((err = krb5_init_context(&ki->ki_ctx)) != 0) {
 		mf_log("krb5_init_context failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -505,7 +503,7 @@ mf_krb5_init(struct krb5_inst *ki, const char *tkt_cache)
 	 */
 	/* err = krb5_cc_default(ki->ki_ctx, &ki->cache); */
 	if ((err = krb5_cc_resolve(ki->ki_ctx, tkt_cache,
-	     &ki->ki_cache)) != KRB5KDC_ERR_NONE) {
+	     &ki->ki_cache)) != 0) {
 		mf_log("default cache failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -533,7 +531,7 @@ mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 	 * Generate a full principal name to be used for authentication.
 	 */
 	if ((err = krb5_sname_to_principal(ki->ki_ctx, NULL, NULL,
-	     KRB5_NT_SRV_HST, &ki->ki_prin)) != KRB5KDC_ERR_NONE) {
+	     KRB5_NT_SRV_HST, &ki->ki_prin)) != 0) {
 		mf_log("create principal failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -543,7 +541,7 @@ mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 	 * appropriate form for authentication protocols.
 	 */
 	if ((err = krb5_parse_name(ki->ki_ctx, kp->kp_prin,
-	     &ki->ki_prin)) != KRB5KDC_ERR_NONE) {
+	     &ki->ki_prin)) != 0) {
 		mf_log("parse_name failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
 	}
@@ -676,8 +674,7 @@ mf_valid_user(const char *principal, const char *password)
 	 */
 	if ((err = krb5_get_init_creds_password(ki.ki_ctx,
 	     &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
-	     krb5_prompter_posix, NULL, 0, NULL, &opt)) !=
-	    KRB5KDC_ERR_NONE)
+	     krb5_prompter_posix, NULL, 0, NULL, &opt)) == 0)
 		ki.ki_init = 1;
 	else
 		mf_log("bad authentication (%d)", err);

@@ -1,4 +1,4 @@
-/* $ID$ */
+/* $Id$ */
 /*
 ** GridJob - Handles creating and maintaining of
 ** a grid job and the gram internals

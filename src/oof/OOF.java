@@ -11,9 +11,3 @@ public class OOF {
 		this.jasp = j;
 	}
 };
-
-public class OOFException extends Exception {
-};
-
-public class OOFToStringException extends OOFException {
-};

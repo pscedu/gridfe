@@ -17,6 +17,7 @@ public class GridJob extends RSLElement implements Serializable
 	public GridJob(String host)
 	{
 		this.host = new String(host);
+		this.id = new String("No job submitted");
 	}
 
 	public void setHost(String host)
@@ -70,9 +71,10 @@ public class GridJob extends RSLElement implements Serializable
 		return this.gi.getStatusAsString();
 	}
 
+	/* Id is saved when job is submitted */
 	public String getIDAsString()
 	{
-		return this.gi.getIDAsString();
+		return this.id;
 	}
 
 	/*

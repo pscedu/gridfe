@@ -133,8 +133,8 @@ public class GridInt implements Serializable
 		 * above us provide an error message.
 		 */
 		data = new String[OI_MAX];
-		data[OI_STDOUT] = "Error: standard output not specified.";
-		data[OI_STDERR] = "Error: standard error not specified.";
+		data[OI_STDOUT] = "Error: standard output improperly specified.";
+		data[OI_STDERR] = "Error: standard error improperly specified.";
 
 		remote = job.remote();
 
@@ -243,11 +243,11 @@ public class GridInt implements Serializable
 			** If directory does not start with '/' then it
 			** needs to default to "~".
 			*/
-			if(file[i] != null)
-			{
-				dir[i] = (file[i].charAt(0) != '/') ? "~" : "";
-				dir[i] += (job.dir != null) ? "/" + job.dir : "";
-			}
+//			if(file[i] != null)
+//			{
+//				dir[i] = (file[i].charAt(0) != '/') ? "~" : "";
+//				dir[i] += (job.dir != null) ? "/" + job.dir : "";
+//			}
 
 			/*
 			** Unfortunately GRAM assumes directories start from
@@ -260,11 +260,13 @@ public class GridInt implements Serializable
 			** Therefore we have to manually adjust stdout, stderr
 			** and directory accordingly.
 			*/
-			if(file[i] != null && file[i].charAt(0) != '/' &&
-				file[i].charAt(0) != '~')
-			{
-				file[i] = dir[i] + "/" + file[i];
-			}
+//			if(file[i] != null && file[i].charAt(0) != '/' &&
+//				file[i].charAt(0) != '~')
+//			{
+//				file[i] = dir[i] + "/" + file[i];
+//			}
+			file[i] = job.convert(file[i]);
+			System.out.println("File: "+file[i]);
 
 			/* Read stdout/stderr */
 			try
@@ -295,6 +297,7 @@ public class GridInt implements Serializable
 		return this.list.get(name);
 	}
 
+//---This is most likely not needed anymore-------------------------------------
 	/* Get the data from the job list for html output */
 	public String[][] getJobListString()
 		throws GSSException
@@ -319,6 +322,7 @@ public class GridInt implements Serializable
 
 		return jobs;
 	}
+//-----------------------------------------------------------------------------
 
 	public JobList getJobList()
 	{

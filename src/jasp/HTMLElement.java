@@ -3,14 +3,16 @@ package jasp;
 
 import java.util.*;
 
-public class HTMLElement {
+public class HTMLElement
+{
 	private JASP jasp;
 	private String name;
 	private String value;
 	private List attrs;
 	private List styles;
 
-	public HTMLElement(JASP jasp, String name, String value) {
+	public HTMLElement(JASP jasp, String name, String value)
+	{
 		this.jasp  = jasp;
 		this.name  = name;
 		this.value = value;
@@ -18,14 +20,16 @@ public class HTMLElement {
 		this.styles = new LinkedList();
 	}
 
-	public HTMLElement(JASP jasp, String name) {
+	public HTMLElement(JASP jasp, String name)
+	{
 		this.jasp = jasp;
 		this.name = name;
 		this.attrs  = new LinkedList();
 		this.styles = new LinkedList();
 	}
 
-	public String build() {
+	public String build()
+	{
 		String s;
 		Attribute attr;
 		Iterator i;
@@ -57,29 +61,44 @@ public class HTMLElement {
 		return s;
 	}
 
-	public void addAttribute(String name, String value) {
+	public void addAttribute(String name, String value)
+	{
 		this.attrs.add(new Attribute(name, value));
 	}
 
-	public void addStyle(String name, String value) {
+	public void addStyle(String name, String value)
+	{
 		this.styles.add(new Attribute(name, value));
 	}
 
-	public void setValue(String s) {
+	public void setValue(String s)
+	{
 		this.value = s;
 	}
 
-	public void appendValue(String s) {
+	public void appendValue(String s)
+	{
 		this.value += s;
 	}
 }
 
 class Attribute {
-	public String name;
-	public String value;
+	private String name;
+	private String value;
 
-	public Attribute(String name, String value) {
+	public Attribute(String name, String value)
+	{
 		this.name  = name;
 		this.value = value;
+	}
+
+	public String getName()
+	{
+		return this.name;
+	}
+
+	public String getValue()
+	{
+		return this.value;
 	}
 }

@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class ListStart extends START {
+public class ListStart extends START implements Startable {
 	public Object type;
 	public ListStart(OOF oof, Object[] attrs) throws OOFBadElementFormException {
 		super(oof, attrs);

@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class TableEnd extends END {
+public class TableEnd extends END implements Endable {
 	public TableEnd(OOF oof) throws OOFBadElementFormException {
 		super(oof);
 	}

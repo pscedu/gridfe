@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class Paragraph extends ELEMENT {
+public class Paragraph extends ELEMENT implements Startable, Endable {
 	public Paragraph(OOF oof, Object[] attrs, Object[] os) throws OOFBadElementFormException {
 		super(oof, attrs, os);
 	}

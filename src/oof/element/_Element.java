@@ -5,7 +5,7 @@ import java.util.*;
 import oof.*;
 import oof.filter.*;
 
-public abstract class ELEMENT {
+public abstract class ELEMENT implements Startable, Endable {
 	public LinkedList attrs;
 	public LinkedList children;
 	public OOF oof;
@@ -53,5 +53,16 @@ public abstract class ELEMENT {
 			if (((String)e).equals(key))
 				return (String)i.next();
 		return null;
+	}
+
+	public String getValue() {
+		String v = "";
+		for (Iterator i = this.children.iterator(); i.hasNext(); )
+			v += i.next().toString();
+		return v;
+	}
+
+	public LinkedList getAttributes() {
+		return this.attrs;
 	}
 };

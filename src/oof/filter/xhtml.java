@@ -12,31 +12,23 @@ public class xhtml extends FILTER {
 	}
 
 	private String build(String name, ELEMENT e) {
-		String t = "";
+		String t = this.build(name, (Startable)e);
+		String v = e.getValue();
 
-		t += "<" + name;
-		for (Iterator i = e.attrs.iterator(); i.hasNext(); ) {
-			t += " " + i.next().toString() + "=\"" +
-			     i.next().toString() + "\"";
-		}
-
-		String v = "";
-		for (Iterator i = e.children.iterator(); i.hasNext(); )
-			v += i.next().toString();
-
-		if (v.equals("") && !name.equals("div"))
-			t += " />";
-		else
-			t += ">" + v + "</" + name + ">";
+		if (v.equals("") && !name.equals("div") && !name.equals("a")) {
+			/* Strip completed start tag. */
+			t = t.substr(0, t.length() - 2) + " />";
+		} else
+			t += v + this.build(name, (Endable)e);
 
 		return t;
 	}
 
-	private String build(String name, START s) {
+	private String build(String name, Startable s) {
 		String t = "";
 
 		t += "<" + name;
-		for (Iterator i = s.attrs.iterator(); i.hasNext(); ) {
+		for (Iterator i = s.getAttributes.iterator(); i.hasNext(); ) {
 			t += " " + i.next().toString() + "=\"" +
 			     i.next().toString() + "\"";
 		}
@@ -44,7 +36,7 @@ public class xhtml extends FILTER {
 		return t;
 	}
 
-	private String build(String name, END e) {
+	private String build(String name, Endable e) {
 		return "</" + name + ">";
 	}
 
@@ -157,22 +149,22 @@ public class xhtml extends FILTER {
 			tag = "ol";
 		else
 			tag = "ul";
-		return this.build(tag, (END)e);
+		return this.build(tag, (Endable)e);
 	}
 
 	public String build(FormStart e) {
-		return this.build("form", (START)e);
+		return this.build("form", (Startable)e);
 	}
 
 	public String build(FormEnd e) {
-		return this.build("form", (END)e);
+		return this.build("form", (Endable)e);
 	}
 
 	public String build(TableStart e) {
-		return this.build("table", (START)e);
+		return this.build("table", (Startable)e);
 	}
 
 	public String build(TableEnd e) {
-		return this.build("table", (END)e);
+		return this.build("table", (Endable)e);
 	}
 }

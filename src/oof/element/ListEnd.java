@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class ListEnd extends END {
+public class ListEnd extends END implements Endable {
 	public Object type;
 	public ListEnd(OOF oof, Object[] attrs) throws OOFBadElementFormException {
 		super(oof, attrs);

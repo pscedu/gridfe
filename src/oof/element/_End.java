@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public abstract class END extends ELEMENT {
+public abstract class END implements Endable {
 	public END(OOF oof) throws OOFBadElementFormException {
 		super(oof, new Object[] {}, new Object[] {});
 	}

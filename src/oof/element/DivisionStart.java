@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class DivisionStart extends START {
+public class DivisionStart extends START implements Startable {
 	public DivisionStart(OOF oof, Object[] attrs) throws OOFBadElementFormException {
 		super(oof, attrs);
 	}

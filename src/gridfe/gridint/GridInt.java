@@ -161,7 +161,15 @@ public class GridInt implements Serializable
 					host, port);
 
 		/* Start the Gass Server */
-		this.gass.start();
+		//this.gass.start();
+		try
+		{
+			this.gass.start_remote();
+		}
+		catch(Exception e)
+		{
+			throw new IOException("start_remote() failed.");
+		}
 	}
 
 	/* Setup file retrieval */

@@ -77,8 +77,7 @@ public class GridJob extends RSLElement implements Serializable
 
 		/* XXX - Check for host to be localhost */
 //		if(this.host.equals(BasicServices.getLocalhost()))
-//		if(this.host.equalsIgnoreCase("gridinfo.psc.edu"))
-		if(!this.host.equalsIgnoreCase("mugatu.psc.edu"))
+		if(this.host.equalsIgnoreCase("gridinfo.psc.edu"))
 		{
 			/*
 			** If the job is remote, the output

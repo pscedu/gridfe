@@ -161,8 +161,8 @@ public class suite
 			int tlen = 32;
 			int toff = 0;
 
-			try
-			{
+//			try
+//			{
 				gi.startRetrieve(j3, file[i]);
 
 				data[i] += gi.retrieve(tlen, toff);
@@ -172,11 +172,11 @@ public class suite
                         	data[i] += gi.retrieve(0, toff);
 				
 				gi.stopRetrieve();
-			}
-			catch(Exception e)
-			{
-				data[i] += e.getMessage();
-			}
+//			}
+//			catch(Exception e)
+//			{
+//				data[i] += e.getMessage();
+//			}
 		}
 
 		System.out.println("stderr: "+data[1]);

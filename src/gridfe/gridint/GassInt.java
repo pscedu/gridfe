@@ -49,25 +49,36 @@ public class GassInt extends RemoteGassServer
 		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
 */
 		this.setOptions(this.options);
-		this.start(host);
+		this.start(this.host);
 	}
 
 	/* Manually remote start a server - this fails for some reason though, more FUBAR! */
-/*
 	public void start_remote()
 		throws GramException, GSSException
 	{
-		GridJob j = new GridJob("intel2.psc.edu");
+//		GridJob j = new GridJob("intel2.psc.edu");
+		GridJob j = new GridJob(this.host);
+/*
 		j.setRSL(new String[] {"executable", "stdout", "stderr"},
 		new String[] {"$GLOBUS_LOCATION/bin/globus-gass-server",
 		"/tmp/gram.stdout", "/tmp/gram.stderr"},
 		new String("arguments"),
 		//new String[] {"-p", Integer.toString(this.port),"-c", "-r", "&"});
 		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
+*/
+
+		System.out.println("Trying manual job submit");
+		j.setRSL(new String[] {"executable"},
+//		new String[] {"script.sh"});
+		new String[] {"test"});
+//		new String[] {"$GLOBUS_LOCATION/bin/globus-gass-server"},
+//		new String("arguments"),
+//		new String[] {"-p", Integer.toString(this.port),"-c", "-r", "&"});
+//		new String[] {"-p", Integer.toString(this.port),"-c", "-r"});
+
 		j.init(this.gss);
 		j.run();
 	}
-*/
 
 	/*
 	** Inherited Methods (needed from RemoteGassServer):

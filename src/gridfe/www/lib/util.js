@@ -30,13 +30,16 @@ function objGetTop(obj) {
 }
 
 function objSetTop(obj, pos) {
-	if (obj.style) {
+	if (obj.style)
 		obj.style.top = pos + 'px'
-	}
 }
 
 function objSetVisibility(obj, vis) {
-	if (obj.style) {
+	if (obj.style)
 		obj.style.visibility = vis
-	}
+}
+
+function objSetDisplay(obj, disp) {
+	if (obj.style)
+		obj.style.display = disp
 }

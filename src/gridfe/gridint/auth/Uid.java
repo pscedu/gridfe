@@ -1,3 +1,4 @@
+/* $Id$ */
 /*
 ** Data type wrapper over the uid
 */

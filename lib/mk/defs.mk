@@ -6,8 +6,7 @@ JAVA = `which java`
 JAVA_INSTALL_PATH = /usr/java/j2sdk1.4.2_04
 COG_INSTALL_PATH = /usr/java/cog-1.2
 SCLASSPATH =						\
-	${SYSROOT}/:					\
-	${SYSROOT}/lib:					\
+	${SYSROOT}/src:					\
 	/usr/share/java/servlet.jar:			\
 	${JAVA_INSTALL_PATH}/jre/lib/rt.jar:		\
 	${COG_INSTALL_PATH}/lib/cog-jglobus.jar:	\

@@ -4,7 +4,7 @@ SYSROOT = .
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-SUBDIRS += tools gridfe lib
+SUBDIRS += tools src
 
 include ${MAINMK}
 

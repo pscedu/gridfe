@@ -4,6 +4,6 @@ SYSROOT = ..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-SUBDIRS += jasp oof
+SUBDIRS += gridfe jasp oof
 
 include ${MAINMK}

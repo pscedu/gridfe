@@ -45,7 +45,6 @@ XXX Developement Notes:
 #include<stdlib.h>
 #include<krb5.h>
 #include<kx509.h>
-//#include<dlfcn.h>
 #include<err.h>
 #include<openssl/rsa.h>
 #include<openssl/x509v3.h>
@@ -65,16 +64,16 @@ XXX Developement Notes:
 #include"mod_fum.h"
 
 /* Prototypes */
-static void mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
+static int mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
 static void mf_kinit_cleanup(krb5_inst_ptr);
 static void mf_kinit_set_uap(krb5_prefs_ptr, const char*, const char*);
 static void mf_kinit_set_defaults(krb5_prefs_ptr);
-static void mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
+static int mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
 static int mf_user_id_from_principal(const char *principal, char **uid);
-static void mf_kx509(const char*);
-static void mf_kxlist(const char *);
-static void mf_kxlist_setup(krb5_inst_ptr);
-static void mf_kxlist_crypto(krb5_inst_ptr, char*);
+static int mf_kx509(const char*);
+static int mf_kxlist(const char *);
+static int mf_kxlist_setup(krb5_inst_ptr);
+static int mf_kxlist_crypto(krb5_inst_ptr, char*);
 static int mf_krb5_init(krb5_inst_ptr kinst, const char*);
 static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
@@ -124,7 +123,7 @@ void mod_fum_err(char *str, int err)
 int mod_fum_auth(request_rec *r)
 {
 	char *user;
-	int err = OK;
+	int err;
 	const char *pass = NULL;
 
 	/* Save request rec */
@@ -204,7 +203,7 @@ int mf_main(const char *principal, const char *password)
 	/* Read uid from /etc/passwd */
 	err = mf_user_id_from_principal(principal, &uid);
 
-	if(!err)
+	if(err == OK)
 	{
 		tkt_cache = mf_dstrcat(kKrb5DefaultFile, uid);
 
@@ -215,28 +214,42 @@ int mf_main(const char *principal, const char *password)
 
 			/* kinit - requires only principal/password */
 			err = mf_krb5_init(&kinst, tkt_cache);
-			if(!err)
-			{
-				mf_kinit_set_defaults(&kprefs);
-				mf_kinit_set_uap(&kprefs, principal, password);
-				mf_kinit_setup(&kinst, &kprefs);
+			if(err != OK)
+				goto RET;
+
+			mf_kinit_set_defaults(&kprefs);
+			mf_kinit_set_uap(&kprefs, principal, password);
+
+			err = mf_kinit_setup(&kinst, &kprefs);
+			if(err != OK)
+				goto RET;
 		
-				/* kinit -c /tmp/krb5cc_$UID */
-				mf_kinit(&kinst, &kprefs);
+			/* kinit -c /tmp/krb5cc_$UID */
+			err = mf_kinit(&kinst, &kprefs);
+			if(err != OK)
+				goto RET;
 		
-				mf_kinit_cleanup(&kinst);
-				mf_krb5_free(&kinst);
+			mf_kinit_cleanup(&kinst);
+			mf_krb5_free(&kinst);
 		
-				/* ----------- KX509 ----------- */
+			/* ----------- KX509 ----------- */
 			
-				/* kx509 - just call the kx509lib*/
-				mf_kx509(tkt_cache);
+			/* kx509 - just call the kx509lib*/
+			err = mf_kx509(tkt_cache);
+			if(err != OK)
+				goto RET;
 		
-				/* ----------- KXLIST ----------- */
+			/* ----------- KXLIST ----------- */
 		
-				/* kxlist -p */
-				mf_kxlist(tkt_cache);
-			}
+			/* kxlist -p */
+			err = mf_kxlist(tkt_cache);
+			if(err != OK)
+				goto RET;
+		}
+		else
+		{
+			mf_err("tkt_cache is Null", 1);
+			err = HTTP_INTERNAL_SERVER_ERROR;
 		}
 	}
 
@@ -247,11 +260,12 @@ int mf_main(const char *principal, const char *password)
 /*
 -------------------------------KXLIST------------------------------
 */
-static void mf_kxlist(const char *tkt_cache)
+static int mf_kxlist(const char *tkt_cache)
 {
 	krb5_inst kinst;
 	char *uid;
 	char *name;
+	int err;
 
 	/* 
 	** Parse tkt_cache name to get uid:
@@ -259,67 +273,103 @@ static void mf_kxlist(const char *tkt_cache)
 	** /tmp/krb5cc_UID
 	*/
 	uid = mf_get_uid_from_ticket_cache(tkt_cache);
-	
-	/* krb5 initial context setup */
-	mf_krb5_init(&kinst, tkt_cache);
-	
-	/* Obtain proper kx509 credentials */
-	mf_kxlist_setup(&kinst);
 
-	/* Perform Crypto & write Certficate */
-	name = mf_dstrcat(kX509DefaultFile, uid);
-	
-	mf_kxlist_crypto(&kinst, name);
+	if(uid)
+	{
+		/* krb5 initial context setup */
+		err = mf_krb5_init(&kinst, tkt_cache);
 
-	mf_krb5_free(&kinst);
+		if(err == OK)
+		{
+			/* Obtain proper kx509 credentials */
+			err = mf_kxlist_setup(&kinst);
+
+			if(err == OK)
+			{
+				/* Perform Crypto & write Certficate */
+				name = mf_dstrcat(kX509DefaultFile, uid);
+
+				if(!name)
+				{
+					err = HTTP_INTERNAL_SERVER_ERROR;
+					goto RET;
+				}
+
+				err = mf_kxlist_crypto(&kinst, name);
+				mf_krb5_free(&kinst);
+			}
+		}
+	}
+	else
+	{
+		err = HTTP_INTERNAL_SERVER_ERROR;
+		goto RET;
+	}
+
+	RET:
+	return err;
 }
 
 /*
 ** Perform crypto and write the X.509 Certificate
 */
-static void mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
+static int mf_kxlist_crypto(krb5_inst_ptr kinst, char *name)
 {
 	unsigned int klen;
 	unsigned int clen;
 	unsigned char *data;
 	FILE *file;
+	int err = OK;
 	/* Must be set! */
 	RSA *priv = NULL;
 	X509 *cert = NULL;
 
 	file = fopen(name, "w");
-	if(!file)
-		mf_err("mem error", 1);
+	if(file)
+	{
 
-	klen = kinst->credentials.ticket.length;
-	clen = kinst->credentials.second_ticket.length;
-
-	/* Decode the Certifcate (we want PEM format) */
-	data = kinst->credentials.second_ticket.data;
-	d2i_X509((X509**)(&cert), &data, clen);
-
-	/* Extract & decode the RSA Private Key from the certifcate */
-	data = kinst->credentials.ticket.data;
-	d2i_RSAPrivateKey(&priv, (const unsigned char**)(&data), klen);
-
-	if(!priv)
-		mf_err("d2i_RSAPrivateKey failed", 1);
-
-	/* write the certificate appropriately formated */
-	PEM_write_X509(file, cert);
-	PEM_write_RSAPrivateKey(file, priv, NULL, NULL, 0, NULL, NULL);
+		klen = kinst->credentials.ticket.length;
+		clen = kinst->credentials.second_ticket.length;
 	
-	fclose(file);
+		/* Decode the Certifcate (we want PEM format) */
+		data = kinst->credentials.second_ticket.data;
+		d2i_X509((X509**)(&cert), &data, clen);
 
-	/* Set proper permissions */
-	chmod(name, kX509FilePermissions);
+		/* Extract & decode the RSA Private Key from the certifcate */
+		data = kinst->credentials.ticket.data;
+		d2i_RSAPrivateKey(&priv, (const unsigned char**)(&data), klen);
+
+		if(priv)
+		{
+			/* write the certificate appropriately formated */
+			PEM_write_X509(file, cert);
+			PEM_write_RSAPrivateKey(file, priv, NULL, NULL, 0, NULL, NULL);
+			
+			fclose(file);
+		
+			/* Set proper permissions */
+			chmod(name, kX509FilePermissions);
+		}
+		else
+		{
+			mf_err("d2i_RSAPrivateKey failed", 1);
+			err = HTTP_INTERNAL_SERVER_ERROR;
+		}
+	}
+	else
+	{
+		mf_err("mem error", 1);
+		err = HTTP_INTERNAL_SERVER_ERROR;
+	}
+
+	return err;
 }
 
 
 /*
 ** Load the kx509 credentials
 */
-static void mf_kxlist_setup(krb5_inst_ptr kinst)
+static int mf_kxlist_setup(krb5_inst_ptr kinst)
 {
 	krb5_error_code err;
 	krb5_creds screds;
@@ -332,7 +382,10 @@ static void mf_kxlist_setup(krb5_inst_ptr kinst)
 					kinst->cache,
 					&screds.client);	
 	if(err)
+	{
 		mf_err("get client principal failed", err);
+		goto RET;
+	}
 	
 	/* Now obtain one for the server */
 	err = krb5_sname_to_principal(kinst->context,
@@ -341,7 +394,10 @@ static void mf_kxlist_setup(krb5_inst_ptr kinst)
 					KRB5_NT_UNKNOWN,
 					&screds.server);
 	if(err)
+	{
 		mf_err("get server principal failed", err);
+		goto RET;
+	}
 
 	/* Retrieve the kx509 credentials search by Service Name Only! */
 	err = krb5_cc_retrieve_cred(kinst->context,
@@ -350,10 +406,16 @@ static void mf_kxlist_setup(krb5_inst_ptr kinst)
 					&screds,
 					&kinst->credentials);
 	if(err)
+	{
 		mf_err("unable to retrieve kx509 credential", err);
+		goto RET;
+	}
 	
 	krb5_free_principal(kinst->context, screds.server);
 	krb5_free_principal(kinst->context, screds.client);
+
+	RET:
+	return KrbToApache(err);
 }
 
 /*
@@ -414,7 +476,6 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 
 	if(p)
 	{
-
 		/* read the passwd file */
 		pw = getpwnam(p);
 		
@@ -430,16 +491,16 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 		else
 		{
 			mf_err("User not in /etc/passwd", 1);
-			err = 1;
+			err = HTTP_UNAUTHORIZED;
 		}
 	}
 	else
 	{
 		mf_err("principal slice error", 1);
-		err = 1;
+		err = HTTP_INTERNAL_SERVER_ERROR;
 	}
 
-	return ModfumToApache(err);
+	return err;
 }
 
 
@@ -447,7 +508,7 @@ static int mf_user_id_from_principal(const char *principal, char **uid)
 -------------------------------KX509-------------------------------
 */
 
-static void mf_kx509(const char *tkt_cache)
+static int mf_kx509(const char *tkt_cache)
 {
 	char *argv[3];
 	int argc;
@@ -464,6 +525,8 @@ static void mf_kx509(const char *tkt_cache)
 
 	if(err != KX509_STATUS_GOOD) 
 		mf_err("kx509 failed", err);
+	
+	return Kx509ToApache(err);
 }
 
 
@@ -474,7 +537,7 @@ static void mf_kx509(const char *tkt_cache)
 /*
 ** Perform the functionality of kinit...
 */
-static void mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
+static int mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err;
 	krb5_get_init_creds_opt opt;
@@ -493,13 +556,19 @@ static void mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 		kinst->principal, (char*)(kprefs->password),
 		krb5_prompter_posix, NULL, 0, NULL, &opt);
 	if(err)
+	{
 		mf_err("get initial credentials failed", err);
+		goto RET;
+	}
 		
 
 	/* Initialize the cache file */
 	err = krb5_cc_initialize(kinst->context, kinst->cache, kinst->principal);
 	if(err)
+	{
 		mf_err("initialize cache failed", err);
+		goto RET;
+	}
 	
 	
 	/* Store the Credential */
@@ -507,6 +576,8 @@ static void mf_kinit(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	if(err)
 		mf_err("store credentials failed", err);
 
+	RET:
+	return KrbToApache(err);
 }
 
 /* Set the user (principal) and password */
@@ -564,7 +635,7 @@ static void mf_krb5_free(krb5_inst_ptr kinst)
 /*
 ** Kinit initial setup
 */
-static void mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
+static int mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err; 
 
@@ -575,7 +646,10 @@ static void mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	err = krb5_sname_to_principal(kinst->context,
 		NULL, NULL, KRB5_NT_SRV_HST, &kinst->principal);
 	if(err)
+	{
 		mf_err("create principal failed", err);
+		goto RET;
+	}
 	
 	/*
 	** Take the principal name we were given and parse it
@@ -584,6 +658,9 @@ static void mf_kinit_setup(krb5_inst_ptr kinst, krb5_prefs_ptr kprefs)
 	err = krb5_parse_name(kinst->context, kprefs->pname, &kinst->principal);
 	if(err)
 		mf_err("parse_name failed", err);
+	
+	RET:
+	return KrbToApache(err);
 }
 
 static void mf_kinit_cleanup(krb5_inst_ptr kinst)

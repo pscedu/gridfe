@@ -54,8 +54,6 @@ XXX Developement Notes:
 #include"http_main.h"
 #include"http_protocol.h"
 #include"http_request.h"
-//#include"apr_pools.h"
-//#include"apr_compat.h"
 #include"apr_strings.h"
 
 #include"mod_fum.h"
@@ -76,14 +74,17 @@ static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
 static char* mf_dstrslice(const char*, int, int);
 static char* mf_dstrcat(const char*, const char*);
-static void mod_fum_hooks(apr_pool_t *p);
 static request_rec* mf_request(request_rec *r);
 static apr_pool_t* mf_pool(apr_pool_t *p);
+static void mod_fum_hooks(apr_pool_t *p);
 int mod_fum_auth(request_rec *r);
 int do_kx509(int, char**);
 
+//DEBUG
+void mod_fum_err(char *str, int err);
 
-/* Apache (2.X only!) module record */
+
+/* Apache (2.X only!) module record, handlers, & hooks */
 module fum_module =
 {
 	STANDARD20_MODULE_STUFF,
@@ -95,13 +96,21 @@ module fum_module =
 	mod_fum_hooks,
 };
 
-
 /* Register hooks in Apache */
 static void mod_fum_hooks(apr_pool_t *p)
 {
-	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_MIDDLE);
+	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_FIRST);
+	//ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_MIDDLE);
 }
 
+//DEBUG
+void mod_fum_err(char *str, int err)
+{
+	FILE *fp;
+	fp = fopen("/tmp/rbudden-mod-fum", "a");
+	fprintf(fp, "%s : error %d\n", str, err);
+	fclose(fp);
+}
 
 /* Apache Authentication Hook */
 int mod_fum_auth(request_rec *r)
@@ -110,26 +119,52 @@ int mod_fum_auth(request_rec *r)
 	int err = OK;
 	const char *pass = NULL;
 
+	//DEBUG
+	mod_fum_err("\nentered mod_fum_auth", 1);
+
 //	auth_data_ptr data = (auth_data_ptr)
 //		ap_module_config(r->per_dir_coinfig, &fum_module);
 
 	/* Save request rec */
 	mf_save_pool(r->pool);
 	mf_save_request(r);
+	
+	//DEBUG
+	mod_fum_err("pool/request saved", 1);
 
-	/* Get user/pw */
-	user = r->user;
+	/*
+	** Get user/pass - NOTE: ap_get_basic_auth_pw()
+	** must be called first!!! otherwise r->user will
+	** be NULL!!
+	*/
 	err = ap_get_basic_auth_pw(r, &pass);
+	user = r->user;
+
+	//DEBUG
+	mod_fum_err("user/pass", 1);
+	mod_fum_err(user, 1);
+	mod_fum_err(pass, 1);
 
 	if(err != OK)
-		mf_err("error retrieving password", 1);
+		mf_err("error retrieving password", err);
 	
 	if(!user || !pass)
+	{
+		mf_err("err obtaining username/password NULL", 1);
 		return HTTP_UNAUTHORIZED;
+		
+		//DEBUG - DECLINED allows the request to go through to apache's passwd file
+		//return DECLINED;
+	}
 	
-
 	/* Create Certificate */
+	//DEBUG
+	mod_fum_err("create cert", 1);
+	return HTTP_UNAUTHORIZED;
+
 	mf_main(user, pass);
+
+	mod_fum_err("cert created", 1);
 	
 	// XXX HTTP_ACCEPTED or HTTP_CREATED???
 	return HTTP_ACCEPTED;

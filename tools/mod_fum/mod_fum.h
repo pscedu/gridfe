@@ -33,6 +33,8 @@
 #define kKX509ServiceName "kx509"
 #define kX509DefaultFile "/tmp/x509up_u"
 #define kKrb5DefaultFile "/tmp/krb5cc_"
+#define kCredentialFileName "krb5cc_"
+#define kCredentialPath "/tmp";
 #define kX509FilePermissions 0600
 
 typedef struct

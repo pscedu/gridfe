@@ -74,9 +74,9 @@ static void mf_kinit_cleanup(krb5_inst_ptr);
 static void mf_kinit_set_uap(krb5_prefs_ptr, const char*, const char*);
 static void mf_kinit_set_defaults(krb5_prefs_ptr);
 static int mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
-static int mf_user_id_from_principal(const char *principal, char **uid);
+static int mf_user_id_from_principal(const char*, char**);
 static int mf_kx509(const char*);
-static int mf_kxlist(const char *);
+static int mf_kxlist(const char*);
 static int mf_kxlist_setup(krb5_inst_ptr);
 static int mf_kxlist_crypto(krb5_inst_ptr, char*);
 static int mf_krb5_init(krb5_inst_ptr kinst, const char*);
@@ -84,12 +84,13 @@ static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
 static char* mf_dstrslice(const char*, int, int);
 static char* mf_dstrcat(const char*, const char*);
-static request_rec* mf_request(request_rec *r);
-static apr_pool_t* mf_pool(apr_pool_t *p);
-static void mod_fum_hooks(apr_pool_t *p);
-int mod_fum_auth(request_rec *r);
+static request_rec* mf_request(request_rec*);
+static apr_pool_t* mf_pool(apr_pool_t*);
+static void mod_fum_hooks(apr_pool_t*);
+static int mf_check_for_credentials(const char*);
+int mod_fum_auth(request_rec *);
 int do_kx509(int, char**);
-int mf_main(const char *principal, const char *password);
+int mf_main(const char*, const char*);
 
 /* Apache (2.X only!) module record, handlers, & hooks */
 module fum_module =
@@ -133,14 +134,42 @@ int mod_fum_auth(request_rec *r)
 
 	if(err == OK)
 	{
-		/* Create Certificate */
 		if(!user || !pass)
 		{
 			mf_err("err obtaining username/password NULL", 1);
 			err = HTTP_UNAUTHORIZED;
 		}
 		else
-			err = mf_main(user, pass);
+		{
+			/* Check if previous credentials exist */
+			if(mf_check_for_credentials(user))
+			{
+				/*
+				** If they exist, are they still valid
+				** and is the user/pass valid also!!
+				** (make sure a correct username and wrong
+				** password doesn't work!!!)
+				*/
+
+				// XXX
+				if(0)
+				{
+					if(0)
+					{
+
+					}
+				}
+
+
+				mf_err("cached credentials found!!", 1);
+			}
+			else
+			{
+				/* Otherwise Create Certificate */
+				err = mf_main(user, pass);
+				mf_err("new credentials created!!", 1);
+			}
+		}
 	}
 	else
 		mf_err("ap_get_basic_auth failed", err);
@@ -662,6 +691,65 @@ static void mf_kinit_cleanup(krb5_inst_ptr kinst)
 	if(kinst->context)
 		krb5_free_context(kinst->context);
 }
+
+
+
+
+/*
+** Check for previous credentials in /tmp
+*/
+static int mf_check_for_credentials(const char *principal)
+{
+	char *uid;
+	char *cert;
+	int found = 0;
+	int err;
+
+	/* Read uid from /etc/passwd */
+	err = mf_user_id_from_principal(principal, &uid);
+
+	if(err == OK)
+	{
+		/* Create cert name */
+		cert = mf_dstrcat(kCredentialFileName, uid);
+
+		if(cert)
+		{
+			DIR *dir;
+			struct dirent *d;
+
+			/* Does the file exist */
+			dir = opendir(kCredentialPath);
+
+			while(dir)
+			{
+				if((d = readdir(dir)) == NULL)
+					break;
+				if(strcmp(d->d_name, cert) == 0)
+				{
+					found = 1;
+					break;
+				}
+			}
+
+			closedir(dir);
+		}
+		else
+			mf_err("error creating cert string", 1);
+	}
+	else
+		mf_err("error finding uid", err);
+
+	return found;
+}
+
+
+
+
+
+/*
+-------------------------------DSTR-------------------------------
+*/
 
 /*
 ** dynamic strcat routine and malloc wrapper

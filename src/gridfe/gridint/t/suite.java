@@ -18,7 +18,7 @@ public class suite
 
 		/* GridInt Test Suite */
 		GridInt gi = new GridInt(BasicServices.getUserID());
-		gi.authenticate();
+		gi.auth();
 		System.out.print("Remaining Lifetime: ");
 		System.out.println(gi.getRemainingLifetime());
 //		System.out.println(gi.getGlobusAuth().getCredential().getPrivateKey());

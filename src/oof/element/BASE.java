@@ -1,7 +1,7 @@
 /* $Id$ */
 package oof.element;
 
-class BASE {
+public class BASE {
 	private Container[] children;
 	private int len, pos;
 	private String name;
@@ -65,4 +65,10 @@ class BASE {
 	public String build() {
 		return 
 	}
+};
+
+protected class Container {
+	public int type;
+	public String s;
+	public Element e;
 };

@@ -1,7 +1,10 @@
 /* $Id$ */
 
-import gridint.*;
+package gridfe;
+
+import gridfe.gridint.*;
 import jasp.*;
+import java.io.*;
 import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
@@ -47,7 +50,7 @@ public class Page
 	private String root;
 
 	/* CSS class desc */
-	final static Object CCDESC = (Object)"desc";
+	public final static Object CCDESC = (Object)"desc";
 
 	Page(HttpServletRequest req, HttpServletResponse res)
 	{

@@ -22,7 +22,10 @@ all: ${TARGET}
 .c.o:
 	${CC} ${CFLAGS} -c $<
 
-depend:
+jdep-prog:
+	(cd ${SYSROOT}/tools/jdep && make)
+
+depend: jdep-prog
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -40,6 +43,7 @@ depend:
 		env CLASSPATH=${CLASSPATH} ${JDEP} $${i%class}java >> .depend	\
 			|| exit 1;						\
 	done
+	echo "jdep-prog: ${JDEP}" >> .depend
 ifdef OBJS
 	mkdep ${OBJS:.o=.c}
 endif
@@ -61,8 +65,8 @@ test: all ${TESTS}
 			echo "./$$i";						\
 			env ${TESTENV} ./$$i;					\
 		else 								\
-			echo "${JAVA} ${JFLAGS} $$i";				\
-			${JAVA} ${JFLAGS} $$i || exit 1;			\
+			echo "${JAVA} ${JFLAGS} $${i%.class}";			\
+			${JAVA} ${JFLAGS} $${i%.class} || exit 1;			\
 		fi;								\
 	done
 

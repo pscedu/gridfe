@@ -6,6 +6,15 @@
 ** kx509, and kxlist -p ...
 */
 
+/*
+XXX When deployed:
+	1) change mf_err() for apache log
+	2) change mf_dstrcpy() for apache malloc
+	3) change mf_dstrfree() for apache free
+*/
+
+#include<stdio.h>
+#include<string.h>
 #include <krb5.h>
 #include <err.h>
 
@@ -13,9 +22,12 @@
 
 static void mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
 static void mf_kinit_cleanup(krb5_inst_ptr);
-static void mf_kinit_set_uap(krb5_prefs_ptr, const char *, const char *);
+static void mf_kinit_set_uap(krb5_prefs_ptr, const char*, const char*);
 static void mf_kinit_set_defaults(krb5_prefs_ptr);
 static void mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
+void mf_get_ticket_cache(krb5_inst_ptr , char **);
+static void mf_kx509(const char*);
+static char* mf_dstrcpy(const char*); 
 
 /*
 ** mod_fum main... should be called by Apache
@@ -25,19 +37,66 @@ int mf_main(const char *principal, const char *password)
 {
 	krb5_inst kinst;
 	krb5_prefs kprefs;
+	char *tkt_cache;
+	/*
+	const char *t;
+	char **argv;
+	int argc;
+	*/
 
 	/* kinit - requires only principal/password */
 	mf_kinit_set_defaults(&kprefs);
 	mf_kinit_set_uap(&kprefs, principal, password);
+	mf_kinit_setup(&kinst, &kprefs);
+
 	mf_kinit(&kinst, &kprefs);
 
-	/* XXX kx509 */
+	/* Save the tkt_cache name kinit_cleanup() */
+	mf_get_ticket_cache(&kinst, &tkt_cache);
+	printf("ticket cache: %s\n",tkt_cache);
+	
+	mf_kinit_cleanup(&kinst);
+
+
+	/* kx509 - just call the kx509lib*/
+	mf_kx509(tkt_cache);
 
 	/* XXX kxlist -p */
 	
 	/* XXX return err if auth failed */
+
+
+	if(tkt_cache != NULL)
+		free(tkt_cache);
+	
 	return 0;
 }
+
+/*
+-------------------------------KX509-------------------------------
+*/
+
+void mf_kx509(const char *tkt_cache)
+{
+	char *argv[3];
+	int argc;
+	int err;
+
+	/* setup kx509 as would be called from command line */
+	argv[0] = mf_dstrcpy("kx509");
+	argv[1] = mf_dstrcpy("-c");
+	argv[2] = mf_dstrcpy(tkt_cache);
+	argc = 3;
+
+//	if((err = do_kx509(argc, argv)))
+//		mf_err("kx509 failed", err, TODO);
+	
+}
+
+
+/*
+-------------------------------KINIT-------------------------------
+*/
 
 /*
 ** Perform the functionality of kinit...
@@ -46,8 +105,6 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 {
 	krb5_error_code err;
 	krb5_get_init_creds_opt opt;
-
-	mf_kinit_setup(k5, kprefs);
 
 	/* Set default credential options? */
 	krb5_get_init_creds_opt_init(&opt);
@@ -71,12 +128,12 @@ void mf_kinit(krb5_inst_ptr k5, krb5_prefs_ptr kprefs)
 	if(err)
 		mf_err("initialize cache failed", err, TODO);
 	
+	
 	/* Store the Credential */
 	err = krb5_cc_store_cred(k5->context, k5->cache, &k5->credentials);
 	if(err)
 		mf_err("store credentials failed", err, TODO);
-		
-	mf_kinit_cleanup(k5);
+
 }
 
 /* Set the user (principal) and password */
@@ -91,6 +148,28 @@ void mf_kinit_set_defaults(krb5_prefs_ptr kprefs)
 	kprefs->proxiable = kProxiable;
 	kprefs->forwardable = kForwardable;
 	kprefs->lifetime = kLifetime;
+}
+
+/*
+** Get the ticket cache location
+** NOTE: must be called with a valid krb5_inst!
+*/
+void mf_get_ticket_cache(krb5_inst_ptr kinst, char **tkt_cache)
+{
+	const char *t;
+	size_t len;
+
+	/* Save the tkt_cache name kinit_cleanup() */
+	t = krb5_cc_get_name(kinst->context, kinst->cache);
+	len = strlen(t) + 1;
+	*tkt_cache = malloc(len * sizeof(char));
+
+	if(*tkt_cache == NULL)
+		mf_err("malloc failed", 1, TODO);
+	
+	/* Null terminate manually, linux needs strlcpy! */
+	strncpy(*tkt_cache, t, len - 1);
+	(*tkt_cache)[len - 1] = '\0';
 }
 
 /*
@@ -143,4 +222,35 @@ static void mf_kinit_cleanup(krb5_inst_ptr k5)
 		krb5_cc_close(k5->context, k5->cache);
 	if(k5->context)
 		krb5_free_context(k5->context);
+}
+
+
+/* 
+** dynamic strcpy routine and malloc() wrapper
+*/
+char* mf_dstrcpy(const char *s)
+{
+	char *s2;
+	size_t len;
+
+	/* this can easily be changed for ap_malloc */
+	len = strlen(s) + 1;
+	s2 = (char*)(malloc(sizeof(char)*len));
+
+	if(!s2)
+		mf_err("malloc failed", 1, TODO);
+
+	strncpy(s2,s,len);
+	s2[len] = '\0';
+
+	return s2;
+}
+
+/*
+** dynamic string function free() wrapper
+*/
+void mf_dstrfree(char *s)
+{
+	if(s)
+		free(s);
 }

@@ -15,11 +15,11 @@ public class certs
 		OOF oof = p.getOOF();
 		String s = "";
 
-		s += p.header("gijoe") + "badabadba!" + p.footer();
-/*
 		int uid = 6342;
 //		int uid = page.getUserID();
 
+		s += p.header("gijoe") + "badabadba!" + p.footer();
+/*
 		// DEBUG - use p.getGridInt() later;
 		GridInt gi = new GridInt(uid);
 		if (gi == null)

@@ -116,23 +116,12 @@ public class GassInt extends RemoteGassServer
 		{
 			/* Create a new buf that is proper size */
 			byte[] tmp = new byte[len - read];
-			read += this.fin.read(tmp, offset, len - read);
+//			read += this.fin.read(tmp, offset, len - read);
+			read += this.fin.read(tmp, 0, len - read);
 			buf.append(new String(tmp));
 		}
 
 		return read;
-	}
-
-	/* Read the entire file into a String */
-	public String read()
-		throws IOException
-	{
-		int len = (int)(this.getSize());
-
-		StringBuffer buf = new StringBuffer("");
-		this.read(buf, len, 0);
-
-		return buf.toString();
 	}
 
 	/* Get the size of the file opened by the GassInputStream */

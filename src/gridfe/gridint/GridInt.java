@@ -127,7 +127,7 @@ public class GridInt implements Serializable
 
 	/* Get the job output (stdout/stderr) */
 	public String[] getJobData(GridJob job)
-		throws GassException, IOException
+		throws GSSException, GassException, IOException
 	{
 		String data[];
 		String file[];
@@ -152,16 +152,46 @@ public class GridInt implements Serializable
 		/* Loop and grab all data from all files */
 		for(int i = 0; i < OI_MAX; i++)
 		{
-			data[i] += this.retrieve(job, file[i], 64, 0);
-			data[i] += this.retrieve(job, file[i], 64, 0);
-			data[i] += this.retrieve(job, file[i], 0, 0);
+			int toff = 0;
+			int tlen = 64;
+
+			this.startRetrieve(job, file[i]); 
+			data[i] += this.retrieve(tlen, toff);
+			toff += tlen;
+//			data[i] += "\n\n";
+			System.out.println("1:\n"+data[i]);
+			data[i] += this.retrieve(tlen, toff);
+//			data[i] += "\n\n";
+			toff += tlen;
+			System.out.println("2:\n"+data[i]);
+			data[i] += this.retrieve(0, toff);
+			System.out.println("3:\n"+data[i]);
+			
+//			data[i] += this.retrieve(0, 0);
+			this.stopRetrieve();
 
 			/* Test multiple reads */
-//			data[i] += this.retrieve(job, file[i], 512, 0);
+/*			int tlen = 128;
+			int toff = 0;
+			for(;;)
+			{
+				try
+				{
+					data[i] += this.retrieve(job, file[i], tlen, toff);
+					toff += tlen;
+					System.out.println("tlen: "+tlen);
+					System.out.println("toff: "+toff);
+					System.out.println(data[i]);
+				}
+				catch(Exception e)
+				{
+					break;
+				}
+			}
 //			data[i] += this.retrieve(job, file[i], 512, 512);
 //			data[i] += this.retrieve(job, file[i], 0, 1024);
+*/
 		}
-
 
 		return data;
 	}
@@ -228,79 +258,78 @@ public class GridInt implements Serializable
 		return this.retrieve(job, job.stderr, len, off);
 	}
 */	
-	/*
-	** XXX - this is going to be too slow...
-	** gass server should not have to start up
-	** and shut down between every chunk of data read
-	*/
-	private String retrieve(GridJob job, String file, int len, int off)
-		throws GassException, IOException
+	/* Setup file retrieval */
+	public void startRetrieve(GridJob job, String file)
+		throws GassException, IOException, GSSException
 	{
 		String data = "";
 
 		/* Remote Fetch */
 		if(job.remote(file))
+		{
 			data += "Remote Output not supported yet.";
+		}
+		/* Local Fetch */
 		else
 		{
 			/* Start Gass Server (0,0 = random port) */
 			this.startGass(0, 0, job.getHost());
-
-			/* Read the data */
-			data += this.retrieveLocal(job, file, len, off);
-
-			/* Stop Gass Server */
-			this.stopGass();
 		}
-
-		return data;
-	}
-
-	/* Retrieve Local File (Chuck of 'len' bytes, 'len < 0' read all) */
-	private String retrieveLocal(GridJob job, String file, int len, int off)
-	{
-		String data = "";
 
 		/* Convert from GRAM -> GASS convention */
 		file = job.convert(file);
 
-		try
-		{
-			this.gass.open(file);
-
-			if(len > 0)
-			{
-				StringBuffer str = new StringBuffer("");
-				this.gass.read(str, len, off);
-				data += str.toString();
-			}
-			else
-			{
-				data += this.gass.read();
-			}
-
-			this.gass.close();
-		}
-		catch(Exception e)
-		{
-			data += " Exception: "+e.getMessage();
-		}
-
-		return data;
+		/* Open the file for reading */
+		this.gass.open(file);
 	}
 
-	/* Retrieve Remote Files */
-	private String retrieveRemote(GridJob job, String file)
+	/* End file retrieval */
+	public void stopRetrieve()
+		throws IOException
 	{
-		String data = "Remote file read not supported yet.";
-		return data;
-	}
+		/* Close the file */
+		this.gass.close();
 
-	/* Close the Gass Server */
-	private void stopGass()
-	{
-		/* Terminate the Gass Server */
+		/* Close the Gass Server */
 		this.gass.shutdown();
+	}
+
+
+	/* File (Chuck of 'len' bytes, 'len < 0' read all) */
+	private String retrieve(int len, int off)
+		throws IOException
+	{
+		String data = "";
+		long size = this.gass.getSize();
+		long left = size - off;
+
+		/* 
+		** Check len is not greater than len of file  (or
+		** what is left of reading it)
+		**
+		** XXX - this is messed up how the size of the file
+		** is of type long and the length to read must be an
+		** int... (precision problems possible??)
+		*/
+		if(len > left)
+			len = (int)(left);
+
+		/* Read len */
+		if(len > 0 && left > 0)
+		{
+			StringBuffer str = new StringBuffer("");
+			this.gass.read(str, len, 0);
+			data += str.toString();
+		}
+		/* Read what's left */
+		else if(left > 0)
+		{
+			StringBuffer str = new StringBuffer("");
+			this.gass.read(str, (int)(left), 0);
+			data += str.toString();
+		}
+
+		return data;
 	}
 
 

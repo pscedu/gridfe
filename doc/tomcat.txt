@@ -1,0 +1,65 @@
+$Id$
+
+How to setup GridFE under Tomcat
+================================
+
+Overview
+========
+
+There are several ways to have Tomcat serve GridFE, a property than
+most servlets support:
+
+(1) Tomcat runs standalone.  Under this mode, Tomcat listens on a
+    port that Web browsers connect to directly.
+(2) Apache delegates special requests to Tomcat.  Apache must be
+    be configured to acknowledge such requests, and is done so through
+    a "connector."
+
+Tomcat must be made known of the GridFE root, which is done so through
+a "context" (and must be so, else it would only work in standalone
+mode).
+
+File					Edit	Description
+===============================================================================
+/etc/tomcat/web.xml			*	Web-related configuration
+/etc/tomcat/server.xml				Server-related configuration
+/etc/sysconfig/tomcat				System-related configuration
+/etc/init.d/tomcat				Tomcat execution control
+/usr/share/tomcat				Tomcat general home
+/var/www/gridfe					GridFE base
+/var/lib/tomcat					Tomcat Web home
+/etc/httpd/conf/workers2.properties	*	Tomcat connector configuration
+
+Details
+=======
+There are severals implications of running Tomcat as either a standalone
+or runner service.  If SSL is being used and Tomcat is running standalone,
+it must handle SSL itself; whereas if Tomcat is set up as a runner service
+under Apache, Apache can handle SSL duties and let Tomcat and the applications
+it hosts worry about something other than SSL encryption/decryption.
+
+To configure the Tomcat runner service through Apache, add the following to
+/etc/httpd/conf/workers2.properties:
+
+===============================================================================
+[uri:/gridfe]
+info=Grid Front End
+context=/gridfe
+debug=0
+
+[uri:/gridfe/*]
+info=Map all of GridFE
+===============================================================================
+
+Next, configure Tomcat to acknowledge GridFE, specified in
+/etc/tomcat/server.xml:
+
+===============================================================================
+<Context path="/gridfe" docBase="gridfe" debug="0" reloadable="true" crossContext="true">
+  <Logger className="com.redhat.tomcat.Logger" filename="localhost_examples.log" timestamp="true"/>
+</Context>
+===============================================================================
+
+Since this will be inside the encompassing <Host> element, the `docBase' will
+be relative to `Host appBase', so a symbolic link (or something) must be
+created to point from the appBase to the real GridFE root location.

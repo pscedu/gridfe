@@ -77,7 +77,7 @@ public class GridFE extends HttpServlet {
 		}
 		
 		/* ``/'' is optional for index pages. */
-		if (uri.charAt(uri.length()) == '/')
+		if (uri.charAt(uri.length() - 1) == '/')
 			uri += "index";
 
 		Class handler = null;

@@ -90,6 +90,7 @@ public class GridFE extends HttpServlet {
 				c = uri.charAt(s.length());
 			else
 				c = '\0';
+w.print("uri: " + uri + "; s: " + s);
 			if (uri.equals(s) || (uri.startsWith(s) &&
 			    (c == '/' || c == '?'))) {
 				handler = this.dtab[i].getHandler();

@@ -1,4 +1,4 @@
-/* $ID$ */
+/* $Id$ */
 
 package gridfe.gridint.auth;
 
@@ -23,4 +23,3 @@ public class CertInfo
 		this.time = time;
 	}
 }
-

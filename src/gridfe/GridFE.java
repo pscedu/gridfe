@@ -98,6 +98,8 @@ public class GridFE extends HttpServlet
 			}
 		}
 
+w.print("<br />handler: " + handler);
+
 		/* ``/'' is optional for index page. */
 		if (uri.equals(p.getServRoot()))
 			handler = gridfe.www.index.class;
@@ -114,6 +116,7 @@ public class GridFE extends HttpServlet
 
 		w.print(s);
 		w.print("uri: " + uri);
+		w.print("<br />handler: " + handler);
 	}
 
 	private String handleError(Page p, String msg)

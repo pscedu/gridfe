@@ -42,6 +42,7 @@ NOTES:
 #include<openssl/x509v3.h>
 #include<openssl/pem.h>
 #include<sys/stat.h>
+#include<pwd.h>
 #include"mod_fum.h"
 
 static void mf_kinit_setup(krb5_inst_ptr, krb5_prefs_ptr);
@@ -51,11 +52,11 @@ static void mf_kinit_set_defaults(krb5_prefs_ptr);
 static void mf_kinit(krb5_inst_ptr, krb5_prefs_ptr);
 static void mf_get_ticket_cache(krb5_inst_ptr, char**);
 static void mf_free_ticket_cache(char*);
+void mf_user_id_from_principal(const char *principal, char **uid);
 static void mf_kx509(const char*);
 static void mf_kxlist(const char *);
 static void mf_kxlist_setup(krb5_inst_ptr);
 static void mf_kxlist_crypto(krb5_inst_ptr, char*);
-//static void mf_krb5_init(krb5_inst_ptr);
 static void mf_krb5_init(krb5_inst_ptr kinst, const char*);
 static void mf_krb5_free(krb5_inst_ptr kinst);
 static char* mf_get_uid_from_ticket_cache(const char*);
@@ -74,25 +75,26 @@ int mf_main(const char *principal, const char *password)
 	krb5_inst kinst;
 	krb5_prefs kprefs;
 	char *tkt_cache;
+	char *uid;
 
 	/* XXX Resolve UID from KDC with given principal */
 	//DEBUG
-	#define kKRB5CCNAME "/tmp/krb5cc_6342"
-	tkt_cache = mf_dstrcpy(kKRB5CCNAME);
+	//#define kKRB5CCNAME "/tmp/krb5cc_6342"
+	//tkt_cache = mf_dstrcpy(kKRB5CCNAME);
+	mf_user_id_from_principal(principal, &uid);
+	tkt_cache = mf_dstrcat("/tmp/krb5cc_", uid);
+	free(uid);
 
 	/* ----------- KINIT ----------- */
 
 	/* kinit - requires only principal/password */
-	mf_krb5_init(&kinst, kKRB5CCNAME);
+	mf_krb5_init(&kinst, tkt_cache);
 	mf_kinit_set_defaults(&kprefs);
 	mf_kinit_set_uap(&kprefs, principal, password);
 	mf_kinit_setup(&kinst, &kprefs);
 
 	/* kinit -c /tmp/krb5cc_$UID */
 	mf_kinit(&kinst, &kprefs);
-
-	/* Save the tkt_cache name kinit_cleanup() */
-	//mf_get_ticket_cache(&kinst, &tkt_cache);
 
 	//DEBUG
 	printf("ticket cache: %s\n",tkt_cache);
@@ -110,8 +112,8 @@ int mf_main(const char *principal, const char *password)
 	/* kxlist -p */
 	mf_kxlist(tkt_cache);
 	
-	//mf_free_ticket_cache(tkt_cache);
-	free(tkt_cache);
+
+	mf_dstrfree(tkt_cache);
 	
 	return 0;
 }
@@ -133,7 +135,7 @@ static void mf_kxlist(const char *tkt_cache)
 	uid = mf_get_uid_from_ticket_cache(tkt_cache);
 	
 	/* krb5 initial context setup */
-	mf_krb5_init(&kinst, kKRB5CCNAME);
+	mf_krb5_init(&kinst, tkt_cache);
 	
 	/* Obtain proper kx509 credentials */
 	mf_kxlist_setup(&kinst);
@@ -270,6 +272,48 @@ static char* mf_get_uid_from_ticket_cache(const char *tkt)
 	return uid;
 }
 
+/*
+** Parse the principal and get the uid either from the KDC
+** (if that is even possible!) or just read from /etc/passwd
+*/
+void mf_user_id_from_principal(const char *principal, char **uid)
+{
+	struct passwd *pw;
+	int i, j;
+	char *p;
+	char *buf = NULL;
+
+	/* parse principal */
+	for(i = 0, j = 0; i < strlen(principal); i++, j++)
+	{
+		if(principal[i] == '@')
+			break;
+	}
+
+	printf("%d %d\n", i, j);
+	p = mf_dstrslice(principal, 0, j - 1);
+	//DEBUG
+	puts(p);
+
+	/* read the passwd file */
+	pw = getpwnam(p);
+
+	if(!pw)
+		mf_err("User not in /etc/passwd", 1, TODO);
+
+	/* convert uid to (char*) */
+	printf("uid %d\n", pw->pw_uid);
+	i = snprintf(buf, 0, "%d", pw->pw_uid);
+	j = (i+1)*sizeof(char);
+	buf = malloc(j);
+	snprintf(buf, j, "%d", pw->pw_uid);
+	buf[i] = '\0';
+	*uid = buf;
+
+
+	free(p);
+}
+
 
 /*
 -------------------------------KX509-------------------------------
@@ -398,10 +442,9 @@ static void mf_krb5_init(krb5_inst_ptr kinst, const char *tkt_cache)
 		mf_err("krb5_init_context failed", err, TODO);
 	
 	/*
-	** Read the default credential cache:
-	** equivalent to
-	** krb5__cc_resolve(kinst->context, getenv("KRB5CACHE"),
-	**			kinst->cache);
+	** Don't use the default!! we need to be able to
+	** write the tkt out with different uid's for each
+	** individual user...
 	*/
 	//err = krb5_cc_default(kinst->context, &kinst->cache);
 	err = krb5_cc_resolve(kinst->context, tkt_cache, &kinst->cache);

@@ -6,7 +6,7 @@ public class ELEMENT {
 	private LinkedList attrs;
 	private LinkedList children;
 
-	ELEMENT(Object[] attrs = {}, String s = null) {
+	ELEMENT(Object[] attrs = null, String s = null) {
 		this.attrs    = new LinkedList();
 		this.children = new LinkedList(s);
 	}

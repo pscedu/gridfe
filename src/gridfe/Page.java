@@ -155,7 +155,7 @@ public class Page
 		   +		this.addScript(
 		   			"include('" + r + "/lib/Browser.js');" +
 		   			"include('" + r + "/lib/util.js');")
-		   +		this.addScript(this.buildMenuCode())
+//		   +		this.addScript(this.buildMenuCode())
 		   +		this.addScript(
 		   			// This must be loaded last.
 		   			"include('" + r + "/lib/main.js');")

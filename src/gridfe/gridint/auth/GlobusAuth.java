@@ -7,6 +7,7 @@ import java.security.PrivateKey;
 import org.globus.gsi.*;
 import org.globus.gsi.gssapi.*;
 import org.ietf.jgss.*;
+import gridfe.gridint.*;
 
 public class GlobusAuth
 {
@@ -15,87 +16,37 @@ public class GlobusAuth
 	private Uid uid;
 
 	/*
-	** X.509 Standard for files /tmp/x509up_uXXX
-	** where XXX is the userid
+	** X.509 Standard for files /tmp/x509up_u!!!
+	** where !!! is the userid
 	*/
 	private final String def = "/tmp/x509up_u";
-
 	public GlobusAuth(Uid uid)
 	{
 		this.file = this.def + uid.intValue();
 	}
 
-	public GlobusAuth(int uid)
-	{
-		this.uid = new Uid(uid);
-		this.file = this.def + this.uid.intValue();
-	}
-
-/*
-	public GlobusAuth(String uid)
-	{
-		this.uid = new Uid(uid);
-		this.file = this.def + this.uid.intValue();
-	}
-*/
-
-	/* Overide Default X.509 Certificate File*/
-	public void setFile(String file)
-	{
-		this.file = file;
-	}
-
+	/* Grab the credential from the file */
 	public void createCredential()
 		throws GlobusCredentialException
 	{
 		this.gc = new GlobusCredential(file);
 	}
 
-	/*
-	** Generic Private Data Interfaces
-	*/
-
 	public GlobusCredential getCredential()
 	{
 		return this.gc;
 	}
 
-	public Uid getUid()
+	/* Certificate Information Record */
+	public CertInfo getCertInfo()
 	{
-		return this.uid;
-	}
-
-	/*
-	** Implement the GlobusCredential methods we need
-	*/
-
-	public PrivateKey getPrivateKey()
-	{
-		return this.gc.getPrivateKey();
-	}
-
-	public String getSubject()
-	{
-		return this.gc.getSubject();
-	}
-
-	public int getProxyType()
-	{
-		return this.gc.getProxyType();
-	}
-
-	public String getIssuer()
-	{
-		return this.gc.getIssuer();
-	}
-
-	public int getStrength()
-	{
-		return this.gc.getStrength();
-	}
-
-	public int getCertNum()
-	{
-		return this.gc.getCertNum();
+		CertInfo ci = 
+		new CertInfo( this.gc.getSubject(),
+				this.gc.getProxyType(),
+				this.gc.getIssuer(),
+				this.gc.getStrength(),
+				this.gc.getIdentity(),
+				this.gc.getTimeLeft() );
+		return ci;
 	}
 };

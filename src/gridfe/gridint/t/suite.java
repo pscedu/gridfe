@@ -56,28 +56,32 @@ public class suite
 		/* Create a new job */
 		System.out.println("Creating New Job...");
 
+		GridJob j = new GridJob("intel2.psc.edu");
 //		GridJob j = new GridJob("mugatu.psc.edu");
-		GridJob j = new GridJob("gridinfo.psc.edu");
+//		GridJob j = new GridJob("gridinfo.psc.edu");
 		j.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/sleep", "gram.out"},
 			new String("arguments"),
 //			new String[] {"10s"});
 			new String[] {"2s"});
+		j.setName("J1");
 
 //		GridJob j2 = new GridJob("mugatu.psc.edu");
-		GridJob j2 = new GridJob("gridinfo.psc.edu");
+//		GridJob j2 = new GridJob("gridinfo.psc.edu");
+		GridJob j2 = new GridJob("intel2.psc.edu");
 		j2.setRSL(new String[] {"executable"},
 			new String[] {"/bin/sleep"},
 			new String("arguments"),
 //			new String[] {"15s"});
 			new String[] {"5s"});
+		j2.setName("J2");
 
 		/* job to test output permission */
 		String j3_out = "gram.out.date";
 		//String j3_out = "/tmp/gram.out.date";
-		//String j3_host = "intel2.psc.edu";
-		String j3_err = "gram.out";
-		String j3_host = "mugatu.psc.edu";
+		String j3_err = "gram123.out";
+		String j3_host = "intel2.psc.edu";
+		//String j3_host = "mugatu.psc.edu";
 		String j3_name = "Date";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
@@ -94,7 +98,7 @@ public class suite
 		System.out.println("Submiting Job...");
 		gi.jobSubmit(j);
 		gi.jobSubmit(j2);
-		gi.jobSubmit(j3);
+//		gi.jobSubmit(j3);
 
 		/* Print the job id string */
 		System.out.println("j - id string: "+j.getIDAsString());
@@ -128,14 +132,19 @@ public class suite
 		/* Monitor job status */
 		do
 		{
-			System.out.println("J1: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
-			System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
+			System.out.print("J1: "+gi.getJob("J1").getStatus());
+			System.out.println(" : "+gi.getJob(0).getStatusAsString());
+			System.out.print("J2: "+gi.getJob("J2").getStatus());
+			System.out.println(" : "+gi.getJob(1).getStatusAsString());
 			Thread.sleep(600);
 
-		}while(gi.getJobStatus() != -1 || gi.getJobStatus(1) != -1);
+		}while(gi.getJob(0).getStatus() != -1 || gi.getJob(1).getStatus() != -1);
 
-		System.out.println("J1: "+gi.getJobStatus()+" : "+gi.getJobStatusAsString());
-		System.out.println("J2: "+gi.getJobStatus(1)+" : "+gi.getJobStatusAsString(1));
+		System.out.print("J1: "+gi.getJob("J1").getStatus());
+		System.out.println(" : "+gi.getJob(0).getStatusAsString());
+		System.out.print("J2: "+gi.getJob("J2").getStatus());
+		System.out.println(" : "+gi.getJob(1).getStatusAsString());
+
 
 		/* Use a GassInt to grab job output */
 /*
@@ -159,7 +168,7 @@ public class suite
 		System.out.println("Gass Server shutdown");
 */
 
-		String[] data;
+/*		String[] data;
 		System.out.println("Retrieving job data...");
 //		j3 = gi.getJob(2);
 		j3 = gi.getJob(j3_name);
@@ -170,14 +179,15 @@ public class suite
 		data = gi.getJobData(j3);
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);
-
+*/
 		/* Get the job list and len */
 		String[][] jobs = gi.getJobListString();
 
+		System.out.println("# of Jobs: "+jobs.length);
 		for(int i = 0; i < jobs.length; i++)
 		{
-			System.out.println("Name: " + jobs[gi.kJobName][i] + "\tStatus: " + 
-				jobs[gi.kJobStatus][i] + "\tRSL: " + jobs[gi.kJobRSL][i]);
+			System.out.println("Name: " + jobs[i][gi.kJobName] + "\tStatus: " + 
+				jobs[i][gi.kJobStatus] + "\tRSL: " + jobs[i][gi.kJobRSL]);
 		}
 
 		/* Logout - remove credentials */

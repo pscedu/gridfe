@@ -19,7 +19,7 @@ public class certs
 //		int uid = page.getUserID();
 		CertInfo ci;
 
-		ci = gi.getCertInfo();
+		ci = p.getGridInt().getCertInfo();
 
 		long tmp;
 		long sec = ci.time;
@@ -118,7 +118,7 @@ public class certs
 						},
 						new Object[] {
 							"class", p.genClass(),
-							"value", ci.type
+							"value", new Integer(ci.type)
 						}
 					},
 					new Object[][] {

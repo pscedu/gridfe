@@ -1,4 +1,7 @@
 /* $Id$ */
+import jasp.*;
+import oof.*;
+
 public class Page {
 	private OOF  oof;
 	private JASP jasp;
@@ -9,7 +12,7 @@ public class Page {
 		this.oof  = new OOF(this.jasp, "xhtml");
 	}
 
-	public void header(String title) {
+	public String header(String title) {
 		String s = new String();
 
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
@@ -25,7 +28,7 @@ public class Page {
 		return s;
 	}
 
-	public void footer() {
+	public String footer() {
 		String s = new String();
 
 		s =		"</body>"

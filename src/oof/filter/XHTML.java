@@ -3,7 +3,7 @@ package oof.filter;
 
 import oof.element.*;
 
-public class XHTML extends Filter {
+public class XHTML extends FILTER {
 	private OOF oof;
 
 	public build(ELEMENT e) {

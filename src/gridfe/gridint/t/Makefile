@@ -4,6 +4,6 @@ SYSROOT = ../../../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-TESTS += suite.class
+TESTS += usermap.class suite.class
 
 include ${MAINMK}

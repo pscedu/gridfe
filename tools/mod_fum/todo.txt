@@ -3,17 +3,18 @@ $Id$
 TODO
 1) ap_uname2id(char *) - use this to obtain user id?
 
-X) mf_get_uid_from_ticket_cache really isn't needed... we could
-	save the uid from what we got from passwd, but for now
-	just keep this in case code gets switched later, we don't
-	have to rely on anything except the ticket cache name.
+X) mf_get_uid_from_ticket_cache() really isn't needed.  We could
+   save the uid from what we got from passwd, but for now
+   just keep this in case code gets switched later, we don't
+   have to rely on anything except the ticket cache name.
 
-XXX Development Notes:
+Development Notes:
+
 1) currently only users with user account can use authenticate.
-	mod_fum requires a uid lookup from /etc/passwd to write
-	the X.509 certificates in /tmp.
+   mod_fum requires a uid lookup from /etc/passwd to write
+   the X.509 certificates in /tmp.
 
 2) Apache 2.X series support only! (1.X could be added, but is
-	currently not needed for this project) Version 1.X changed
-	enough functions, data types, etc. that it was not worth
-	the time to try and support both types at the moment.
+   currently not needed for this project) Version 1.X changed
+   enough functions, data types, etc. that it was not worth
+   the time to try and support both types at the moment.

@@ -96,9 +96,9 @@ public class RSLElement implements Serializable
 			/* Save some parameters to retrieve job output/err */
 			if(param[i].equals("stdout"))
 				this.stdout = value[i];
-			if(param[i].equals("stderr"))
+			else if(param[i].equals("stderr"))
 				this.stderr = value[i];
-			if(param[i].equals("directory"))
+			else if(param[i].equals("directory"))
 				this.directory = value[i];
 		}
 	}

@@ -22,6 +22,7 @@ public class certs
 		GridInt gi = new GridInt(uid);
 		if (gi == null)
 			s += "GI IS NULL<br />";
+/*
 		gi.auth();
 		
 		CertInfo ci;
@@ -150,7 +151,7 @@ public class certs
 				}
 		     )
 		   + p.footer();
-
+*/
 		return (s);
 	}
 };

@@ -521,7 +521,7 @@ mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 
 	/*
 	 * Take the principal name we were given and parse it into the
-	 * appropriate form for authentication protocols
+	 * appropriate form for authentication protocols.
 	 */
 	if ((err = krb5_parse_name(ki->ki_ctx, kp->kp_prin,
 	     &ki->ki_prin)) != KRB5KDC_ERR_NONE) {
@@ -534,9 +534,9 @@ mf_kinit_setup(struct krb5_inst *ki, struct krb5_prefs *kp)
 static void
 mf_kinit_cleanup(struct krb5_inst *ki)
 {
-	if (ki->ki_prin)
+	/* if (ki->ki_prin) */
 		krb5_free_principal(ki->ki_ctx, ki->ki_prin);
-	if (ki->ki_ctx)
+	/* if (ki->ki_ctx) */
 		krb5_free_context(ki->ki_ctx);
 }
 
@@ -563,7 +563,7 @@ mf_check_for_cred(const char *principal)
 		mf_log("error creating cert string");
 		return (0);
 	}
-	/* Does the file exist */
+	/* Check if the file exists */
 	if ((dp = opendir(_PATH_CERT_DIR)) != NULL) {
 		while ((d = readdir(dp)) != NULL) {
 			if (strcmp(d->d_name, cert) == 0) {
@@ -630,39 +630,40 @@ mf_valid_cred(char *principal)
 static int
 mf_valid_user(const char *principal, const char *password)
 {
-	char tkt[] = _PATH_MFTMP;
 	krb5_get_init_creds_opt opt;
+	char tkt[] = _PATH_MFTMP;
 	struct krb5_prefs kp;
 	struct krb5_inst ki;
 	int err;
 
-	err = mf_krb5_init(&ki, tkt);
-	if (err != OK) {
+	if ((err = mf_krb5_init(&ki, tkt)) != OK) {
 		mf_log("krb5_init failed (%d)", err);
 		return (0);
 	}
 	ki.ki_init = 0;
 	kp.kp_prin = principal;
 	kp.kp_pw = password;
-	if ((err = mf_kinit_setup(&ki, &kp)) == KRB5KDC_ERR_NONE)
-		err = OK;
-	else
-		err = HTTP_UNAUTHORIZED;
-	if (err == OK) {
-		krb5_get_init_creds_opt_init(&opt);
 
-		/* Try and get an initial ticket */
-		err = krb5_get_init_creds_password(ki.ki_ctx,
-		    &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
-		    krb5_prompter_posix, NULL, 0, NULL, &opt);
-
-		/* If this succeeds, then the user/pass is correct */
-		if (err == OK)
-			ki.ki_init = 1;
-		else
-			mf_log("bad authentication (%d)", err);
-	} else
+	if (!mf_kinit_setup(&ki, &kp)) {
 		mf_log("mf_kinit_setup failed (%d)", err);
+		goto cleanup;
+	}
+	
+	krb5_get_init_creds_opt_init(&opt);
+
+	/*
+	 * Try and get an initial ticket.  If this succeeds,
+	 * then the username/password is correct.
+	 */
+	if ((err = krb5_get_init_creds_password(ki.ki_ctx,
+	     &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
+	     krb5_prompter_posix, NULL, 0, NULL, &opt)) !=
+	    KRB5KDC_ERR_NONE)
+		ki.ki_init = 1;
+	else
+		mf_log("bad authentication (%d)", err);
+
+cleanup:
 	mf_kinit_cleanup(&ki);
 	mf_krb5_free(&ki);
 	return (ki.ki_init);
@@ -704,7 +705,7 @@ mf_dstrslice(const char *s, int x, int y)
 
 	if (!len)
 		/* XXX: fix this shit. */
-		return (s2);
+		return (NULL);
 
 	if ((s2 = apr_palloc(mf_pool, sizeof(char) * len)) == NULL) {
 		mf_log("malloc failed");
@@ -737,6 +738,6 @@ mf_log(const char *fmt, ...)
 	/* (void)snprintf(buf, sizeof(buf), "%s\n", buf); */
 	va_end(ap);
 
-	ap_log_error(APLOG_MARK, APLOG_ERR, (apr_status_t)(NULL),
+	ap_log_error(APLOG_MARK, APLOG_ERR, (apr_status_t)NULL,
 	    mf_rec->server, "%s", buf);
 }

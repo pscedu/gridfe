@@ -63,11 +63,20 @@ public class suite
 		/* Use GridInt to test GramInt */
 		GramInt gri = new GramInt(gi.getGSSAuth().getGSSCredential(), "mugatu.psc.edu");
 		System.out.println(r);
-		//System.out.println(gri.getIDAsString());
-		gri.jobSubmit(r.toString());
-		System.out.println(gri.getStatusAsString());
-		System.out.println(gri.getStatus());
+		gri.jobSubmit(r);
+
+		/* Sleep and check status every second */
+		for(int i = 0; i < 20; i++)
+		{
+			System.out.println(gri.getStatusAsString());
+			System.out.println(gri.getStatus());
+			//java.lang.Object.wait(60);
+			//this.wait(60);
+			Thread.sleep(120);
+		}
+
 		System.out.println(gri.getJob().getID());
 		System.out.println(gri.getIDAsString());
+		System.out.println(gri.getStdout());
 	}
 }

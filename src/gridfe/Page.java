@@ -261,7 +261,7 @@ public class Page
 		   +				"<img src=\"" + r + "/img/gridfe.png\" alt=\"[GridFE]\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px; "
-		   +			  "text-align: center;\">"
+		   +			  "text-align: center; left-padding: 100px;\">"
 		   +				"<img src=\"" + r + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
 		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"

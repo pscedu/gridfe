@@ -6,16 +6,17 @@
 ** kx509, and kxlist -p ...
 */
 
-#include <krb5.h>
+#include<krb5.h>
+#include"httpd.h"
 
-#if 0
-#define mf_err(x,y,z) ap_log_error(APLOG_MARK,APLOG_EMERG,z,x ": Err %d", y)
-#define mf_warn(x,y,z) ap_log_error(APLOG_MARK,APLOG_WARN,z,x ": Err %d", y)
-#endif
-
-//#define mf_err(x,y,z) errx(1, x ": error %d", y)
-#define mf_err(x,y,z) errx(1,"%s: error %d on line %d of %s",x,y,__LINE__,__FILE__)
-#define mf_warn(x,y,z) warnx(x ": error %d", y)
+/* Macro Functions */
+#define mf_save_pool(x) mf_pool(x)
+#define mf_get_pool() mf_pool(NULL)
+#define mf_save_request(x) mf_request(x)
+#define mf_get_request() mf_request(NULL)
+#define mf_err(x,y) ap_log_error(APLOG_MARK, APLOG_EMERG, \
+			(apr_status_t)(NULL), (mf_get_request())->server, \
+			"%s: error: %d", x, y)
 
 #define kProxiable 1
 #define kForwardable 0
@@ -39,14 +40,8 @@ typedef struct
 	
 }krb5_inst, *krb5_inst_ptr;
 
-/* Kerberos 5 Preferences */
 typedef struct
 {
-	/*
-	** XXX only implementing what
-	** we currently need... add support
-	** for more krb5 options later
-	*/
 	krb5_deltat lifetime;
 	int forwardable;
 	int proxiable;

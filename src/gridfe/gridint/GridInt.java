@@ -307,14 +307,14 @@ public class GridInt implements Serializable
 		**			{"rsl1", "rsl2", "rsl3"}};
 		*/
 		int len = this.list.size();
-		String[][] jobs = new String[3][len];
+		String[][] jobs = new String[len][3];
 
 		/* NOTE: this is reverse order than submitted! */
 		for(int i = 0; i < len; i++)
 		{
-			jobs[kJobName][i] = this.list.get(i).getName();
-			jobs[kJobStatus][i] = this.list.get(i).getStatusAsString();
-			jobs[kJobRSL][i] = this.list.get(i).toString();
+			jobs[i][kJobName] = this.list.get(i).getName();
+			jobs[i][kJobStatus] = this.list.get(i).getStatusAsString();
+			jobs[i][kJobRSL] = this.list.get(i).toString();
 		}
 
 		return jobs;
@@ -324,35 +324,6 @@ public class GridInt implements Serializable
 	{
 		return this.list;
 	}
-
-	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-	/*
-	** XXX - Should this even be in here?? Once the GridJob is
-	** obtained through name or index (as above), just use
-	** job.getStatus() and job.getStatusAsString()
-	*/
-	/* currently get's the most recent job status */
-	public String getJobStatusAsString()
-		throws GSSException
-	{
-		return this.list.get().getStatusAsString();
-	}
-	public String getJobStatusAsString(int x)
-		throws GSSException
-	{
-		return this.list.get(x).getStatusAsString();
-	}
-	public int getJobStatus()
-		throws GSSException
-	{
-		return this.list.get().getStatus();
-	}
-	public int getJobStatus(int x)
-		throws GSSException
-	{
-		return this.list.get(x).getStatus();
-	}
-	/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 	/* Get Certificate Information */
 	public CertInfo getCertInfo()

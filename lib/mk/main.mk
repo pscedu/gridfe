@@ -43,7 +43,7 @@ depend: jdep
 			|| exit 1;						\
 	done
 
-test: all ${TESTS}
+test: all $(addsuffix .class,$(basename ${TESTS}))
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -62,7 +62,7 @@ test: all ${TESTS}
 
 clean:
 	@# XXX: test classes
-	rm -f ${CLASSES} .depend
+	rm -f ${CLASSES} .depend $(addsuffix .class,${TESTS})
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\

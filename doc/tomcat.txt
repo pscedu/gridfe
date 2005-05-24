@@ -6,7 +6,7 @@ How to setup GridFE under Tomcat
 Overview
 ========
 
-There are several ways to have Tomcat serve GridFE, a property than
+There are several ways to setup Tomcat to serve GridFE, an ability that
 most servlets support:
 
 (1) Tomcat runs standalone.  Under this mode, Tomcat listens on a
@@ -38,28 +38,49 @@ it must handle SSL itself; whereas if Tomcat is set up as a runner service
 under Apache, Apache can handle SSL duties and let Tomcat and the applications
 it hosts worry about something other than SSL encryption/decryption.
 
-To configure the Tomcat runner service through Apache, add the following to
-/etc/httpd/conf/workers2.properties:
+To configure the Tomcat servlet runner service through Apache, add the
+following to /etc/httpd/conf/workers2.properties:
 
-===============================================================================
-[uri:/gridfe]
-info=Grid Front End
-context=/gridfe
-debug=0
+	========================================================================
+	[uri:/gridfe]
+	info=Grid Front End
+	context=/gridfe
+	debug=0
 
-[uri:/gridfe/*]
-info=Map all of GridFE
-===============================================================================
+	[uri:/gridfe/*]
+	info=Map all of GridFE
+	========================================================================
 
 Next, configure Tomcat to acknowledge GridFE, specified in
 /etc/tomcat/server.xml:
 
-===============================================================================
-<Context path="/gridfe" docBase="gridfe" debug="0" reloadable="true" crossContext="true">
-  <Logger className="com.redhat.tomcat.Logger" filename="localhost_examples.log" timestamp="true"/>
-</Context>
-===============================================================================
+	========================================================================
+	<Context path="/gridfe" docBase="gridfe" debug="0" reloadable="true"
+	 crossContext="true">
+	  <Logger className="com.redhat.tomcat.Logger" filename="gridfe.log"
+	   timestamp="true"/>
+	</Context>
+	========================================================================
 
 Since this will be inside the encompassing <Host> element, the `docBase' will
 be relative to `Host appBase', so a symbolic link (or something) must be
 created to point from the appBase to the real GridFE root location.
+
+Apache Configuration
+====================
+The mod_jk2 Apache module must be activated.  This provides the communication
+between Apache and Tomcat, using the configuration specified worker2.properties.
+
+Sample Apache configuration to require SSL for GridFE for encrypted
+communication:
+
+LoadModule fum_module modules/mod_fum.so
+LoadModule jk2_module modules/mod_jk2.so
+
+<Location "/gridfe/gridfe">
+        AuthName "GridFE Login"
+        AuthType Fum
+        Require valid-user
+        SSLRequireSSL
+</Location>
+

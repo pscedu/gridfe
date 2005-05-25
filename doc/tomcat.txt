@@ -21,12 +21,13 @@ mode).
 
 File					Edit	Description
 ===============================================================================
-/etc/tomcat/web.xml			*	Web-related configuration
-/etc/tomcat/server.xml				Server-related configuration
+/etc/tomcat/web.xml				Web-related configuration
+/etc/tomcat/server.xml			*	Server-related configuration
 /etc/sysconfig/tomcat				System-related configuration
 /etc/init.d/tomcat				Tomcat execution control
 /usr/share/tomcat				Tomcat general home
 /var/www/gridfe					GridFE base
+/var/www/gridfe/WEB-INF/web.xml		*	GridFE servlet configuration
 /var/lib/tomcat					Tomcat Web home
 /etc/httpd/conf/workers2.properties	*	Tomcat connector configuration
 

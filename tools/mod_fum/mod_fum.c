@@ -12,10 +12,11 @@
 -------------------------------------------------------------------
 */
 
-#define _GNU_SOURCE /* wow, gross */
+#define _GNU_SOURCE /* wow, gross, needed for some stat function */
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <ctype.h>
 #include <dirent.h>
 #include <pwd.h>
 #include <stdarg.h>
@@ -387,28 +388,14 @@ mf_kxlist_setup(struct krb5_inst *ki)
 static char *
 mf_get_uid_from_ticket_cache(const char *tkt)
 {
-	int i, j, b, e;
 	char *uid;
 
-	/* Default to end of the string. */
-	e = strlen(tkt) - 1;
-
-	/* Grab the boundary of the UID. */
-	for (i = 0, j = 0; i < (strlen(tkt) - 1) && j < 2; i++) {
-		if (tkt[i] == '_') {
-			if (j)
-				e = i;
-			else
-				b = i + 1;
-			j++;
-		}
+	/* Parse `/tmp/krb5cc_fum_5222' for `5222'. */
+	if ((uid = strrchr(tkt, '_')) == NULL || !isdigit(*++uid)) {
+		mf_log("invalid ticket format: %s", tkt);
+		return (NULL);
 	}
-
-	/* Slice and convert the UID. */
-	uid = mf_dstrslice(tkt, b, e);
-	if (uid == NULL)
-		mf_log("uid slice error");
-	return (uid);
+	return (apr_pstrdup(mf_pool, uid));
 }
 
 /*

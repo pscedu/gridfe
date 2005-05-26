@@ -1,10 +1,8 @@
 # $Id$
 
 MAINMK = ${SYSROOT}/lib/mk/main.mk
-JAVAC = `which javac`
-JAVA = `which java`
-JAVA_PREFIX = /usr/java/j2sdk1.4.2_05
-COG_PREFIX = /usr/java/cog-1.2
+JAVAC = ${JAVA_PREFIX}/bin/javac
+JAVA = ${JAVA_PREFIX}/bin/java
 SCLASSPATH =					\
 	${SYSROOT}/src:				\
 	/usr/share/java/servlet.jar:		\
@@ -13,7 +11,7 @@ SCLASSPATH =					\
 	${COG_PREFIX}/lib/puretls.jar:		\
 	${COG_PREFIX}/lib/cryptix32.jar:	\
 	${COG_PREFIX}/lib/cryptix-asn1.jar:	\
-	${COG_PREFIX}/lib/jce-jdk13-120.jar:	\
+	${COG_PREFIX}/lib/jce-jdk13-125.jar:	\
 	.
 CLASSPATH = `echo ${SCLASSPATH} | tr -d '\t\n\ '`
 CFLAGS += -Wall -W -g

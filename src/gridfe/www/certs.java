@@ -37,7 +37,11 @@ public class certs {
 
 		s += p.header("Certificate Management")
 		   + oof.table(
-				new Object[] {},
+				new Object[] {
+					"border", "0",
+					"cellspacing", "0",
+					"cellpadding", "0"
+				},
 				new Object[][][] {
 					new Object[][] {
 						new Object[] {

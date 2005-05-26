@@ -373,17 +373,20 @@ mf_kxlist_setup(struct krb5_inst *ki)
 static char *
 mf_get_uid_from_ticket_cache(const char *tkt)
 {
-	int i, b, e;
+	int i, j, b, e;
 	char *uid;
 
 	/* Default to end of the string. */
 	e = strlen(tkt) - 1;
 
-	/* Grab UID boundry starting at end! */
-	for (i = e; i >= 0; i--) {
-		if(tkt[i] == '_') {
-			b = i + 1;
-			break;
+	/* Grab the boundary of the UID. */
+	for (i = 0, j = 0; i < (strlen(tkt) - 1) && j < 2; i++) {
+		if (tkt[i] == '_') {
+			if (j)
+				e = i;
+			else
+				b = i + 1;
+			j++;
 		}
 	}
 

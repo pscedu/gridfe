@@ -773,15 +773,18 @@ mf_dstrslice(const char *s, int x, int y)
 static void
 mf_log(const char *fmt, ...)
 {
-	char buf[BUFSIZ];
+	char tbuf[BUFSIZ], buf[BUFSIZ];
 	va_list ap;
 	int __sav_errno = errno;
 
 	va_start(ap, fmt);
 	(void)vsnprintf(buf, sizeof(buf), fmt, ap);
-	if (__sav_errno)
-		(void)snprintf(buf, sizeof(buf), "%s: %s", buf,
+	if (__sav_errno) {
+		(void)snprintf(tbuf, sizeof(tbuf), "%s: %s", buf,
 		    strerror(__sav_errno));
+		(void)strncpy(buf, tbuf, sizeof(buf) - 1);
+		buf[sizeof(buf) - 1] = '\0';
+	}
 	/* (void)snprintf(buf, sizeof(buf), "%s\n", buf); */
 	va_end(ap);
 
@@ -789,4 +792,5 @@ mf_log(const char *fmt, ...)
 	ap_log_error(APLOG_MARK, APLOG_ERR, (apr_status_t)NULL,
 	    mf_rec->server, "%s", buf);
 #endif /* STANDALONE */
+	errno = __sav_errno;
 }

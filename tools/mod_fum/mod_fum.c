@@ -284,7 +284,7 @@ mf_kxlist(const char *tkt_cache)
 	 *	/tmp/krb5cc_UID_FUBAR
 	 *	/tmp/krb5cc_UID
 	 */
-	if ((uid = mf_get_uid_from_ticket_cache(tkt_cache)) == 0)
+	if ((uid = mf_get_uid_from_ticket_cache(tkt_cache)) == NULL)
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	/* krb5 initial context setup */
 	if ((err = mf_krb5_init(&ki, tkt_cache)) != 0)
@@ -295,6 +295,7 @@ mf_kxlist(const char *tkt_cache)
 
 	/* Perform crypto & write certificate */
 	name = mf_dstrcat(_PATH_X509CERT, uid);
+mf_log("path: %s, uid: %s, ful: %s", _PATH_X509CERT, uid, name);
 	if (name == NULL)
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	err = mf_kxlist_crypto(&ki, name);
@@ -314,6 +315,7 @@ mf_kxlist_crypto(struct krb5_inst *ki, char *name)
 	RSA *priv = NULL;
 	FILE *file;
 
+mf_log("kxlist_crypto: open %s", name);
 	if ((file = fopen(name, "w")) == NULL) {
 		mf_log("%s", name);
 		return (HTTP_INTERNAL_SERVER_ERROR);

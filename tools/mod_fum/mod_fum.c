@@ -650,6 +650,7 @@ mf_valid_cred(char *principal)
 	if (tkt_cache == NULL)
 		return (0);
 	if (mf_krb5_init(&ki, tkt_cache) != OK)
+		/* XXX: mf_krb5_free(&ki); ? */
 		return (0);
 
 	/* Grab the kx509 credentials */
@@ -691,7 +692,7 @@ mf_valid_user(const char *principal, const char *password)
 	kp.kp_prin = principal;
 	kp.kp_pw = password;
 
-	if (!mf_kinit_setup(&ki, &kp)) {
+	if ((err = mf_kinit_setup(&ki, &kp)) != 0) {
 		mf_log("mf_kinit_setup failed (%d)", err);
 		goto cleanup;
 	}
@@ -704,10 +705,10 @@ mf_valid_user(const char *principal, const char *password)
 	 */
 	if ((err = krb5_get_init_creds_password(ki.ki_ctx,
 	     &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
-	     krb5_prompter_posix, NULL, 0, NULL, &opt)) == 0)
-		ki.ki_init = 1;
-	else
+	     krb5_prompter_posix, NULL, 0, NULL, &opt)) != 0)
+		/* XXX: ki.ki_init = 0 ? */
 		mf_log("bad authentication (%d)", err);
+	ki.ki_init = 1;
 
 cleanup:
 	mf_kinit_cleanup(&ki);

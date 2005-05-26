@@ -147,6 +147,8 @@ mod_fum_auth(request_rec *r)
 	mf_pool = r->pool;
 	mf_rec = r;
 
+mf_log("auth()");
+
 	if ((type = ap_auth_type(r)) == NULL ||
 	    strcasecmp(type, "fum") != 0)
 		return (DECLINED);
@@ -169,16 +171,18 @@ mod_fum_auth(request_rec *r)
 			return (err);
 	}
 
+mf_log("auth() - cred");
 	/*
 	 * They exist, make sure the user/pass is correct;
 	 * otherwise, a correct username and wrong password
 	 * will work.
 	 */
 	if (!mf_valid_user(user, pass)) {
-		mf_log("wrong user/pass combination");
+		mf_log("wrong user/pass combination; user: %s", user);
 		goto failed_auth;
 	}
 
+mf_log("auth() - valid");
 	/*
 	 * Finally check if the credentials have expired
 	 * or not.  If so, create new certs; if not, do
@@ -194,6 +198,7 @@ mod_fum_auth(request_rec *r)
 		goto failed_auth;
 	}
 
+mf_log("auth() - create");
 	/* Create new certs */
 	if ((err = mod_fum_main(user, pass)) != HTTP_UNAUTHORIZED)
 		return (err);
@@ -215,16 +220,18 @@ mod_fum_main(const char *principal, const char *password)
 
 	/* XXX Resolve UID from KDC with given principal (possible?) */
 
+mf_log("main()");
 	/* Read UID from /etc/passwd */
 	if ((err = mf_user_id_from_principal(principal, &uid)) != 0)
 		return (err);
 	tkt_cache = mf_dstrcat(_PATH_KRB5CERT, uid);
 	free(uid);
 	if (tkt_cache == NULL) {
-		mf_log("tkt_cache is NULL");
+		mf_log("dstrcat");
 		return (HTTP_INTERNAL_SERVER_ERROR);
 	}
 
+mf_log("main() - krb5");
 	if ((err = mf_krb5_init(&ki, tkt_cache)) != 0)
 		return (err);
 
@@ -234,6 +241,7 @@ mod_fum_main(const char *principal, const char *password)
 	kp.kp_prin = principal;
 	kp.kp_pw = password;
 
+mf_log("main() - kinit");
 	if ((err = mf_kinit_setup(&ki, &kp)) != 0)
 		return (err);
 
@@ -244,17 +252,22 @@ mod_fum_main(const char *principal, const char *password)
 	mf_kinit_cleanup(&ki);
 	mf_krb5_free(&ki);
 
+mf_log("main() - kx509");
 	if ((err = mf_kx509(tkt_cache)) != 0)
 		return (err);
 
+mf_log("main() - kxlist");
 	/* kxlist -p */
 	if ((err = mf_kxlist(tkt_cache)) != 0)
 		return (err);
-		
-mf_log("prin: %s", principal);
 
+mf_log("success!");
+
+#if 0
+	/* Tomcat doesn't receive this. */
 	if ((err = apr_env_set(MF_USERENV, principal, mf_pool)) != OK)
 		return (err);
+#endif
 
 	return (0); /* HTTP_OK ? */
 }

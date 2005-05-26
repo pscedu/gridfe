@@ -80,8 +80,8 @@ public class GridFE extends HttpServlet {
 		if (uri.charAt(uri.length() - 1) == '/')
 			uri += "index";
 
-		Class handler = null;
-		String s, best;
+		Class handler = null, best = null;
+		String s;
 		int bestlen = 5000 /* XXX: INT_MAX */;
 		char c;
 		for (int i = 0; i < this.dtab.length; i++) {
@@ -102,11 +102,13 @@ public class GridFE extends HttpServlet {
 				c = '\0';
 			if (s.startsWith(uri) && c == '/' &&
 			    s.length() < bestlen) {
-				best = s;
+				best = this.dtab[i].getHandler();
 				bestlen = s.length();
 			}
 		}
-		if (handler == null)
+		if (best != null)
+			handler = best;
+		else if (handler == null)
 			handler = gridfe.www.notfound.class;
 
 		try {

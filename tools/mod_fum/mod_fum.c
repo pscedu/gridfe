@@ -448,14 +448,14 @@ mf_user_id_from_principal(const char *principal, char **uid)
 static int
 mf_kx509(const char *tkt_cache)
 {
-	char *argv[3];
+	char *argv[4];
 	int argc, err;
 
 	/* setup kx509 as would be called from command line */
 	argv[0] = apr_pstrdup(mf_pool, "kx509");
 	argv[1] = apr_pstrdup(mf_pool, "-c");
 	argv[2] = apr_pstrdup(mf_pool, tkt_cache);
-	/* argv[3] = NULL; */
+	argv[3] = NULL;
 	argc = 3;
 
 	if ((err = do_kx509(argc, argv)) != KX509_STATUS_GOOD) {

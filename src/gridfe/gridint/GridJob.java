@@ -45,7 +45,7 @@ public class GridJob extends RSLElement implements Serializable
 		this.gi = new GramInt(gss, this.host);
 	}
 
-	/* Submit the job and save the id string */
+	/* Submit the job and save the ID string */
 	public void run()
 	    throws GramException, GSSException {
 		/*

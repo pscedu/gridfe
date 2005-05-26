@@ -85,7 +85,6 @@ struct krb5_prefs {
 };
 
 static char	*mf_dstrcat(const char *, const char *);
-static char	*mf_dstrslice(const char *, int, int);
 static char	*mf_get_uid_from_ticket_cache(const char *);
 static int	 mf_check_for_cred(const char *);
 static int	 mf_kinit(struct krb5_inst *, struct krb5_prefs *);
@@ -417,24 +416,17 @@ mf_get_uid_from_ticket_cache(const char *tkt)
  * (XXX if that is even possible) or just read from /etc/passwd
  */
 static int
-mf_user_id_from_principal(const char *principal, char **uid)
+mf_user_id_from_principal(const char *prin, char **uid)
 {
 	struct passwd *pw;
-	int i, j;
-	char *p;
+	char *p, *s;
 
 	/* Parse principal. */
-	for (i = 0, j = 0; i < strlen(principal); i++, j++)
-		if (principal[i] == '@')
-			break;
-
-	/* slice username */
-	if ((p = mf_dstrslice(principal, 0, j - 1)) == NULL) {
-		mf_log("principal slice error");
-		return (HTTP_INTERNAL_SERVER_ERROR);
-	}
+	p = apr_pstrdup(mf_pool, prin);
+	if ((s = strchr(p, '@')) != NULL)
+		*s = '\0';
 	if ((pw = getpwnam(p)) == NULL){
-		mf_log("User not in /etc/passwd");
+		mf_log("user not in /etc/passwd: %s", p);
 		return (HTTP_UNAUTHORIZED);
 	}
 	if (asprintf(uid, "%d", pw->pw_uid) == -1) {
@@ -736,38 +728,6 @@ mf_dstrcat(const char *s1, const char *s2)
 	(void)strncat(s, s2, strlen(s2));
 	s[len - 1] = '\0';
 	return (s);
-}
-
-/*
- * dynamic string routing to slice a section
- */
-static char *
-mf_dstrslice(const char *s, int x, int y)
-{
-	size_t len, slen;
-	char *s2;
-
-	slen = strlen(s);
-	len = y - x + 2;
-
-	if (!len)
-		/* XXX: fix this shit. */
-		return (NULL);
-
-	if ((s2 = apr_palloc(mf_pool, sizeof(char) * len)) == NULL) {
-		mf_log("malloc failed");
-		return (NULL);
-	}
-	if (x >= 0 && y >= 0) {
-		if (x < slen && y < slen) {
-			/* ptr increment to start location */
-			s += x;
-			(void)strncpy(s2, s, len - 1);
-			s2[len - 1] = '\0';
-		} else
-			s2 = NULL;
-	}
-	return (s2);
 }
 
 static void

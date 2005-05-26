@@ -373,7 +373,7 @@ mf_kxlist_setup(struct krb5_inst *ki)
 static char *
 mf_get_uid_from_ticket_cache(const char *tkt)
 {
-	int i, j, b, e;
+	int i, b, e;
 	char *uid;
 
 	/* Default to end of the string. */

@@ -379,14 +379,11 @@ mf_get_uid_from_ticket_cache(const char *tkt)
 	/* Default to end of the string. */
 	e = strlen(tkt) - 1;
 
-	/* Grab the boundary of the UID. */
-	for (i = 0, j = 0; i < (strlen(tkt) - 1) && j < 2; i++) {
-		if (tkt[i] == '_') {
-			if (j)
-				e = i;
-			else
-				b = i + 1;
-			j++;
+	/* Grab UID boundry starting at end! */
+	for (i = e; i >= 0; i--) {
+		if(tkt[i] == '_') {
+			b = i + 1;
+			break;
 		}
 	}
 

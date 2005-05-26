@@ -93,3 +93,7 @@ way to do this is to simply copy or symbolically link the following
 libraries in $GRIDFE_ROOT/WEB-INF:
 
   jce-jdk13-$VERSION.jar
+
+Also, a symbolic link 'classes' to 'src' must be made:
+
+  $ ln -s src classes

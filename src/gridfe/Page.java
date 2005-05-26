@@ -69,18 +69,22 @@ public class Page {
 
 		try {
 			Base64 enc = new Base64();
+			String hdr;
 
 			/*
 			 * Reparse authorization because getRemoteUser() doesn't
 			 * work.
 			 */
-			String combo = new String(
-			  enc.decode((String)req.getHeader("authorization")));
+			hdr = (String)req.getHeader("authorization");
+			if (hdr.startsWith("Basic "))
+				hdr = hdr.substring(6);
+			String combo = new String(enc.decode(hdr));
 			String[] auth = BasicServices.splitString(combo, ":");
 			String kuid = auth[0];
 			UserMap m = new UserMap();
 			String uid = m.kerberosToSystem(kuid);
 			this.gi = new GridInt(BasicServices.getUserID(uid));
+			this.gi.auth();
 /*
 			this.gi = new GridInt(BasicServices.getUserID(
 			    m.kerberosToSystem(req.getRemoteUser())));
@@ -88,7 +92,7 @@ public class Page {
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
-			this.error(e.getMessage() + ": " + req.getHeader("authorization"));
+			this.error(e.getClass().getName() + ": " + e.toString());
 		}
 	}
 
@@ -168,12 +172,13 @@ public class Page {
 	public String header(String title)
 	  throws OOFException {
 		String s, name, url;
-		String sr = this.servroot, wr = this.webroot;
+		String wr = this.webroot;
 		Menu m;
 		int y;
 
 		/* Register menu. */
 		this.addMenu("Main", "/", null);
+		this.addMenu("System News", "http://www.psc.edu/general/posts/posts.html", null);
 		this.addMenu("Jobs", "/jobs",
 			new Object[] {
 				"Submit", "/jobs/submit",
@@ -230,7 +235,7 @@ public class Page {
 											/* Netscape 4 may not like this. */
 			   +			     "z-index:10; visibility: hidden; \" "
 			   +			     "id=\"" + divName(m.getName()) + "\">"
-			   +				"<a href=\"" + sr + m.getURL() + "\" "
+			   +				"<a href=\"" + this.buildURL(m.getURL()) + "\" "
 			   +				   "onmouseover=\"menuShow(this.parentNode)\" "
 			   +				   "onmouseout=\"menuHide(this.parentNode)\">"
 			   +					"<img src=\"" + wr + "/img/buttons/"
@@ -245,7 +250,7 @@ public class Page {
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
 					s +=		"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
 					   +		     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
-					   +			"<a href=\"" + sr + url + "\" "
+					   +			"<a href=\"" + this.buildURL(url) + "\" "
 					   +			   "onmouseover=\"menuShow(objGet('" + divName(m.getName()) + "'))\" "
 					   +			   "onmouseout=\"menuHide(objGet('" + divName(m.getName()) + "'))\">"
 					   +				"<img src=\"" + wr + "/img/buttons/"
@@ -274,7 +279,7 @@ public class Page {
 		   +			  "text-align: center; padding-left: 113px; padding-top:1px;\">"
 		   +				"<img src=\"" + wr + "/img/propaganda.png\" alt=\"\" />"
 		   +			"</div>"
-		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px;\">"
+		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px; padding-left: 3px;\">"
 		   +				this.oof.header(new Object[] {
 								"size", "3",
 								"style", "margin-top:0px"
@@ -325,6 +330,18 @@ public class Page {
 
 	public String getWebRoot() {
 		return (this.webroot);
+	}
+
+	public HttpServletRequest getRequest() {
+		return (this.req);
+	}
+
+	public String buildURL(String s) {
+		if (s.indexOf(':') != -1) {
+			return (s);
+		} else {
+			return (this.servroot + s);
+		}
 	}
 };
 

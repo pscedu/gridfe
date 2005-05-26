@@ -10,8 +10,10 @@ public class CertFile {
 	** Certificates are normally stored in /tmp/x509up_u!!!
 	** where !!! is the userid
 	*/
+/*
 	private final String xdef = "/tmp/x509up_u";
 	private final String kdef = "/tmp/krb5cc_";
+*/
 
 	/*
 	** These are what mod_fum creates so they dont
@@ -22,8 +24,8 @@ public class CertFile {
 	** file to be read in... kinda nasty hard coded
 	** the way it is for development purposes!
 	*/
-	// private final String xdef = "/tmp/x509up_fum_u";
-	// private final String kdef = "/tmp/krb5cc_fum_";
+	private final String xdef = "/tmp/x509up_fum_u";
+	private final String kdef = "/tmp/krb5cc_fum_";
 
 	private String xfile;
 	private String kfile;

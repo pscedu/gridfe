@@ -96,7 +96,7 @@ public class GridInt implements Serializable {
 	public void revive()
 	    throws MalformedURLException, GSSException,
 		   GlobusCredentialException {
-		this.auth();
+//		this.auth();
 		for (int i = 0; i < this.list.size(); i++) {
 			this.list.get(i).revive(this.gss.getGSSCredential());
 		}

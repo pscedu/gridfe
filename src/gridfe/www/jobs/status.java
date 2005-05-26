@@ -17,7 +17,11 @@ public class status {
 		GridJob j;
 
 		s += p.header("Job Status")
-		  +  oof.table_start(new Object[] {})
+		  +  oof.table_start(new Object[] {
+			  "class", p.CCTBL,
+			  "border", "0",
+			  "cellspacing", "0",
+			  "cellpadding", "0" })
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", p.CCDESC, "value", "ID" },
 					new Object[] { "class", p.CCDESC, "value", "Name" },

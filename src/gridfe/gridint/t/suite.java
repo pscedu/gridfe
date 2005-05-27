@@ -78,17 +78,17 @@ public class suite
 		String j3_out = "gram.out.date";
 //		String j3_out = "/tmp/gram.out.date";
 		String j3_err = "gram.err";
-//		String j3_host = "intel2.psc.edu";
-		String j3_host = "mugatu.psc.edu";
+		String j3_host = "intel2.psc.edu";
+//		String j3_host = "mugatu.psc.edu";
 		String j3_name = "Date";
 		int j3_port = 28003;
 		GridJob j3 = new GridJob(j3_host);
-//		j3.setRSL(new String[] {"executable", "stdout", "directory"},
-//			new String[] {"/bin/date", j3_out, "gram_jobs"});
+		j3.setRSL(new String[] {"executable", "directory", "stdout"},
+			new String[] {"/bin/date", "gram_jobs", j3_out});
 //		j3.setRSL(new String[] {"executable", "stdout", "stderr"},
 //			new String[] {"/bin/date", j3_out, j3_err});
-		j3.setRSL(new String[] {"executable", "stdout", "directory", "stderr"},
-			new String[] {"/bin/date", j3_out, "gram_jobs", j3_err});
+//		j3.setRSL(new String[] {"executable", "stdout", "directory", "stderr"},
+//			new String[] {"/bin/date", j3_out, "gram_jobs", j3_err});
 		j3.setName(j3_name);
 
 		/* Submit the job to GRAM */
@@ -101,6 +101,7 @@ public class suite
 		/* Print the job id string */
 		System.out.println("j - id string: "+j.getIDAsString());
 		System.out.println("j2 - id string: "+j2.getIDAsString());
+		System.out.println("j3 - id string: "+j3.getIDAsString());
 
 		/* Test Serialization */
 		System.out.println("Serializing Job...");
@@ -150,6 +151,10 @@ public class suite
 		System.out.println(j3);
 
 		/* Data Retrieval (Read a few chunks, then the rest */
+	/* Data Retrieval only works on localhost for now, so disable */
+	int ret = 0;
+	if(ret == 1)
+	{
 		String[] data = {"", ""};
 		String[] file = {j3.stdout, j3.stderr};
 		for (int i = 0; i < 2; i++) {
@@ -176,6 +181,7 @@ public class suite
 
 		System.out.println("stderr: "+data[1]);
 		System.out.println("stdout: "+data[0]);
+	}
 
 		/* Get the job list and len */
 		JobList jl = gi.getJobList();

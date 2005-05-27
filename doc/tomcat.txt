@@ -85,8 +85,8 @@ LoadModule jk2_module modules/mod_jk2.so
         SSLRequireSSL
 </Location>
 
-Site Layout
-===========
+Site Layout and Installation
+============================
 Java and CoG routines are used in GridFE, so these libraries will needed
 to be added to the CLASSPATH.  The easiest, servlet-runner-independent
 way to do this is to simply copy or symbolically link the following
@@ -94,6 +94,14 @@ libraries in $GRIDFE_ROOT/WEB-INF:
 
   jce-jdk13-$VERSION.jar
 
-Also, a symbolic link 'classes' to 'src' must be made:
+Next, the distribution needs to be built.  Change directory into the
+GridFE source code root and run:
+
+  $ make
+  $ make install
+
+After a successful build, the 'src' directory needs to be renamed to
+'classes', as this is the name that Java servlet runners expect to find
+the servlet classes:
 
   $ ln -s src classes

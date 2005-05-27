@@ -28,8 +28,13 @@ public class UserMap {
 				for (int j = 0; j < fields.length; j++) {
 					String[] pair = BasicServices.splitString(fields[j],
 					    "=");
+					/*
+					 * OpenSSL 0.9.6 (Globus 2.x) uses `USERID'.
+					 * OpenSSL 0.9.7 (Globus 4.x) uses `UID'.
+					 */
 					if (pair.length == 2 &&
-					    pair[0].equals("USERID") &&
+					    (pair[0].equals("USERID") ||
+					     pair[0].equals("UID")) &&
 					    pair[1].equals(prin))
 						return (dn.getUsername());
 				}

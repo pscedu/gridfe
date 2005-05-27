@@ -349,6 +349,28 @@ System.out.println("want user " + uid + ", kuid " + kuid);
 			return (this.servroot + s);
 		}
 	}
+
+	public String escapeHTML(String s) {
+		String t = "";
+		char ch;
+		for (int i = 0; i < s.length(); i++) {
+			ch = s.charAt(i);
+			switch (ch) {
+			case '<':  t += "&lt;";		break;
+			case '>':  t += "&gt;";		break;
+			case '"':  t += "&quot;";	break;
+			case '\'': t += "&apos;";	break;
+			case '&':  t += "&amp;";	break;
+			default:
+				if (32 <= ch && ch <= 126)
+					t += ch;
+				else
+					t += "&#" + Integer(ch) + ";";
+				break;
+			}
+		}
+		return (t);
+	}
 };
 
 /* vim: set ts=4: */

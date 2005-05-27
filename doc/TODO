@@ -1,9 +1,10 @@
 $Id$
 
----- GridFE ----
-
-1. Add configuration to apache to not permit SSLv2... should be
+Add configuration to apache to not permit SSLv2... should be
 the command "SSLProtocol all -SSLv2" but figure out where it goes
 (this should be a real quick fix)
 
-2. Add timestamp to submitted jobs...
+Add timestamp to submitted jobs.
+
+Add example suite and show equivalent of "globus-job-run" commands
+for a variety of examples

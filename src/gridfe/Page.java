@@ -365,7 +365,7 @@ System.out.println("want user " + uid + ", kuid " + kuid);
 				if (32 <= ch && ch <= 126)
 					t += ch;
 				else
-					t += "&#" + Integer(ch) + ";";
+					t += "&#" + new Integer(ch) + ";";
 				break;
 			}
 		}

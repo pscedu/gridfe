@@ -95,6 +95,7 @@ public class GridFE extends HttpServlet {
 				handler = this.dtab[i].getHandler();
 				break;
 			}
+			/* XXX: redirect when `/' for a dir is not given. */ 
 			/* Handle "/foo" for "/foo/index". */
 			if (s.length() > uri.length())
 				c = s.charAt(uri.length());
@@ -116,6 +117,7 @@ public class GridFE extends HttpServlet {
 				new Class[] { Page.class }).invoke(null, new Object[] {p});
 		} catch (Exception e) {
 			s = this.handleError(p, e + ": " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		w.print(s);

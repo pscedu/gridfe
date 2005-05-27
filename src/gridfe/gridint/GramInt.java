@@ -29,11 +29,15 @@ public class GramInt {
 	public void jobSubmit(GridJob j)
 	    throws GramException, GSSException {
 		/* Make sure the host is there */
+		System.out.println("Trying to Ping Host");
 		Gram.ping(this.gss, this.host);
+		System.out.println(e.getMessage());
 
 		/* Create and process Job */
 		this.job = this.createJob(j.toString());
+		System.out.println("Trying GramJob.request()");
 		this.job.request(this.host, true);
+		System.out.println("GramJob.request() finished!");
 	}
 
 	/* Used internally to by this.gramRequest and GridJob.revive */

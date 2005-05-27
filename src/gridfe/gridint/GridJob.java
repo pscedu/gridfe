@@ -53,6 +53,7 @@ public class GridJob extends RSLElement implements Serializable
 		** was submitted? (just a thought)
 		*/
 		this.gi.jobSubmit(this);
+		System.out.println("this.gi.jobSubmit finished");
 		this.id = this.gi.getIDAsString();
 	}
 

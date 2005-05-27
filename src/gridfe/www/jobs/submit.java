@@ -24,15 +24,23 @@ public class submit {
 			stdout = req.getParameter("stdout");
 
 			if (label == null || host == null || args == null ||
-			  exec == null || stdout == null)
-				errmsg = "Please specify all parameters.";
+			  exec == null || stdout == null || host.equals("") ||
+			  label.equals("") || exec.equals(""))
+				errmsg = "Please specify all required form fields.";
 			if (errmsg == null) {
+System.out.println("GridJob()");
 				GridJob j = new GridJob(host);
+System.out.println("GridInt()");
+				GridInt gi = p.getGridInt();
+System.out.println("job.set()");
 				j.setName(label);
 				j.setRSL(
 					new String[] { "executable", "arguments", "stdout" },
 					new String[] { exec, args, stdout });
-				j.run();
+//				j.run();
+System.out.println("job.submit()");
+				gi.jobSubmit(j);
+System.out.println("job.submit() returned");
 
 				String s = "";
 				s += p.header("Submitted Job")
@@ -55,7 +63,7 @@ public class submit {
 		s += oof.form(
 				new Object[] {
 					"action", "submit",
-					"method", "GET",
+					"method", "POST",
 					"enctype", "application/x-www-form-urlencoded"
 				},
 				new Object[] {
@@ -144,6 +152,7 @@ public class submit {
 									"class", p.CCTBLFTR,
 									"value", oof.input(new Object[] {
 												"type", "submit",
+												"name", "submitted",
 												"value", "Submit"
 											})
 								}

@@ -83,9 +83,12 @@ public class Page {
 			String kuid = auth[0];
 			UserMap m = new UserMap();
 			String uid = m.kerberosToSystem(kuid);
+System.out.println("want user " + uid + ", kuid " + kuid);
 			this.gi = new GridInt(BasicServices.getUserID(uid));
 			this.gi.auth();
 /*
+			// Tomcat does not get the real getRemoteUser(), so we
+			// have to hack.
 			this.gi = new GridInt(BasicServices.getUserID(
 			    m.kerberosToSystem(req.getRemoteUser())));
 */
@@ -187,6 +190,9 @@ public class Page {
 			});
 		this.addMenu("Certificate Management", "/certs", null);
 /*
+		this.addMenu("MDS/LDAP", "/ldap", null);
+		this.addMenu("GridFTP", "/gridftp", null);
+		this.addMenu("GRIS/GIIS", "/gris", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalog",		"/rls/addcat",

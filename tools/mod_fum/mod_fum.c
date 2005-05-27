@@ -102,6 +102,7 @@ static void	 mf_kinit_cleanup(struct krb5_inst *);
 static void	 mf_krb5_free(struct krb5_inst *);
 static void	 mf_log(const char *, ...);
 static void	 mod_fum_hooks(apr_pool_t *);
+static int	 mf_remove_certs(char *principal);
 
 int do_kx509(int, char **);
 int mod_fum_main(const char *, const char *);
@@ -163,6 +164,7 @@ mf_log("auth()");
 
 	/* Check if previous credentials exist. */
 	if (!mf_check_for_cred(user)) {
+mf_log("creating new credentials");
 		/* Create new certs. */
 		if ((err = mod_fum_main(user, pass)) ==
 		    HTTP_UNAUTHORIZED)
@@ -186,22 +188,30 @@ mf_log("auth() - valid");
 	/*
 	 * Finally check if the credentials have expired
 	 * or not.  If so, create new certs; if not, do
-	 * nothing.
+	 * nothing. Mod_fum assumes that if the kerberos
+	 * ticket (created by mod_fum) is valid, that the
+	 * X.509 Ticket is as well.
 	 */
 	if (!mf_valid_cred(user)) {
 		/*
-		 * XXX This could also be a permissions problem.  If the
-		 * user has already a valid X.509 certificate, Apache
-		 * does not have permission to read it.
+		 * This could also be a permissions problem.  If the
+		 * user has already a valid kerberos certificate, Apache
+		 * does not have permission to read it. Thus mod_fum
+		 * creates credentials with unique names.
 		 */
-		mf_log("credentials expired");
-		goto failed_auth;
+		mf_log("credentials expired, removing and recreating");
+
+		/* Try and remove old certs */
+		mf_remove_certs(user);
+	
+		/* Create new certs */
+		if ((err = mod_fum_main(user, pass)) != HTTP_UNAUTHORIZED)
+			return (err);
 	}
 
-mf_log("auth() - create");
-	/* Create new certs */
-	if ((err = mod_fum_main(user, pass)) != HTTP_UNAUTHORIZED)
-		return (err);
+	/* Without this, auth always fails with previous credentails */
+	else
+		return OK;
 
 failed_auth:
 	name = ap_auth_name(r);
@@ -693,6 +703,31 @@ cleanup:
 	mf_kinit_cleanup(&ki);
 	mf_krb5_free(&ki);
 	return (ki.ki_init);
+}
+
+/*
+** Remove krb5 and x509 certificates
+*/
+static int mf_remove_certs(char *principal)
+{
+	char *command;
+	char *file;
+	char *uid;
+	int err;
+
+	/* Get uid */
+	if((err = mf_user_id_from_principal(principal, &uid)) != 0)
+		mf_log("mod_fum uid error %d", err);
+	
+	/* Remove kerberos tkt */
+	file = mf_dstrcat(_PATH_KRB5CERT, uid);
+	if((err = remove(file)) != 0)
+		mf_log("error removing KRB5CERT");
+
+	/* Remove x509 cert */
+	file = mf_dstrcat(_PATH_X509CERT, uid);
+	if((err = remove(file)) != 0)
+		mf_log("error removing X509CERT");
 }
 
 /*

@@ -19,7 +19,7 @@
 <!--
 	<init-param>
 		<param-name>extra-classpath</param-name>
-		<param-value>/var/www/gridfe/WEB-INF/classes/jce-jdk13-120.jar</param-value>
+		<param-value>/var/www/gridfe/WEB-INF/classes/jce-jdk13-125.jar</param-value>
 	</init-param>
 -->
 </web-app>

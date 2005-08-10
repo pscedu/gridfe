@@ -290,6 +290,10 @@ public class Page {
 
 		s +=			"</div>"
 		   +		"</div>"
+		   +		"<div style=\"clear: both; width: 826px; text-align: right\">"
+		   +			"Copyright &copy; 2004-2005 "
+		   +			"<a href=\"http://www.psc.edu/\">Pittsburgh Supercomputing Center</a>"
+		   +		"</div>"
 		   +	"</body>"
 		   + "</html>";
 

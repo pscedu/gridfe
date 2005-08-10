@@ -25,15 +25,15 @@ class Menu {
 	}
 
 	public String getName() {
-		return this.name;
+		return (this.name);
 	}
 
 	public String getURL() {
-		return this.url;
+		return (this.url);
 	}
 
 	public LinkedList getItems() {
-		return this.items;
+		return (this.items);
 	}
 }
 
@@ -83,15 +83,8 @@ public class Page {
 			String kuid = auth[0];
 			UserMap m = new UserMap();
 			String uid = m.kerberosToSystem(kuid);
-System.out.println("want user " + uid + ", kuid " + kuid);
 			this.gi = new GridInt(BasicServices.getUserID(uid));
 			this.gi.auth();
-/*
-			// Tomcat does not get the real getRemoteUser(), so we
-			// have to hack.
-			this.gi = new GridInt(BasicServices.getUserID(
-			    m.kerberosToSystem(req.getRemoteUser())));
-*/
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
@@ -123,7 +116,8 @@ System.out.println("want user " + uid + ", kuid " + kuid);
 		String t = "";
 
 		for (int i = 0; i < name.length(); i++)
-			if (name.charAt(i) != ' ')
+			if (name.charAt(i) != ' ' &&
+			    name.charAt(i) != '/')
 				t += name.charAt(i);
 		return (t);
 	}
@@ -189,10 +183,9 @@ System.out.println("want user " + uid + ", kuid " + kuid);
 				"Output", "/jobs/output"
 			});
 		this.addMenu("Certificate Management", "/certs", null);
-/*
-		this.addMenu("MDS/LDAP", "/ldap", null);
-		this.addMenu("GridFTP", "/gridftp", null);
-		this.addMenu("GRIS/GIIS", "/gris", null);
+//		this.addMenu("MDS/LDAP", "/ldap", null);
+//		this.addMenu("GridFTP", "/gridftp", null);
+//		this.addMenu("GRIS/GIIS", "/gris", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalog",		"/rls/addcat",
@@ -201,7 +194,6 @@ System.out.println("want user " + uid + ", kuid " + kuid);
 				"Add Resource",		"/rls/addres"
 			});
 		this.addMenu("Node Availability", "/nodes", null);
-*/
 
 		/* Start page output. */
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"

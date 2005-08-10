@@ -16,9 +16,9 @@ public class index {
 		   + oof.list(
 				oof.LIST_UN,
 				new Object[] {
-					oof.link("Submit a job", "/jobs/submit"),
-					oof.link("View status of a job", "/jobs/status"),
-					oof.link("Collect output from a job", "/jobs/output")
+					oof.link("Submit a job", p.buildURL("/jobs/submit")),
+					oof.link("View status of a job", p.buildURL("/jobs/status")),
+					oof.link("Collect output from a job", p.buildURL("/jobs/output"))
 				}
 		     )
 		   + p.footer();

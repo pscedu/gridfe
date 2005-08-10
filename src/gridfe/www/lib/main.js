@@ -26,6 +26,8 @@ function menuMove() {
 window.onload = function() {
 	if (document.cookie != null)
 		MENU_INIT_INTV = 0
+	else
+		document.cookie = 'init=true'
 	window.setTimeout('menuMove()', MENU_INIT_INTV)
 }
 

@@ -201,6 +201,7 @@ public class Page {
 		  + 	"<head>"
 		  +	 		"<title>GridFE - " + this.jasp.escapeHTML(title) + "</title>"
 		  +			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
+		  +			"<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />"
 		  +			"<link rel=\"stylesheet\" type=\"text/css\" "
 		  +				"href=\"" + wr + "/lib/main.css\" media=\"screen\">"
 		  +			"<script type=\"text/javascript\" src=\"" + wr + "/lib/Global.js\"></script>"

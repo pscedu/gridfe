@@ -40,7 +40,8 @@ public class certs {
 				new Object[] {
 					"border", "0",
 					"cellspacing", "0",
-					"cellpadding", "0"
+					"cellpadding", "0",
+					"class", "tbl"
 				},
 				new Object[][][] {
 					new Object[][] {

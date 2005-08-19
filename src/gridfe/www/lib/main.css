@@ -22,6 +22,8 @@ body {
 	padding: 2px;
 	color: #ffffff;
 	font-weight: bold;
+	width: 20%;
+	vertical-align: top;
 }
 
 .data1 {
@@ -32,7 +34,7 @@ body {
 }
 
 .data2 {
-	background-color: #DDEEFF;
+	background-color: #EEEEFF;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
 	padding: 2px;
@@ -50,7 +52,7 @@ td.hdr, td.subhdr {
 	border-left: 1px solid black;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
-	padding: 5px;
+	padding: 3px;
 }
 
 td.hdr + td.hdr, td.subhdr + td.subhdr {
@@ -67,13 +69,33 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 
 .tbl {
 	border-top: 1px solid black;
+	width: 600px;
 }
 
 .tblftr {
 	text-align: center;
-	background-color: #000066;
+	background-color: #003366;
+	padding: 3px;
 }
 
 a:link, a:visited {
 	color: #336699;
+}
+
+input {
+	background-color: #ddeeff;
+	border: 1px solid black;
+	padding: 1px;
+	margin-right: 1px;
+}
+
+.button, button {
+	background-color: #336699;
+	color: #ffffff;
+	border: 1px solid black;
+	font-weight: bold;
+}
+
+.err {
+	color: #990000;
 }

@@ -65,7 +65,8 @@ System.out.println("job.submit() returned");
 		   +   "once it is completed.");
 		if (errmsg != null)
 			s += oof.p(new Object[] { "class", "err" },
-			  "An error has occurred while processing your submission: " + errmsg);
+			  "" + oof.strong("An error has occurred while processing your submission: ") +
+			  errmsg);
 		s += oof.form(
 				new Object[] {
 					"action", "submit",

@@ -57,6 +57,9 @@ public class Page {
 	public final static Object CCTBLFTR = (Object)"tblftr";
 	public final static int MENU_ITEM_HEIGHT = 35;
 
+	public final static int PATHTYPE_WEB = 0;
+	public final static int PATHTYPE_SERV = 1;
+
 	Page(HttpServletRequest req, HttpServletResponse res) {
 		this.req = req;
 		this.res = res;
@@ -341,6 +344,20 @@ public class Page {
 			return (s);
 		} else {
 			return (this.servroot + s);
+		}
+	}
+
+	public String buildURL(int type, String s) {
+		if (s.indexOf(':') != -1)
+			return (s);
+		switch (type) {
+		case PATHTYPE_WEB:
+			return (this.webroot + s);
+		case PATHTYPE_SERV:
+			return (this.servroot + s);
+		default:
+			/* throw new InvalidPathTypeException(); */
+			return (null);
 		}
 	}
 

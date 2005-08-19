@@ -15,38 +15,46 @@ public class submit {
 
 		req = p.getRequest();
 		if (req.getParameter("submitted") != null) {
-			String label, host, args, exec, stdout;
+			String label = req.getParameter("label");
+			String host = req.getParameter("host");
+			String localexec = req.getParameter("localexec");
+			String remoteexec = req.getParameter("remoteexec");
+			String args = req.getParameter("args");
+			String stdout = req.getParameter("stdout");
 
-			label = req.getParameter("label");
-			host = req.getParameter("host");
-			args = req.getParameter("args");
-			exec = req.getParameter("exec");
-			stdout = req.getParameter("stdout");
+			if (label == null)
+				label = "";
+			if (host == null)
+				host = "";
+			if (localexec == null)
+				localexec = "";
+			if (remoteexec == null)
+				remoteexec = "";
+			if (args == null)
+				args = "";
+			if (stdout == null)
+				stdout = "";
 
-			if (label == null || host == null || args == null ||
-			  exec == null || stdout == null || host.equals("") ||
-			  label.equals("") || exec.equals(""))
-				errmsg = "Please specify all required form fields.";
-			if (errmsg == null) {
-System.out.println("GridJob()");
-				GridJob j = new GridJob(host);
-System.out.println("GridInt()");
-				GridInt gi = p.getGridInt();
-System.out.println("job.set()");
-				j.setName(label);
-				j.setRSL(
-					new String[] { "executable", "arguments", "stdout" },
-					new String[] { exec, args, stdout });
-//				j.run();
-System.out.println("job.submit()");
-				gi.jobSubmit(j);
-System.out.println("job.submit() returned");
+			if (req.getParameter("submitted").equals("View RLS For This Submission")) {
+			} else {
+				if (host.equals("") || label.equals("") ||
+				  (remoteexec.equals("") && localexec.equals("")))
+					errmsg = "Please specify all required form fields.";
+				if (errmsg == null) {
+					GridJob j = new GridJob(host);
+					GridInt gi = p.getGridInt();
+					j.setName(label);
+					j.setRSL(
+						new String[] { "executable", "arguments", "stdout" },
+						new String[] { remoteexec, args, stdout });
+					gi.jobSubmit(j);
 
-				String s = "";
-				s += p.header("Submitted Job")
-				   + p.getOOF().p("The job has been submitted successfully.")
-				   + p.footer();
-				return (s);
+					String s = "";
+					s += p.header("Submitted Job")
+					   + p.getOOF().p("The job has been submitted successfully.")
+					   + p.footer();
+					return (s);
+				}
 			}
 		}
 		return (form(p, errmsg));
@@ -192,7 +200,11 @@ System.out.println("job.submit() returned");
 										"The contents may, however, be displayed or saved " +
 										"to your local computer from the " +
 										oof.link("Job Output", p.buildURL("/jobs/output")) +
-										" page."
+										" page." +
+										oof.br() +
+										oof.br() +
+										"Leaving this field blank will result in no output " +
+										"being saved."
 /*
 										checkbox
 										[x] Download to local machine?

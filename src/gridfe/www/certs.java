@@ -36,6 +36,8 @@ public class certs {
 				   min + " mins";
 
 		s += p.header("Certificate Management")
+		   + oof.p("The following information has been extracted from the " +
+		     "certificate that was generated for you when you logged on.")
 		   + oof.table(
 				new Object[] {
 					"border", "0",

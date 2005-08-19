@@ -10,7 +10,7 @@ body {
 .bg {
 	background-color: #336699;
 	/* XXX: dynamically generate path */
-	background-image: url(/gridfe/img/background.png);
+	/* background-image: url(/gridfe/img/background.png); */
 }
 
 .desc {
@@ -20,6 +20,8 @@ body {
 	border-top: 0px;
 	white-space: nowrap;
 	padding: 2px;
+	color: #ffffff;
+	font-weight: bold;
 }
 
 .data1 {
@@ -30,7 +32,7 @@ body {
 }
 
 .data2 {
-	background-color: #EEEEEE;
+	background-color: #DDEEFF;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
 	padding: 2px;
@@ -45,10 +47,13 @@ body {
 }
 
 td.hdr, td.subhdr {
-	border: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	padding: 5px;
 }
 
-td.hdr > td.hdr, td.subhdr > td.subhdr {
+td.hdr + td.hdr, td.subhdr + td.subhdr {
 	border-left: 0px;
 }
 
@@ -61,9 +66,14 @@ td.hdr > td.hdr, td.subhdr > td.subhdr {
 }
 
 .tbl {
+	border-top: 1px solid black;
 }
 
 .tblftr {
 	text-align: center;
 	background-color: #000066;
+}
+
+a:link, a:visited {
+	color: #336699;
 }

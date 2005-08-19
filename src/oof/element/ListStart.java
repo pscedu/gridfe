@@ -4,12 +4,10 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class ListStart extends START
-{
+public class ListStart extends START {
 	public Object type;
 	public ListStart(OOF oof, Object[] attrs)
-		throws OOFBadElementFormException
-	{
+	    throws OOFBadElementFormException {
 		super(oof, attrs);
 		if ((this.type = this.removeAttribute("type")) != this.oof.LIST_UN &&
 		    this.type != this.oof.LIST_OD)

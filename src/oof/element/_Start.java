@@ -5,22 +5,19 @@ import java.util.*;
 import oof.*;
 import oof.element.*;
 
-public abstract class START implements Startable
-{
+public abstract class START implements Startable {
 	public LinkedList attrs;
 	public OOF oof;
 
 	public START(OOF oof, Object[] attrs)
-		throws OOFBadElementFormException
-	{
+	    throws OOFBadElementFormException {
 		this.oof	= oof;
 		this.attrs	= new LinkedList();
 		for (int i = 0; i < attrs.length; i++)
 			this.attrs.add(attrs[i]);
 	}
 
-	public Object removeAttribute(String key)
-	{
+	public Object removeAttribute(String key) {
 		for (int i = 0; i < this.attrs.size(); i += 2)
 			if (((String)this.attrs.get(i)).equals(key)) {
 				Object val = this.attrs.get(i + 1);
@@ -31,14 +28,12 @@ public abstract class START implements Startable
 		return null;
 	}
 
-	public void addAttribute(String key, String val)
-	{
+	public void addAttribute(String key, String val) {
 		this.attrs.add((Object)key);
 		this.attrs.add((Object)val);
 	}
 
-	public String getAttribute(String key)
-	{
+	public String getAttribute(String key) {
 		Object e;
 		for (Iterator i = this.attrs.iterator();
 		     (e = i.next()) != null; )
@@ -47,14 +42,13 @@ public abstract class START implements Startable
 		return null;
 	}
 
-	public LinkedList getAttributes()
-	{
+	public LinkedList getAttributes() {
 		return this.attrs;
 	}
 
-	public String toString()
-	{
-		/* This would be so much easier:
+	public String toString() {
+		/*
+		 * This would be so much easier:
 		 *	this.oof.__getFilter().build(this);
 		 */
 		try {

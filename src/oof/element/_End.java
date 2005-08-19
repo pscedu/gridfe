@@ -4,17 +4,15 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public abstract class END implements Endable
-{
+public abstract class END implements Endable {
 	public OOF oof;
 
-	public END(OOF oof) throws OOFBadElementFormException
-	{
+	public END(OOF oof)
+	    throws OOFBadElementFormException {
 		this.oof = oof;
 	}
 
-	public String toString()
-	{
+	public String toString() {
 		/* This would be so much easier:
 		 *	this.oof.__getFilter().build(this);
 		 */

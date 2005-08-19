@@ -28,6 +28,7 @@ body {
 
 .data1 {
 	background-color: #FFFFFF;
+	border-left: 1px solid black;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
 	padding: 2px;
@@ -35,9 +36,14 @@ body {
 
 .data2 {
 	background-color: #EEEEFF;
+	border-left: 1px solid black;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
 	padding: 2px;
+}
+
+td + .data1, td + .data2 {
+	border-left: 0px;
 }
 
 .hdr {
@@ -45,7 +51,7 @@ body {
 	background-color: #6699CC;
 	color: #FFFFFF;
 	font-weight: bold;
-	font-size: 18px;
+	font-size: 16px;
 }
 
 td.hdr, td.subhdr {
@@ -64,7 +70,7 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 	background-color: #336699;
 	color: #FFFFFF;
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 .tbl {

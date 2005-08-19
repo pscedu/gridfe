@@ -214,87 +214,84 @@ public class Page {
 		   				"include('" + wr + "/lib/main.js');")
 		  +		"</head>"
 		  +		"<body>"
-		  +			"<div class=\"bg\" style=\"width: 826px;\">"
-		  +				"<div class=\"bg\" style=\"width: 200px; float: left; text-align:center;\">"
-		  +					"<br />"
-		   					/* PSC logo. */
-		  +					"<div style=\"position: relative; top:0px; left:0px; z-index:100\">"
+		  +			"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"bg\" width=\"827\">"
+		  +				"<tr>"
+		  +					"<td width=\"200\" align=\"center\" rowspan=\"3\" "
+		  +					  "style=\"border-bottom:1px solid black\">"
+		  +						"<br />"
+		   						/* PSC logo. */
 		  +						"<a href=\"http://www.psc.edu/\">"
 		  +							"<img src=\"" + wr + "/img/psc.png\" "
 		  +							     "alt=\"[Pittsburgh Supercomputing Center]\" "
 		  +							     "border=\"0\" />"
 		  +						"</a>"
-		  +						"<br /><br />"
-		  +					"</div>";
+		  +						"<br /><br />";
 
 		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().size();
 		for (Iterator i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
-			s +=			"<div style=\"position: relative; top:" + y + "px; left:0px; "
-											/* Netscape 4 may not like this. */
-			   +			     "z-index:10; visibility: hidden; \" "
-			   +			     "id=\"" + divName(m.getName()) + "\">"
-			   +				"<a href=\"" + this.buildURL(m.getURL()) + "\" "
-			   +				   "onmouseover=\"menuShow(this.parentNode)\" "
-			   +				   "onmouseout=\"menuHide(this.parentNode)\">"
+			s +=				"<a href=\"" + this.buildURL(m.getURL()) + "\">"
 			   +					"<img src=\"" + wr + "/img/buttons/"
 			   +						imageName(m.getName()) + ".png\" "
 			   +					     "alt=\"" + m.getName() + "\" border=\"0\" />"
-			   +				"</a>"
-			   +			"</div>";
+			   +				"</a>";
 			if (m.getItems() != null) {
 				/* Sub-menu */
 				for (Iterator j = m.getItems().iterator();
 				     j.hasNext() && (name = (String)j.next()) != null &&
 				     j.hasNext() && (url  = (String)j.next()) != null; ) {
-					s +=		"<div style=\"position: relative; top:0px; left:0px; z-index:5; "
-					   +		     "display:none\" id=\"" + divName(m.getName() + name) + "\">"
-					   +			"<a href=\"" + this.buildURL(url) + "\" "
-					   +			   "onmouseover=\"menuShow(objGet('" + divName(m.getName()) + "'))\" "
-					   +			   "onmouseout=\"menuHide(objGet('" + divName(m.getName()) + "'))\">"
+					s +=			"<a href=\"" + this.buildURL(url) + "\">"
 					   +				"<img src=\"" + wr + "/img/buttons/"
 					   +					imageName(name) + ".png\" "
 					   +				     "alt=\"" + name + "\" border=\"0\" />"
-					   +			"</a>"
-					   +		"</div>";
+					   +			"</a>";
 				}
 			}
 		}
 
-							/* Sponsors */
-		s +=				"<br />"
-		   +				"<a href=\"http://www-unix.globus.org/cog/\">"
-		   +					"<img src=\"" + wr + "/img/cog-toolkit.png\" border=\"0\" />"
-		   +				"</a>"
-		   +				"<a href=\"\">"
-		   +					"<img src=\"" + wr+ "/img/globus-toolkit.png\" border=\"0\" />"
-		   +				"</a>"
-		   +				"<br /><br />"
-		   +			"</div>"
-		   +			"<div style=\"width: 700px; margin-left: 413px\">"
-		   +				"<img src=\"" + wr + "/img/gridfe.png\" alt=\"[GridFE]\" />"
-		   +			"</div>"
-		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px; "
-		   +			  "text-align: center; padding-left: 113px; padding-top:1px;\">"
-		   +				"<img src=\"" + wr + "/img/propaganda.png\" alt=\"\" />"
-		   +			"</div>"
-		   +			"<div style=\"background-color: #ffffff; width: 626px; margin-left: 200px; padding-left: 3px;\">"
-		   +				this.oof.header(new Object[] {
-								"size", "3",
-								"style", "margin-top:0px"
-							}, title);
+								/* Sponsors */
+		s +=					"<br /><br />"
+		   +					"<a href=\"http://www-unix.globus.org/cog/\">"
+		   +						"<img src=\"" + wr + "/img/cog-toolkit.png\" border=\"0\" />"
+		   +					"</a>"
+		   +					"<a href=\"\">"
+		   +						"<img src=\"" + wr+ "/img/globus-toolkit.png\" border=\"0\" />"
+		   +					"</a>"
+		   +					"<br /><br />"
+		   +				"</td>"
+		   +				"<td align=\"right\" height=\"107\" "
+		   +				    "style=\"border-right: 1px solid black; border-bottom: 1px solid black\">"
+		   +					"<img src=\"" + wr + "/img/gridfe.png\" alt=\"[GridFE]\" border=\"0\" hspace=\"0\" />"
+		   +				"</td>"
+		   +			"</tr>"
+		   +			"<tr>"
+		   +				"<td align=\"center\" height=\"7\" style=\"background-color: #ffffff; "
+		   +				  "padding-left: 213px; border-left: 1px solid black\">"
+		   +					"<img src=\"" + wr + "/img/propaganda.png\" alt=\"\" />"
+		   +				"</td>"
+		   +			"</tr>"
+		   +			"<tr>"
+		   +				"<td style=\"background-color: #ffffff; padding-left: 3px; "
+		   +				  "border-left: 1px solid black\" valign=\"top\">"
+		   +					this.oof.header(new Object[] {
+									"size", "3",
+									"style", "margin-top:0px"
+								}, title);
 		return (s);
 	}
 
 	public String footer() {
 		String s = "";
 
-		s +=			"</div>"
-		   +		"</div>"
-		   +		"<div style=\"clear: both; width: 826px; text-align: right\">"
-		   +			"Copyright &copy; 2004-2005 "
-		   +			"<a href=\"http://www.psc.edu/\">Pittsburgh Supercomputing Center</a>"
-		   +		"</div>"
+		s +=				"</td>"
+		   +			"</tr>"
+		   +			"<tr>"
+		   +				"<td align=\"right\" colspan=\"3\" style=\"background-color: #ffffff\">"
+		   +					"Copyright &copy; 2004-2005 "
+		   +					"<a href=\"http://www.psc.edu/\">Pittsburgh Supercomputing Center</a>"
+		   +				"</td>"
+		   +			"</tr>"
+		   +		"</table>"
 		   +	"</body>"
 		   + "</html>";
 

@@ -3,47 +3,33 @@ package oof.element;
 
 import java.util.*;
 import oof.*;
-import oof.element.*;
 
 public abstract class _Start implements Startable {
-	public LinkedList attrs;
+	public HashMap attrs;
 	public OOF oof;
 
 	public _Start(OOF oof, Object[] attrs)
 	    throws OOFBadElementFormException {
 		this.oof	= oof;
-		this.attrs	= new LinkedList();
-		for (int i = 0; i < attrs.length; i++)
-			this.attrs.add(attrs[i]);
+		this.attrs	= new HashMap();
+		for (int i = 0; i < attrs.length; i += 2)
+			this.attrs.put(attrs[i], attrs[i + 1]);
+	}
+
+	public void addAttribute(String key, Object val) {
+		this.attrs.put(key, val);
+	}
+
+	public Object getAttribute(String key) {
+		return (this.attrs.get(key));
 	}
 
 	public Object removeAttribute(String key) {
-		for (int i = 0; i < this.attrs.size(); i += 2)
-			if (((String)this.attrs.get(i)).equals(key)) {
-				Object val = this.attrs.get(i + 1);
-				this.attrs.remove(i);
-				this.attrs.remove(i);
-				return val;
-			}
-		return null;
+		return (this.attrs.remove(key));
 	}
 
-	public void addAttribute(String key, String val) {
-		this.attrs.add((Object)key);
-		this.attrs.add((Object)val);
-	}
-
-	public String getAttribute(String key) {
-		Object e;
-		for (Iterator i = this.attrs.iterator();
-		     (e = i.next()) != null; )
-			if (((String)e).equals(key))
-				return (String)i.next();
-		return null;
-	}
-
-	public LinkedList getAttributes() {
-		return this.attrs;
+	public HashMap getAttributes() {
+		return (this.attrs);
 	}
 
 	public String toString() {

@@ -48,7 +48,7 @@ td + .data1, td + .data2 {
 
 .hdr {
 	text-align: center;
-	background-color: #6699CC;
+	background-color: #336699;
 	color: #FFFFFF;
 	font-weight: bold;
 	font-size: 16px;
@@ -80,8 +80,11 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 
 .tblftr {
 	text-align: center;
-	background-color: #003366;
+	background-color: #336699;
 	padding: 3px;
+	border-bottom: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
 }
 
 a:link, a:visited {

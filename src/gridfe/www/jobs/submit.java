@@ -110,7 +110,7 @@ public class submit {
 											"name", "label"
 										}) +
 										oof.br() +
-										"This field should contain a label " +
+										"&raquo; This field should contain a label " +
 										"that serves as a mnemonic to you so that " +
 										"you can later quickly access the job."
 								}
@@ -129,10 +129,13 @@ public class submit {
 										}) +
 										oof.input(new Object[] {
 											"type", "select",
-											"options", "Choose a host..."
+											"options", new Object[] {
+												"", "Choose a host...",
+												"test", "testhost"
+											}
 										}) +
 										oof.br() +
-										"This fields should contain the host name " +
+										"&raquo; This field should contain the host name " +
 										"of the target machine on which you would " +
 										"your job to run.  You may select a previously " +
 										"configured host from the drop-down box on the " +
@@ -177,8 +180,8 @@ public class submit {
 											"name", "args"
 										}) +
 										oof.br() +
-										"Any optional command-line arguments to the " +
-										"program can be placed here."
+										"&raquo; Any optional command-line arguments to " +
+										"the program can be placed here."
 								}
 							},
 							new Object[][] {
@@ -194,11 +197,11 @@ public class submit {
 											"name", "stdout"
 										}) +
 										oof.br() +
-										"This specifies the file name that will contain " +
-										"any output produced by your job, and it will saved " +
-										"on the machine where you chose to run your job.  " +
-										"The contents may, however, be displayed or saved " +
-										"to your local computer from the " +
+										"&raquo; This specifies the file name that will " +
+										"contain any output produced by your job, and it " +
+										"will be saved on the machine where you chose to " +
+										"run your job.  The contents may, however, be " +
+										"displayed or saved to your local computer from the " +
 										oof.link("Job Output", p.buildURL("/jobs/output")) +
 										" page." +
 										oof.br() +

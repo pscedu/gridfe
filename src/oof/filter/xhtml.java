@@ -19,7 +19,10 @@ public class xhtml implements Filter {
 		String t = this.build(name, (Startable)e);
 		String v = e.getValue();
 
-		if (v.equals("") && !name.equals("div") && !name.equals("a")) {
+		if (v.equals("") &&
+		    !name.equals("div") &&
+		    !name.equals("a") &&
+		    !name.equals("textarea")) {
 			/* Strip completed start tag. */
 			t = t.substring(0, t.length() - 1) + " />";
 		} else

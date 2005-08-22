@@ -219,7 +219,7 @@ public class Page {
 		  +		"<body>"
 		  +			"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"bg\" width=\"827\">"
 		  +				"<tr>"
-		  +					"<td width=\"200\" align=\"center\" rowspan=\"3\" "
+		  +					"<td width=\"200\" align=\"center\" valign=\"top\" rowspan=\"3\" "
 		  +					  "style=\"border-bottom:1px solid black\">"
 		  +						"<br />"
 		   						/* PSC logo. */

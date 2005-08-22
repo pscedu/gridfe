@@ -53,7 +53,6 @@ public class GridJob extends RSLElement implements Serializable
 		** was submitted? (just a thought)
 		*/
 		this.gi.jobSubmit(this);
-		System.out.println("this.gi.jobSubmit finished");
 		this.id = this.gi.getIDAsString();
 	}
 
@@ -64,41 +63,6 @@ public class GridJob extends RSLElement implements Serializable
 
 		/* Get rid of gi entirely */
 		this.gi = null;
-	}
-
-	/* Check if the file location is remote or local */
-	public boolean remote(String file) {
-		/* Job submitted to remote machine */
-		boolean remote = false;
-
-		/* Check for host to be localhost */
-		String lh = "";
-		try {
-			lh = new String(InetAddress.getLocalHost().getHostName());
-			System.out.println("Hostname: "+lh);
-		} catch (Exception e) {
-			System.out.println("Error: "+ e.getMessage());
-		}
-		if (!this.host.equalsIgnoreCase(lh)) {
-			/*
-			** If the job is remote, the output
-			** is automatically remote whether it
-			** via a gass server or not
-			**
-			** XXX - if it is not local submitted it
-			** could be a job submitted to intel2 with output
-			** going to rachel. need a way to extract the
-			** proper host, etc.
-			*/
-			remote = true;
-		}
-
-		/* Check for starting 'http:' or 'https:' */
-		if (file != null)
-			if (file.startsWith("http:/") ||
-			    file.startsWith("https:/"))
-				remote = true;
-		return (remote);
 	}
 
 	/* Convert GRAM stdout, and directory to a GASS filename */

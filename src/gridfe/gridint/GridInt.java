@@ -154,16 +154,11 @@ public class GridInt implements Serializable {
 
 	public void startRetrieve(GridJob job, String file, int min, int max)
 	    throws GassException, IOException, GSSException {
-		String data = "";
-
-		if (job.remote(file)) {
-			/* XXX Remote Fetch */
-			throw new IOException("Remote Output not supported yet.");
-		} else {
-			/* Local Fetch */
-			/* Start Gass Server (0,0 = random port) */
-			this.startGass(min, max, job.getHost());
-		}
+		/*
+		** Assume all are remote (this should work for
+		** localhost also)
+		*/
+		this.startGass(min, max, job.getHost());
 
 		/* Convert from GRAM -> GASS convention */
 		file = job.convert(file);

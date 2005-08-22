@@ -38,7 +38,7 @@ public class OOF {
 		return new Break(this, attrs);
 	}
 
-	public Elementable Code()
+	public Elementable code()
 	    throws OOFBadElementFormException {
 		return new Code(this, new Object[] {}, new Object[] {});
 	}
@@ -219,6 +219,17 @@ public class OOF {
 	}
 	public Elementable input(Object[] attrs)
 	    throws OOFBadElementFormException {
+		for (int i = 0; i + 1 < attrs.length; i += 2)
+			if (((String)attrs[i]).equals("type")) {
+				if (((String)attrs[i + 1]).equals("select"))
+					return new Select(this, attrs,
+					    new Object[] {});
+				else if (((String)attrs[i + 1]).equals("textarea"))
+					return new Textarea(this, attrs,
+					    new Object[] {});
+				else
+					break;
+			}
 		return new Input(this, attrs, new Object[] {});
 	}
 

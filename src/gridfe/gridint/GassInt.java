@@ -50,19 +50,14 @@ public class GassInt extends RemoteGassServer {
 		this.start(this.host);
 	}
 
-	/*
-	** XXX - there has to be a way to succesfully start a remote gass server
-	** Event the CoG API for RemoteGassServer fails.
-	*/
-	/* Manually remote start a server - this fails for some reason though, more FUBAR */
+	/* Manually remote start a server - this fails for some reason though (GT2.4.3), more FUBAR */
 /*
 	public void start_remote()
 	    throws GramException, GSSException {
 //		GridJob j = new GridJob("intel2.psc.edu");
 		GridJob j = new GridJob(this.host);
-*/
-		/* Build a gridjob that starts the gass server */
-/*
+
+		// Build a gridjob that starts the gass server
 		j.setRSL(new String[] { "executable", "stdout", "stderr" },
 		    new String[] { "$GLOBUS_LOCATION/bin/globus-gass-server",
 			"/tmp/gram.stdout", "/tmp/gram.stderr" },

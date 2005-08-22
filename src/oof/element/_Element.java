@@ -5,12 +5,12 @@ import java.util.*;
 import oof.*;
 import oof.filter.*;
 
-public abstract class ELEMENT implements Element {
+public abstract class _Element implements Elementable {
 	public LinkedList attrs;
 	public LinkedList children;
 	public OOF oof;
 
-	public ELEMENT(OOF oof, Object[] attrs, Object[] os)
+	public _Element(OOF oof, Object[] attrs, Object[] os)
 	    throws OOFBadElementFormException {
 		this.oof	= oof;
 		this.attrs	= new LinkedList();

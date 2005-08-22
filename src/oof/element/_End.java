@@ -4,10 +4,10 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public abstract class END implements Endable {
+public abstract class _End implements Endable {
 	public OOF oof;
 
-	public END(OOF oof)
+	public _End(OOF oof)
 	    throws OOFBadElementFormException {
 		this.oof = oof;
 	}

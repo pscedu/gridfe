@@ -5,10 +5,10 @@ import oof.*;
 import oof.element.*;
 
 /*
- * XXX: subclass ELEMENT to something that does not
+ * XXX: subclass _Element to something that does not
  * contain a value.
  */
-public class Break extends ELEMENT {
+public class Break extends _Element {
 	public Break(OOF oof, Object[] attrs)
 	    throws OOFBadElementFormException {
 		super(oof, attrs, new Object[] {});

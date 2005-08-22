@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class Header extends ELEMENT {
+public class Header extends _Element {
 	public String size;
 	public Header(OOF oof, Object[] attrs, Object[] os)
 	    throws OOFBadElementFormException {

@@ -5,11 +5,11 @@ import java.util.*;
 import oof.*;
 import oof.element.*;
 
-public abstract class START implements Startable {
+public abstract class _Start implements Startable {
 	public LinkedList attrs;
 	public OOF oof;
 
-	public START(OOF oof, Object[] attrs)
+	public _Start(OOF oof, Object[] attrs)
 	    throws OOFBadElementFormException {
 		this.oof	= oof;
 		this.attrs	= new LinkedList();

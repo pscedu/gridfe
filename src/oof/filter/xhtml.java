@@ -15,7 +15,7 @@ public class xhtml implements Filter {
 		this.oof  = oof;
 	}
 
-	private String build(String name, Element e) {
+	private String build(String name, Elementable e) {
 		String t = this.build(name, (Startable)e);
 		String v = e.getValue();
 
@@ -47,64 +47,64 @@ public class xhtml implements Filter {
 	}
 
 	public String build(Break e) {
-		return this.build("br", (Element)e);
+		return this.build("br", (Elementable)e);
 	}
 
 	public String build(Code e) {
-		return this.build("code", (Element)e);
+		return this.build("code", (Elementable)e);
 	}
 
 	public String build(Division e) {
-		return this.build("div", (Element)e);
+		return this.build("div", (Elementable)e);
 	}
 
 	public String build(Email e) {
 		/* XXX: modify clone */
 		e.addAttribute("href", "mailto:" + e.addr);
-		return this.build("a", (Element)e);
+		return this.build("a", (Elementable)e);
 	}
 
 	public String build(Emphasis e) {
-		return this.build("em", (Element)e);
+		return this.build("em", (Elementable)e);
 	}
 
 	public String build(Fieldset e) {
-		return this.build("fieldset", (Element)e);
+		return this.build("fieldset", (Elementable)e);
 	}
 
 	public String build(Form e) {
-		return this.build("form", (Element)e);
+		return this.build("form", (Elementable)e);
 	}
 
 	public String build(Header e) {
-		return this.build("h" + e.size, (Element)e);
+		return this.build("h" + e.size, (Elementable)e);
 	}
 
 	public String build(HorizontalRuler e) {
-		return this.build("hr", (Element)e);
+		return this.build("hr", (Elementable)e);
 	}
 
 	public String build(Image e) {
-		return this.build("img", (Element)e);
+		return this.build("img", (Elementable)e);
 	}
 
 	public String build(Input e) {
 		String s = e.getAttribute("type");
 		if (s != null) {
 			if (s.equals("textarea"))
-				return this.build("textarea", (Element)e);
+				return this.build("textarea", (Elementable)e);
 			else if (s.equals("select"))
-				return this.build("select", (Element)e);
+				return this.build("select", (Elementable)e);
 		}
-		return this.build("input", (Element)e);
+		return this.build("input", (Elementable)e);
 	}
 
 	public String build(Link e) {
-		return this.build("a", (Element)e);
+		return this.build("a", (Elementable)e);
 	}
 
 	public String build(ListItem e) {
-		return this.build("li", (Element)e);
+		return this.build("li", (Elementable)e);
 	}
 
 	public String build(List e) {
@@ -113,23 +113,23 @@ public class xhtml implements Filter {
 			tag = "ol";
 		else
 			tag = "ul";
-		return this.build(tag, (Element)e);
+		return this.build(tag, (Elementable)e);
 	}
 
 	public String build(Paragraph e) {
-		return this.build("p", (Element)e);
+		return this.build("p", (Elementable)e);
 	}
 
 	public String build(Preformatted e) {
-		return this.build("pre", (Element)e);
+		return this.build("pre", (Elementable)e);
 	}
 
 	public String build(Span e) {
-		return this.build("span", (Element)e);
+		return this.build("span", (Elementable)e);
 	}
 
 	public String build(Strong e) {
-		return this.build("strong", (Element)e);
+		return this.build("strong", (Elementable)e);
 	}
 
 	public String build(Table e) {
@@ -149,23 +149,23 @@ public class xhtml implements Filter {
 			s += "</colgroup>";
 			e.prepend(s);
 		}
-		return this.build("table", (Element)e);
+		return this.build("table", (Elementable)e);
 	}
 
 	public String build(TableRow e) {
-		return this.build("tr", (Element)e);
+		return this.build("tr", (Elementable)e);
 	}
 
 	public String build(TableCell e) {
-		return this.build("td", (Element)e);
+		return this.build("td", (Elementable)e);
 	}
 
 	public String build(DivisionStart e) {
-		return this.build("div", (START)e);
+		return this.build("div", (_Start)e);
 	}
 
 	public String build(DivisionEnd e) {
-		return this.build("div", (END)e);
+		return this.build("div", (_End)e);
 	}
 
 	public String build(ListStart e) {
@@ -174,7 +174,7 @@ public class xhtml implements Filter {
 			tag = "ol";
 		else
 			tag = "ul";
-		return this.build(tag, (START)e);
+		return this.build(tag, (_Start)e);
 	}
 
 	public String build(ListEnd e) {

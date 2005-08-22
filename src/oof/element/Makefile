@@ -4,15 +4,25 @@ SYSROOT = ../../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-CLASSES += Break.class Code.class DivisionEnd.class Division.class
-CLASSES += DivisionStart.class Element.class ELEMENT.class Email.class
-CLASSES += Emphasis.class Endable.class END.class Fieldset.class
-CLASSES += FormEnd.class Form.class FormStart.class Header.class
-CLASSES += HorizontalRuler.class Image.class Input.class Link.class
-CLASSES += ListEnd.class ListItem.class List.class ListStart.class
-CLASSES += Paragraph.class Preformatted.class Span.class Startable.class
-CLASSES += START.class Strong.class Table.class TableCell.class
-CLASSES += TableEnd.class TableRow.class TableStart.class
+# Interfaces
+CLASSES += Elementable.class Endable.class Startable.class
+
+# Generic classes
+CLASSES += _Element.class _End.class _Start.class
+
+# Start/end
+CLASSES += DivisionEnd.class DivisionStart.class
+CLASSES += FormEnd.class FormStart.class
+CLASSES += ListEnd.class ListStart.class
+CLASSES += TableEnd.class TableStart.class
+
+# Core classes
+CLASSES += Break.class Code.class Division.class Email.class
+CLASSES += Emphasis.class Endable.class Fieldset.class Form.class
+CLASSES += Header.class HorizontalRuler.class Image.class Input.class
+CLASSES += Link.class ListItem.class List.class Paragraph.class
+CLASSES += Preformatted.class Span.class Strong.class Table.class
+CLASSES += TableCell.class TableRow.class
 TARGET = ${CLASSES}
 
 include ${MAINMK}

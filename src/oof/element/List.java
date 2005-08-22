@@ -4,7 +4,7 @@ package oof.element;
 import oof.*;
 import oof.element.*;
 
-public class List extends ELEMENT {
+public class List extends _Element {
 	public Object type;
 	public List(OOF oof, Object[] attrs, Object[] os)
 	    throws OOFBadElementFormException {

@@ -11,7 +11,7 @@ public class suite {
 			System.out.println("\033[1;32mTest succeeded\033[0;0;0m\n");
 		else {
 			System.out.println("\033[1;31mTest failed!\033[0;0;0m");
-			System.out.println("Expected: " + b);
+			System.out.println("Expected: " + b + "\n");
 			System.exit(1);
 		}
 	}
@@ -63,7 +63,7 @@ public class suite {
 		      	     new Object[] {
 		      		"field1: ", o.input(),
 		      		"field2: ", o.input()}),
-			"<form method=\"post\" action=\"url\">" +
+			"<form action=\"url\" method=\"post\">" +
 				"field1: <input />field2: <input />" +
 			"</form>");
 		t("form", o.form(new Object[] {
@@ -89,14 +89,23 @@ public class suite {
 		t("hr", o.hr(new Object[] { "noborder", "yes" }),
 			"<hr noborder=\"yes\" />");
 
-		t("img", o.img(), "<img />");
+		t("img", o.img(), "<img alt=\"\" />");
 		t("img", o.img(new Object[] { "src", "foo.jpg" }),
-			"<img src=\"foo.jpg\" />");
+			"<img src=\"foo.jpg\" alt=\"\" />");
 
 		t("input", o.input(), "<input />");
 		t("input", o.input(new Object[] { "type", "text", "name", "username" }),
 			"<input type=\"text\" name=\"username\" />");
-		/* XXX: select, textarea */
+		t("input", o.input(new Object[] { "type", "textarea",
+			"name", "ta", "rows", "2", "cols", "30" }),
+			"<textarea cols=\"30\" rows=\"2\" name=\"ta\"></textarea>");
+		t("input", o.input(new Object[] { "type", "select",
+			"name", "sel", "value", "b", "options", new Object[] {
+				"a", "1", "b", "2" } }),
+			"<select size=\"1\" name=\"sel\">" +
+				"<option name=\"a\">1</option>" +
+				"<option selected=\"selected\" name=\"b\">2</option>" +
+			"</select>");
 
 		t("link", o.link("supername"), "<a name=\"supername\"></a>");
 		t("link", o.link("foo", "url"), "<a href=\"url\">foo</a>");

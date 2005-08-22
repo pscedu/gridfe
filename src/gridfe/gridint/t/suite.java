@@ -152,7 +152,7 @@ public class suite
 
 		/* Data Retrieval (Read a few chunks, then the rest */
 	/* Data Retrieval only works on localhost for now, so disable */
-	int ret = 0;
+	int ret = 1;
 	if(ret == 1)
 	{
 		String[] data = {"", ""};

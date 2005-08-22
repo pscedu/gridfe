@@ -103,6 +103,7 @@ input, textarea, select {
 	color: #ffffff;
 	border: 1px solid black;
 	font-weight: bold;
+	cursor: hand;
 }
 
 .err {

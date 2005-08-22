@@ -109,7 +109,7 @@ public class xhtml implements Filter {
 		if (e.getAttribute("rows") == null)
 			e.addAttribute("rows", DEF_TEXTAREA_ROWS);
 		if (e.getAttribute("cols") == null)
-			e.addAttribute("cols", DEF_TEXTAREA_ROWS);
+			e.addAttribute("cols", DEF_TEXTAREA_COLS);
 		/* XXX: hack, this shouldn't be here at all. */
 		e.removeAttribute("type");
 		e.append(e.removeAttribute("value"));

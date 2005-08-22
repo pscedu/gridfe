@@ -20,9 +20,10 @@ CLASSES += TableEnd.class TableStart.class
 CLASSES += Break.class Code.class Division.class Email.class
 CLASSES += Emphasis.class Endable.class Fieldset.class Form.class
 CLASSES += Header.class HorizontalRuler.class Image.class Input.class
-CLASSES += Link.class ListItem.class List.class Paragraph.class
-CLASSES += Preformatted.class Select.class Span.class Strong.class
-CLASSES += Table.class Textarea.class TableCell.class TableRow.class
+CLASSES += Link.class ListItem.class List.class Option.class
+CLASSES += Paragraph.class Preformatted.class Select.class Span.class
+CLASSES += Strong.class Table.class Textarea.class TableCell.class
+CLASSES += TableRow.class
 TARGET = ${CLASSES}
 
 include ${MAINMK}

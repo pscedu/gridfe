@@ -112,7 +112,7 @@ public class submit {
 										oof.br() +
 										"&raquo; This field should contain a label " +
 										"that serves as a mnemonic to you so that " +
-										"you can later quickly access the job."
+										"you can later quickly identify the job."
 								}
 							},
 							new Object[][] {
@@ -129,6 +129,7 @@ public class submit {
 										}) +
 										oof.input(new Object[] {
 											"type", "select",
+											"onchange", ""
 											"options", new Object[] {
 												"", "Choose a host...",
 												"test", "testhost"

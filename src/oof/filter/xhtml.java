@@ -92,14 +92,15 @@ public class xhtml implements Filter {
 	}
 
 	public String build(Input e) {
-		String s = e.getAttribute("type");
-		if (s != null) {
-			if (s.equals("textarea"))
-				return this.build("textarea", (Elementable)e);
-			else if (s.equals("select"))
-				return this.build("select", (Elementable)e);
-		}
 		return this.build("input", (Elementable)e);
+	}
+
+	public String build(Textarea e) {
+		return this.build("textarea", (Elementable)e);
+	}
+
+	public String build(Select e) {
+		return this.build("select", (Elementable)e);
 	}
 
 	public String build(Link e) {

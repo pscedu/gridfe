@@ -71,13 +71,15 @@ public class GridJob extends RSLElement implements Serializable
 		/* Job submitted to remote machine */
 		boolean remote = false;
 
-		/*
-		** XXX - Check for host to be localhost
-		** This hard coded until BasicServices has
-		** a function to extract the hostname.
-		*/
-//		if (!this.host.equals(BasicServices.getHostname()))
-		if (!this.host.equalsIgnoreCase("gridfe.psc.edu")) {
+		/* Check for host to be localhost */
+		String lh = "";
+		try {
+			lh = new String(InetAddress.getLocalHost().getHostName());
+			System.out.println("Hostname: "+lh);
+		} catch (Exception e) {
+			System.out.println("Error: "+ e.getMessage());
+		}
+		if (!this.host.equalsIgnoreCase(lh)) {
 			/*
 			** If the job is remote, the output
 			** is automatically remote whether it

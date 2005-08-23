@@ -67,7 +67,7 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 
 .subhdr {
 	text-align: center;
-	background-color: #336699;
+	background-color: #003366;
 	color: #FFFFFF;
 	font-weight: bold;
 	font-size: 14px;
@@ -108,4 +108,10 @@ input, textarea, select {
 
 .err {
 	color: #990000;
+}
+
+pre {
+	border: 1px solid black;
+	background-color: #ddeeff;
+	padding: 3px;
 }

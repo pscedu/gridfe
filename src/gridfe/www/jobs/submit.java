@@ -11,6 +11,7 @@ public class submit {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req;
+		String rlsout = null;
 		String errmsg = null;
 
 		req = p.getRequest();
@@ -35,18 +36,20 @@ public class submit {
 			if (stdout == null)
 				stdout = "";
 
-			if (req.getParameter("submitted").equals("View RLS For This Submission")) {
-			} else {
-				if (host.equals("") || label.equals("") ||
-				  (remoteexec.equals("") && localexec.equals("")))
-					errmsg = "Please specify all required form fields.";
-				if (errmsg == null) {
-					GridJob j = new GridJob(host);
-					GridInt gi = p.getGridInt();
-					j.setName(label);
-					j.setRSL(
-						new String[] { "executable", "arguments", "stdout" },
-						new String[] { remoteexec, args, stdout });
+			if (host.equals("") || label.equals("") ||
+			  (remoteexec.equals("") && localexec.equals("")))
+				errmsg = "Please specify all required form fields.";
+			if (errmsg == null) {
+				GridJob j = new GridJob(host);
+				GridInt gi = p.getGridInt();
+				j.setName(label);
+				j.setRSL(
+					new String[] { "executable", "arguments", "stdout" },
+					new String[] { remoteexec, args, stdout });
+
+				if (req.getParameter("submitted").equals("View RSL For This Submission"))
+					rlsout = j.toString();
+				else {
 					gi.jobSubmit(j);
 
 					String s = "";
@@ -57,17 +60,18 @@ public class submit {
 				}
 			}
 		}
-		return (form(p, errmsg));
-	}
 
-	public static String form(Page p, String errmsg)
-	  throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
 
+		String hostchgjs =
+			"document.forms[0].elements['host'].value = " +
+			"	(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
+			"	'' : this.options[this.selectedIndex].value ";
+
 		s += p.header("Submit Job")
 		   + oof.p("You can fill out the fields below and press the submit "
-		   +   "button to send a job to another machine.  Aftewards, you can "
+		   +   "button to send a job to another machine.  Afterwards, you can "
 		   +   "navigate the menu on the left side of the page to view status "
 		   +   "information about the job and retrieve any output from the job "
 		   +   "once it is completed.");
@@ -129,7 +133,7 @@ public class submit {
 										}) +
 										oof.input(new Object[] {
 											"type", "select",
-											"onchange", ""
+											"onchange", hostchgjs,
 											"options", new Object[] {
 												"", "Choose a host...",
 												"test", "testhost"
@@ -194,7 +198,7 @@ public class submit {
 									"class", p.genClass(),
 									"value", "" +
 										oof.input(new Object[] {
-											"type", "textarea",
+											"type", "text",
 											"name", "stdout"
 										}) +
 										oof.br() +
@@ -236,15 +240,21 @@ public class submit {
 										oof.input(new Object[] {
 											"type", "reset",
 											"class", "button",
-											"value", "Clear Fields"
+											"value", "Reset Fields"
 										})
 								}
 							}
 						}
 					)
 				}
-			 )
-		   + p.footer();
+			 );
+
+		if (rlsout != null) {
+			s += ""
+			   + oof.p("The RLS output for this job:")
+			   + oof.pre(rlsout);
+		}
+		s += p.footer();
 		return (s);
 	}
 };

@@ -14,11 +14,14 @@ import org.globus.io.gass.client.*;
 import org.ietf.jgss.*;
 
 public class GridInt implements Serializable {
+	public static final int GIF_REGCERT = (1<<1);
+
 	private transient GlobusAuth ga;
 	private transient GSSAuth gss;
 	private transient GassInt gass;
 	private Uid uid;
 	private JobList list;
+	int flags;
 
 	public GridInt(String uid) {
 		this.uid = new Uid(uid);
@@ -30,11 +33,27 @@ public class GridInt implements Serializable {
 		this.list = new JobList();
 	}
 
-	/* Perform all Grid authentication */
+	public GridInt(String uid, int flags) {
+		this.uid = new Uid(uid);
+		this.list = new JobList();
+		this.flags = flags;
+	}
+
+	public GridInt(int uid, int flags) {
+		this.uid = new Uid(uid);
+		this.list = new JobList();
+		this.flags = flags;
+	}
+
+	/* Perform all grid authentication */
 	public void auth()
 	     throws GSSException, GlobusCredentialException {
-		/* Read in the X.509 Cert */
-		this.ga = new GlobusAuth(this.uid);
+		int flags = 0;
+		if ((this.flags & GIF_REGCERT) == GIF_REGCERT)
+			flags |= GlobusAuth.GAF_REGCERT;
+
+		/* Read in the X.509 cert */
+		this.ga = new GlobusAuth(this.uid, flags);
 		this.ga.createCredential();
 
 		/* Convert to a GSSCredential */
@@ -49,12 +68,15 @@ public class GridInt implements Serializable {
 
 	public void logout(String file) {
 		/*
-		** List of files to remove:
-		** 1) X.509 Certificate
-		** 2) Kerberos 5 TKT
-		** 3) GridInt serialize file
-		*/
-		CertFile cf = new CertFile(this.uid);
+		 * List of files to remove:
+		 * 1) X.509 Certificate
+		 * 2) Kerberos 5 TKT
+		 * 3) GridInt serialize file
+		 */
+		int flags = 0;
+		if ((this.flags & GIF_REGCERT) == GIF_REGCERT)
+			flags |= CertFile.CF_REGCERT;
+		CertFile cf = new CertFile(this.uid, flags);
 		String[] list = new String[] {
 			cf.getX509(),
 			cf.getKrbTkt(),
@@ -73,16 +95,18 @@ public class GridInt implements Serializable {
 	/* globus-job-submit equivalent */
 	public void jobSubmit(GridJob job)
 	    throws GramException, GSSException {
-		job.init(this.gss.getGSSCredential());
+		job.init(this, this.gss.getGSSCredential());
 		job.run();
 
 		/* Set default job name if none specified */
 		/* XXX: throw exception instead. */
 		if (job.getName() == null)
-			job.setName("Job-" + this.list.size());
+			job.setName("Job-" + this.list.getList().size());
 
 		/* Add job to list */
-		this.list.push(job);
+		job.setQID(this.getJobList().genQID());
+		/* XXX: synchronized */
+		this.list.add(job);
 	}
 
 	/* Cancel job and remove from job list */
@@ -97,32 +121,34 @@ public class GridInt implements Serializable {
 	    throws MalformedURLException, GSSException,
 		   GlobusCredentialException {
 		this.auth();
-		for (int i = 0; i < this.list.size(); i++) {
-			this.list.get(i).revive(this.gss.getGSSCredential());
+		List ls = this.list.getList();
+		for (int i = 0; i < ls.size(); i++) {
+			((GridJob)ls.get(i)).revive(this,
+			  this.gss.getGSSCredential());
 		}
 	}
 
-	/* Start the Gass Server on a random port within our range */
+	/* Start the Gass server on a random port within our range */
 	private void startGass(int min, int max, String host)
 	    throws GassException, IOException {
 		Random r;
 		int port;
 
 		/*
-		** If min/max are equal, use specific port
-		** otherwise, random.
-		*/
+		 * If min/max are equal, use specific port
+		 * otherwise, random.
+		 */
 		if (min != max) {
 			/* Seed = CertLife * Uid */
 			r = new Random(this.getCertInfo().time *
 			    this.uid.intValue());
 
 			/*
-			** Randomly Generate a Port between
-			** our MIN/MAX Port Boundary using
-			** LCM (Linear Congruent Method)
-			** XXX - configuration for this?
-			*/
+			 * Randomly Generate a Port between
+			 * our MIN/MAX Port Boundary using
+			 * LCM (Linear Congruent Method)
+			 * XXX - configuration for this?
+			 */
 			port = r.nextInt((max - min)) + min + 1;
 		} else
 			port = min;
@@ -204,14 +230,9 @@ public class GridInt implements Serializable {
 		return (data);
 	}
 
-	/* Get a job from the list by index */
-	public GridJob getJob(int index) {
-		return (this.list.get(index));
-	}
-
-	/* Get a job from the list by it's name */
-	public GridJob getJob(String name) {
-		return (this.list.get(name));
+	/* Get a job from the list by unique id */
+	public GridJob getJob(int qid) {
+		return (this.list.get(qid));
 	}
 
 	/* Get the raw JobList class */

@@ -48,7 +48,7 @@ public class Page {
 	private GridInt gi;
 	private JASP jasp;
 	private OOF oof;
-	private String uid;
+	private int uid;
 
 	/* CSS class desc. */
 	public final static Object CCDESC = (Object)"desc";
@@ -70,7 +70,7 @@ public class Page {
 		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
 		this.servroot = "/gridfe/gridfe";
 		this.classCount = 1;
-		this.uid = null;
+		this.uid = -1;
 
 		try {
 			Base64 enc = new Base64();
@@ -84,13 +84,13 @@ public class Page {
 			String kuid = auth[0];
 			UserMap m = new UserMap();
 			String uid = m.kerberosToSystem(kuid);
-			this.uid = uid;
+			this.uid = BasicServices.getUserID(uid);
 			if (!this.restoreGI()) {
 				/*
 				 * Reparse authorization because getRemoteUser() doesn't
 				 * work.
 				 */
-				this.gi = new GridInt(BasicServices.getUserID(uid));
+				this.gi = new GridInt(this.uid);
 				this.gi.auth();
 			}
 			/* XXX: load oof prefs from config/resource. */
@@ -221,8 +221,7 @@ public class Page {
 		this.addMenu("Jobs", "/jobs",
 			new Object[] {
 				"Submit", "/jobs/submit",
-				"Status", "/jobs/status",
-				"Output", "/jobs/output"
+				"Status", "/jobs/status"
 			});
 		this.addMenu("Certificate Management", "/certs", null);
 //		this.addMenu("MDS/LDAP", "/ldap", null);
@@ -418,6 +417,21 @@ public class Page {
 					t += "&#" + new Integer(ch) + ";";
 				break;
 			}
+		}
+		return (t);
+	}
+
+	public String escapeURL(String s) {
+		String t = "";
+		char ch;
+		for (int i = 0; i < s.length(); i++) {
+			ch = s.charAt(i);
+			if (ch == ' ')
+				t += '+';
+			else if (Character.isLetterOrDigit(ch))
+				t += ch;
+			else
+				t += "%" + Integer.toHexString(ch);
 		}
 		return (t);
 	}

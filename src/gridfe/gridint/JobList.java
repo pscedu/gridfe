@@ -10,51 +10,49 @@ import java.util.*;
  * array list.  This allows us to keep track of jobs
  * by both order and name.
  */
-public class JobList implements Serializable
-{
+public class JobList implements Serializable {
 	private List list;
-	private Hashtable table;
+//	private Hashtable table;
 
 	public JobList() {
 		this.list = new ArrayList();
-		this.table = new Hashtable();
+//		this.table = new Hashtable();
 	}
 
-	public void push(GridJob j) {
-		/* Add to end of list */
+	public void add(GridJob j) {
+		/* Add to end of list. */
 		this.list.add(j);
 
-		/* Save index into hashtable */
-		this.table.put(j.getName(), new Integer(this.list.size() - 1));
+		/* Save index into hash table. */
+//		this.table.put(j.getName(), this.genQID());
 	}
 
 	public boolean remove(GridJob j) {
-		/* Remove from hashtable */
-		this.table.remove(j.getName());
+		/* Remove from hashtable. */
+//		this.table.remove(j.getQID());
 
-		/* Remove from list array */
-		return this.list.remove(j);
+		/* Remove from list array. */
+		return (this.list.remove(j));
 	}
 
-	/* Return most recent job submission */
-	public GridJob get() {
-		int index = this.list.size() - 1;
-		return ((GridJob)this.list.get(index));
+	public GridJob get(int qid) {
+		for (int i = 0; i < this.list.size(); i++)
+			if (((GridJob)this.list.get(i)).getQID() == qid)
+				return ((GridJob)this.list.get(i));
+		return (null);
+//		return ((GridJob)this.table.get(qid));
 	}
 
-	public GridJob get(int index) {
-		return ((GridJob)this.list.get(index));
+	public List getList() {
+		return (this.list);
 	}
 
-	public GridJob get(String name) {
-		/* Grab the index from the hashtable */
-		int index = (((Integer)(this.table.get(name))).intValue());
-
-		/* Then grab the job */
-		return ((GridJob)this.list.get(index));
-	}
-
-	public int size() {
-		return (this.list.size());
+	public int genQID() {
+		int qid;
+		Random r = new Random();
+		do {
+			qid = Math.abs(r.nextInt()) % 32768;
+		} while (this.get(qid) != null);
+		return (qid);
 	}
 };

@@ -2,8 +2,9 @@
 
 package gridfe.www.jobs;
 
-import gridfe.gridint.*;
 import gridfe.*;
+import gridfe.gridint.*;
+import java.util.*;
 import oof.*;
 
 public class status {
@@ -14,14 +15,13 @@ public class status {
 		int i;
 
 		GridInt gi = p.getGridInt();
-		JobList list = gi.getJobList();
 		GridJob j;
 
 		s += p.header("Job Status")
 		  +  oof.p("This page contains the status information for any jobs that " +
 		  		"jobs that you have submitted.  For completed jobs, you may follow " +
-				"the link to the " + oof.link("Job Output", p.buildURL("/jobs/output")) +
-				" page to retrieve any output that the job may have generated.")
+				"the link provided to job output page to retrieve any output that " +
+				"the job may have generated.")
 		  +  oof.table_start(new Object[] {
 			  "class", p.CCTBL,
 			  "border", "0",
@@ -35,21 +35,24 @@ public class status {
 					}
 		  		})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", p.CCSUBHDR, "value", "ID" },
 					new Object[] { "class", p.CCSUBHDR, "value", "Name" },
 					new Object[] { "class", p.CCSUBHDR, "value", "Host" },
-//					new Object[] { "class", p.CCSUBHDR, "value", "Remote" },
-					new Object[] { "class", p.CCSUBHDR, "value", "Status" }
+					new Object[] { "class", p.CCSUBHDR, "value", "Status" },
+					new Object[] { "class", p.CCSUBHDR, "value", "Output" },
+					new Object[] { "class", p.CCSUBHDR, "value", "Delete" }
 				});
+
+		List list = gi.getJobList().getList();
 		for (i = 0; i < list.size(); i++) {
-			j = list.get(i);
+			j = (GridJob)list.get(i);
 			String c = p.genClass();
 			s += oof.table_row(new Object [][] {
-				new Object[] { "class", c, "value", j.getIDAsString() },
-				new Object[] { "class", c, "value", j.getHost() },
 				new Object[] { "class", c, "value", j.getName() },
-//				new Object[] { "class", c, "value", j.remote() },
-				new Object[] { "class", c, "value", j.getStatusAsString() }
+				new Object[] { "class", c, "value", j.getHost() },
+				new Object[] { "class", c, "value", j.getStatusAsString() },
+				new Object[] { "class", c, "value",
+				  oof.link("view", p.buildURL("/jobs/output?qid=" + j.getQID())) },
+				new Object[] { "class", c, "value", "" },
 			});
 		}
 		if (i == 0)

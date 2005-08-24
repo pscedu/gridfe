@@ -13,15 +13,16 @@ import java.util.*;
 import javax.security.auth.kerberos.KerberosKey;
 import javax.security.auth.Subject;
 
-public class suite
-{
-	public static void main(String[] args) throws Exception
-	{
-		GridInt gi = new GridInt(BasicServices.getUserID());
+public class suite {
+	public static void main(String[] args)
+	    throws Exception {
+	    	String thost = "intel2.psc.edu";
+	    	String stdout_dir = "gram_jobs";
+
+		GridInt gi = new GridInt(BasicServices.getUserID(), GridInt.GIF_REGCERT);
 		gi.auth();
 
-		CertInfo ci;
-		ci = gi.getCertInfo();
+		CertInfo ci = gi.getCertInfo();
 
 		long tmp;
 		long sec = ci.time;
@@ -32,146 +33,118 @@ public class suite
 		long min = (sec / 60);
 		sec -= min * 60;
 
-		System.out.print("Remaining Lifetime: ");
-		System.out.print(ci.time);
-
-		System.out.print(" (" + days + "Days, ");
-		System.out.print(hours + "Hours, ");
-		System.out.print(min + "Minuets, ");
-		System.out.println( sec + "Seconds)");
-
-		System.out.print("Subject: ");
-		System.out.println(ci.sub);
-		System.out.print("Identity: ");
-		System.out.println(ci.ident);
-		System.out.print("Issuer: ");
-		System.out.println(ci.issuer);
-		System.out.print("KeyStrength: ");
-		System.out.println(ci.key);
-//		System.out.print("Name: ");
-//		System.out.println(gi.getName());
+		System.out.print("Remaining Lifetime: " + ci.time +
+			" (" + days + " days, " + hours + " hours, " +
+			min + " minutes, " + sec + " Seconds)\n" +
+			"Subject: " + ci.sub + "\n" +
+			"Identity: " + ci.ident + "\n" +
+			"Issuer: " + ci.issuer + "\n" +
+			"KeyStrength: " + ci.key + "\n");
 
 		/* Create a new job */
-		System.out.println("Creating New Job...");
+		System.out.println("Creating jobs...");
 
-		GridJob j = new GridJob("intel2.psc.edu");
-//		GridJob j = new GridJob("mugatu.psc.edu");
-//		GridJob j = new GridJob("gridinfo.psc.edu");
-		j.setRSL(new String[] {"executable", "stdout"},
+		GridJob j1 = new GridJob(thost);
+		j1.setRSL(new String[] {"executable", "stdout"},
 			new String[] {"/bin/sleep", "gram.out"},
 			new String("arguments"),
-//			new String[] {"10s"});
 			new String[] {"2s"});
-		j.setName("J1");
+		j1.setName("J1");
 
-//		GridJob j2 = new GridJob("mugatu.psc.edu");
-//		GridJob j2 = new GridJob("gridinfo.psc.edu");
-		GridJob j2 = new GridJob("intel2.psc.edu");
+		GridJob j2 = new GridJob(thost);
 		j2.setRSL(new String[] {"executable"},
 			new String[] {"/bin/sleep"},
 			new String("arguments"),
-//			new String[] {"15s"});
 			new String[] {"5s"});
 		j2.setName("J2");
 
-		/* job to test output permission */
-		String j3_out = "gram.out.date";
-//		String j3_out = "/tmp/gram.out.date";
-		String j3_err = "gram.err";
-		String j3_host = "intel2.psc.edu";
-//		String j3_host = "mugatu.psc.edu";
-		String j3_name = "Date";
-		int j3_port = 28003;
-		GridJob j3 = new GridJob(j3_host);
-		j3.setRSL(new String[] {"executable", "directory", "stdout"},
-			new String[] {"/bin/date", "gram_jobs", j3_out});
-//		j3.setRSL(new String[] {"executable", "stdout", "stderr"},
-//			new String[] {"/bin/date", j3_out, j3_err});
-//		j3.setRSL(new String[] {"executable", "stdout", "directory", "stderr"},
-//			new String[] {"/bin/date", j3_out, "gram_jobs", j3_err});
-		j3.setName(j3_name);
+		GridJob j3 = new GridJob(thost);
+		j3.setRSL(new String[] {"executable", "arguments"},
+			new String[] {"/bin/mkdir", "-p " + stdout_dir});
+		j3.setName("mkdir");
+
+		/* Job to test output permission */
+		GridJob j4 = new GridJob(thost);
+		j4.setRSL(new String[] {"executable", "directory", "stdout"},
+			new String[] {"/bin/date", stdout_dir, "gram.out.date"});
+		j4.setName("Date");
 
 		/* Submit the job to GRAM */
-		System.out.println("RSL: " + j3);
-		System.out.println("Submiting Job...");
-		gi.jobSubmit(j);
+		System.out.println("RSL: " + j4);
+		System.out.println("Submitting jobs...");
+		gi.jobSubmit(j1);
 		gi.jobSubmit(j2);
 		gi.jobSubmit(j3);
+		gi.jobSubmit(j4);
+
+		int qid1 = j1.getQID();
+		int qid2 = j2.getQID();
+		int qid4 = j4.getQID();
 
 		/* Print the job id string */
-		System.out.println("j - id string: "+j.getIDAsString());
-		System.out.println("j2 - id string: "+j2.getIDAsString());
-		System.out.println("j3 - id string: "+j3.getIDAsString());
+		System.out.println("j1 - qid: " + qid1 + "; id string: " + j1.getIDAsString());
+		System.out.println("j2 - qid: " + qid2 + "; id string: " + j2.getIDAsString());
+		System.out.println("j4 - qid: " + qid4 + "; id string: " + j4.getIDAsString());
 
 		/* Test Serialization */
-		System.out.println("Serializing Job...");
+		System.out.println("Serializing gridint...");
 		FileOutputStream fout = new FileOutputStream("job.revive");
 		ObjectOutputStream out = new ObjectOutputStream(fout);
 		out.writeObject(gi);
 		out.close();
 
 		/* Explicitly get rid of this object! */
-		System.out.println("Removing Instance of Job...");
+		System.out.println("Removing instance of job...");
 		WeakReference r = new WeakReference(gi);
 		r.clear();
 		gi = null;
-		j = null;
-		j2 = null;
-		j3 = null;
+		j1 = j2 = j4 = null;
 
-		/* Test Deserialization */
-		System.out.println("Deserializing Job...");
+		/* Test deserialization */
+		System.out.println("Deserializing gridint...");
 		FileInputStream fin = new FileInputStream("job.revive");
 		ObjectInputStream in = new ObjectInputStream(fin);
-
-		gi = (GridInt)(in.readObject());
-
+		gi = (GridInt)in.readObject();
 		in.close();
 
 		/* Monitor job status */
+		GridJob jj1, jj2;
 		do {
-			System.out.print("J1: "+gi.getJob("J1").getStatus());
-			System.out.println(" : "+gi.getJob(0).getStatusAsString());
-			System.out.print("J2: "+gi.getJob("J2").getStatus());
-			System.out.println(" : "+gi.getJob(1).getStatusAsString());
+			jj1 = gi.getJob(qid1);
+			jj2 = gi.getJob(qid2);
+			System.out.print(
+				"J1: " + jj1.getStatus() + ": " + jj1.getStatusAsString() + "\n" +
+				"J2: " + jj2.getStatus() + ": " + jj2.getStatusAsString() + "\n");
 			Thread.sleep(600);
-		} while (gi.getJob(0).getStatus() != -1 ||
-		    gi.getJob(1).getStatus() != -1);
-
-		System.out.print("J1: "+gi.getJob("J1").getStatus());
-		System.out.println(" : "+gi.getJob(0).getStatusAsString());
-		System.out.print("J2: "+gi.getJob("J2").getStatus());
-		System.out.println(" : "+gi.getJob(1).getStatusAsString());
+		} while (jj1.getStatus() != -1 || jj2.getStatus() != -1);
 
 		/* Use a GassInt to grab job output */
 
 		System.out.println("Retrieving job data...");
-//		j3 = gi.getJob(2);
-		j3 = gi.getJob(j3_name);
-		System.out.println(j3);
+		j4 = gi.getJob(qid4);
+		System.out.println(j4);
 
-		/* Data Retrieval (Read a few chunks, then the rest */
-	/* Data Retrieval only works on localhost for now, so disable */
-	int ret = 1;
-	if(ret == 1)
-	{
+		/* Data retrieval (read a few chunks, then the rest */
 		String[] data = {"", ""};
-		String[] file = {j3.stdout, j3.stderr};
+		String[] file = {j4.stdout, j4.stderr};
 		for (int i = 0; i < 2; i++) {
+			if (file[i] == null)
+				continue;
+
 			int tlen = 32;
 			int toff = 0;
 
 			try {
 				/* Start with port range or specific port */
-				gi.startRetrieve(j3, file[i], 28000, 28255);
-//				gi.startRetrieve(j3, file[i], 28001);
+				gi.startRetrieve(j4, file[i], 28000, 28255);
+//				gi.startRetrieve(j4, file[i], 28001);
 
 				data[i] += gi.retrieve(tlen, toff);
-                        	toff += tlen;
-                        	data[i] += gi.retrieve(tlen, toff);
-                        	toff += tlen;
-                        	data[i] += gi.retrieve(0, toff);
-				
+				toff += tlen;
+				data[i] += gi.retrieve(tlen, toff);
+				toff += tlen;
+				data[i] += gi.retrieve(0, toff);
+
 				gi.stopRetrieve();
 			} catch (Exception e) {
 				data[i] += e.getMessage();
@@ -179,17 +152,17 @@ public class suite
 			}
 		}
 
-		System.out.println("stderr: "+data[1]);
-		System.out.println("stdout: "+data[0]);
-	}
+		System.out.println("stderr: " + file[1] + ": " + data[1]);
+		System.out.println("stdout: " + file[0] + ": " + data[0]);
 
 		/* Get the job list and len */
-		JobList jl = gi.getJobList();
+		List jl = gi.getJobList().getList();
 		for (int i = 0; i < jl.size(); i++) {
-			GridJob job = jl.get(i);
-			System.out.print("Name: "+job.getName());
-			System.out.print("\tStatus: "+job.getStatusAsString());
-			System.out.println("\tRSL: "+job);
+			GridJob job = (GridJob)jl.get(i);
+			System.out.println(
+				"Name: " + job.getName() + "\n" +
+				"\tStatus: " + job.getStatusAsString() + "\n" +
+				"\tRSL: " + job);
 		}
 
 		/* Logout - remove credentials */

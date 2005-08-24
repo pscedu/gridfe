@@ -411,9 +411,9 @@ public class Page {
 			case '\'': t += "&apos;";	break;
 			case '&':  t += "&amp;";	break;
 			default:
-				if (32 <= ch && ch <= 126)
+				if (ch == ' ' || ch == '\n' || (32 <= ch && ch <= 126))
 					t += ch;
-				else
+				else if (ch != '\0')
 					t += "&#" + new Integer(ch) + ";";
 				break;
 			}

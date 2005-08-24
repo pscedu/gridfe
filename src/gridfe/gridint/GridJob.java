@@ -7,16 +7,20 @@ import java.net.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
-public class GridJob extends RSLElement implements Serializable
-{
+public class GridJob extends RSLElement implements Serializable {
+	private transient GramInt gmi;
+	private transient GridInt gdi;
 	private String host;
-	private transient GramInt gi;
 	private String id;
 	private String name;
+	private int qid;
 
 	public GridJob(String host) {
+		this.gmi = null;
+		this.gdi = null;
 		this.host = host;
-		this.id = "No job submitted";
+		this.qid = -1;
+		this.id = null;
 	}
 
 	public void setHost(String host) {
@@ -33,36 +37,45 @@ public class GridJob extends RSLElement implements Serializable
 	}
 
 	public String getName() {
-		return this.name;
+		return (this.name);
+	}
+
+	public int getQID() {
+		return (this.qid);
+	}
+
+	public void setQID(int qid) {
+		this.qid = qid;
 	}
 
 	/*
-	** setRSL Wrappers are inherited from RSLElement.java
-	*/
+	 * setRSL Wrappers are inherited from RSLElement.java
+	 */
 
 	/* Internal methods to be called by GridInt ONLY */
-	public void init(GSSCredential gss) {
-		this.gi = new GramInt(gss, this.host);
+	public void init(GridInt gdi, GSSCredential gss) {
+		this.gdi = gdi;
+		this.gmi = new GramInt(gss, this.host);
 	}
 
 	/* Submit the job and save the ID string */
 	public void run()
 	    throws GramException, GSSException {
 		/*
-		** XXX - save a timestamp of when the job
-		** was submitted? (just a thought)
-		*/
-		this.gi.jobSubmit(this);
-		this.id = this.gi.getIDAsString();
+		 * XXX - save a timestamp of when the job
+		 * was submitted? (just a thought)
+		 */
+		this.gmi.jobSubmit(this);
+		this.id = this.gmi.getIDAsString();
 	}
 
-	/* cancel the job and dispose of gramint instance */
+	/* Cancel the job and dispose of gramint instance */
 	public void cancel()
 	    throws GramException, GSSException {
-		this.gi.cancel();
+		this.gmi.cancel();
 
-		/* Get rid of gi entirely */
-		this.gi = null;
+		/* Get rid of gmi entirely */
+		this.gmi = null;
 	}
 
 	/* Convert GRAM stdout, and directory to a GASS filename */
@@ -70,28 +83,28 @@ public class GridJob extends RSLElement implements Serializable
 		String dir = null;
 
 		/*
-		** Determine if directory needs prepended to output.
-		** If std(out/err) string starts with a '/' or '~'
-		** then the user has explicitly stated the path.
-		** If directory does not start with '/' then it
-		** needs to default to "~".
-		*/
+		 * Determine if directory needs prepended to output.
+		 * If std(out/err) string starts with a '/' or '~'
+		 * then the user has explicitly stated the path.
+		 * If directory does not start with '/' then it
+		 * needs to default to "~".
+		 */
 		if (file != null) {
 			dir = (file.charAt(0) != '/') ? "~" : "";
 			dir += (this.dir != null) ? "/" + this.dir : "";
 		}
 
 		/*
-		** Unfortunately GRAM assumes directories start from
-		** ~/ and if ~/dir is specified GRAM cannot expand the ~
-		**
-		** GASS on the other hand seems to assume a full path
-		** and support ~ expansion via the TILDE_EXPAND_ENABLE
-		** option.
-		**
-		** Therefore we have to manually adjust stdout, stderr
-		** and directory accordingly.
-		*/
+		 * Unfortunately GRAM assumes directories start from
+		 * ~/ and if ~/dir is specified GRAM cannot expand the ~
+		 *
+		 * GASS on the other hand seems to assume a full path
+		 * and support ~ expansion via the TILDE_EXPAND_ENABLE
+		 * option.
+		 *
+		 * Therefore we have to manually adjust stdout, stderr
+		 * and directory accordingly.
+		 */
 		if (file != null && file.charAt(0) != '/' &&
 		    file.charAt(0) != '~') {
 			file = dir + "/" + file;
@@ -102,30 +115,30 @@ public class GridJob extends RSLElement implements Serializable
 	/* GramInt wrappers */
 	public int getStatus()
 	    throws GSSException {
-		return (this.gi.getStatus());
+		return (this.gmi.getStatus());
 	}
 
 	public String getStatusAsString()
 	    throws GSSException {
-		return (this.gi.getStatusAsString());
+		return (this.gmi.getStatusAsString());
 	}
 
-	/* ID is saved when job is submitted */
 	public String getIDAsString() {
 		return (this.id);
 	}
 
 	/*
-	** Revive allows a GridJob (and hence a GramJob) to be
-	** recreated from saved values (similar to serialization).
-	*/
+	 * Revive allows a GridJob (and hence a GramJob) to be
+	 * recreated from saved values (similar to serialization).
+	 */
 
 	/* This revive should be called ONLY after a deserialization */
-	public void revive(GSSCredential gss)
+	public void revive(GridInt gdi, GSSCredential gss)
 	    throws MalformedURLException {
+	    	this.gdi = gdi;
 		/* Revive GramInt and it's private data */
-		this.gi = new GramInt(gss, this.host, this.toString());
-		this.gi.createJob(this.toString());
-		this.gi.setID(this.id);
+		this.gmi = new GramInt(gss, this.host, this.toString());
+		this.gmi.createJob(this.toString());
+		this.gmi.setID(this.id);
 	}
 };

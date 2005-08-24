@@ -17,8 +17,7 @@ public class index {
 				oof.LIST_UN,
 				new Object[] {
 					oof.link("Submit a job", p.buildURL("/jobs/submit")),
-					oof.link("View status of a job", p.buildURL("/jobs/status")),
-					oof.link("Collect output from a job", p.buildURL("/jobs/output"))
+					oof.link("Get information about a previously submitted job", p.buildURL("/jobs/status"))
 				}
 		     )
 		   + p.footer();

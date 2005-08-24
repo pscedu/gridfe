@@ -251,4 +251,8 @@ public class GridInt implements Serializable {
 		in.defaultReadObject();
 		this.revive();
 	}
+
+	public GassInt getGass() {
+		return (this.gass);
+	}
 };

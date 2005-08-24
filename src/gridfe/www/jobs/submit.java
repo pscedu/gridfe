@@ -10,32 +10,36 @@ import oof.*;
 public class submit {
 	public static String main(Page p)
 	  throws Exception {
-		HttpServletRequest req;
+		HttpServletRequest req = p.getRequest();
 		String rlsout = null;
 		String errmsg = null;
 
-		req = p.getRequest();
+		String label = req.getParameter("label");
+		String host = req.getParameter("host");
+		String localexec = req.getParameter("localexec");
+		String remoteexec = req.getParameter("remoteexec");
+		String args = req.getParameter("args");
+		String dir = req.getParameter("dir");
+		String stdout = req.getParameter("stdout");
+		String stderr = req.getParameter("stderr");
+
+		if (label == null)
+			label = "";
+		if (host == null)
+			host = "";
+		if (localexec == null)
+			localexec = "";
+		if (remoteexec == null)
+			remoteexec = "";
+		if (args == null)
+			args = "";
+		if (dir == null)
+		if (dir == null)
+			stdout = "";
+		if (stderr == null)
+			stderr = "";
+
 		if (req.getParameter("submitted") != null) {
-			String label = req.getParameter("label");
-			String host = req.getParameter("host");
-			String localexec = req.getParameter("localexec");
-			String remoteexec = req.getParameter("remoteexec");
-			String args = req.getParameter("args");
-			String stdout = req.getParameter("stdout");
-
-			if (label == null)
-				label = "";
-			if (host == null)
-				host = "";
-			if (localexec == null)
-				localexec = "";
-			if (remoteexec == null)
-				remoteexec = "";
-			if (args == null)
-				args = "";
-			if (stdout == null)
-				stdout = "";
-
 			if (host.equals("") || label.equals("") ||
 			  (remoteexec.equals("") && localexec.equals("")))
 				errmsg = "Please specify all required form fields.";
@@ -43,9 +47,43 @@ public class submit {
 				GridJob j = new GridJob(host);
 				GridInt gi = p.getGridInt();
 				j.setName(label);
-				j.setRSL(
-					new String[] { "executable", "arguments", "stdout" },
-					new String[] { remoteexec, args, stdout });
+
+				int n = 1; /* exec */
+				if (!dir.equals(""))
+					n++;
+				if (!stdout.equals(""))
+					n++;
+				if (!stderr.equals(""))
+					n++;
+				if (!args.equals(""))
+					n++;
+				String[] r_keys = new String[n];
+				String[] r_vals = new String[n];
+				n = 0;
+				r_keys[n] = "executable";
+				r_vals[n] = remoteexec;
+				n++;
+				if (!args.equals("")) {
+					r_keys[n] = "arguments";
+					r_vals[n] = args;
+					n++;
+				}
+				if (!dir.equals("")) {
+					r_keys[n] = "directory";
+					r_vals[n] = dir;
+					n++;
+				}
+				if (!stdout.equals("")) {
+					r_keys[n] = "stdout";
+					r_vals[n] = stdout;
+					n++;
+				}
+				if (!stderr.equals("")) {
+					r_keys[n] = "stderr";
+					r_vals[n] = stderr;
+					n++;
+				}
+				j.setRSL(r_keys, r_vals);
 
 				if (req.getParameter("submitted").equals("View RSL For This Submission"))
 					rlsout = j.toString();
@@ -111,6 +149,7 @@ public class submit {
 									"value", "" +
 									    oof.input(new Object[] {
 											"type", "text",
+											"value", p.escapeHTML(label),
 											"name", "label"
 										}) +
 										oof.br() +
@@ -129,6 +168,7 @@ public class submit {
 									"value", "" +
 										oof.input(new Object[] {
 											"type", "text",
+											"value", p.escapeHTML(host),
 											"name", "host"
 										}) +
 										oof.input(new Object[] {
@@ -165,6 +205,7 @@ public class submit {
 										"Or enter remote program path: " +
 										oof.input(new Object[] {
 											"type", "text",
+											"value", p.escapeHTML(remoteexec),
 											"name", "remoteexec"
 										})
 /*
@@ -182,6 +223,7 @@ public class submit {
 									"value", "" +
 										oof.input(new Object[] {
 											"type", "textarea",
+											"value", p.escapeHTML(args),
 											"name", "args"
 										}) +
 										oof.br() +
@@ -192,13 +234,36 @@ public class submit {
 							new Object[][] {
 								new Object[] {
 									"class", p.CCDESC,
-									"value", "Remote output file:"
+									"value", "Remote directory:"
 								},
 								new Object[] {
 									"class", p.genClass(),
 									"value", "" +
 										oof.input(new Object[] {
 											"type", "text",
+//											"value", p.escapeHTML(dir),
+											"name", "dir"
+										}) +
+										oof.br() +
+										"&raquo; This field specifies the directory out of " +
+										"which your job will run.  If left unspecified, your " +
+										"job will run out of your home directory.  Using this " +
+										"parameter may simplify path names to important files, " +
+										"since they can be accessed relative to this directory " +
+										"on the remote machine."
+								}
+							},
+							new Object[][] {
+								new Object[] {
+									"class", p.CCDESC,
+									"value", "Remote standard output file:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "text",
+											"value", p.escapeHTML(stdout),
 											"name", "stdout"
 										}) +
 										oof.br() +
@@ -207,8 +272,38 @@ public class submit {
 										"will be saved on the machine where you chose to " +
 										"run your job.  The contents may, however, be " +
 										"displayed or saved to your local computer from the " +
-										oof.link("Job Output", p.buildURL("/jobs/output")) +
+										"job output page, which can be accessed through the " +
+										oof.link("Job Status", p.buildURL("/jobs/status")) +
 										" page." +
+										oof.br() +
+										oof.br() +
+										"Leaving this field blank will result in no output " +
+										"being saved."
+/*
+										checkbox
+										[x] Download to local machine?
+										[x] Display output on retrieval page.
+*/
+								}
+							},
+							new Object[][] {
+								new Object[] {
+									"class", p.CCDESC,
+									"value", "Remote standard error file:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "text",
+//											"value", p.escapeHTML(stderr),
+											"name", "stderr"
+										}) +
+										oof.br() +
+										"&raquo; This specifies the file name that will " +
+										"contain any error output produced by your job, and it " +
+										"will be saved on the machine where you chose to " +
+										"run your job." +
 										oof.br() +
 										oof.br() +
 										"Leaving this field blank will result in no output " +

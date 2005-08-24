@@ -95,7 +95,7 @@ public class GridInt implements Serializable {
 	/* globus-job-submit equivalent */
 	public void jobSubmit(GridJob job)
 	    throws GramException, GSSException {
-		job.init(this, this.gss.getGSSCredential());
+		job.init(this.gss.getGSSCredential());
 		job.run();
 
 		/* Set default job name if none specified */
@@ -123,8 +123,7 @@ public class GridInt implements Serializable {
 		this.auth();
 		List ls = this.list.getList();
 		for (int i = 0; i < ls.size(); i++) {
-			((GridJob)ls.get(i)).revive(this,
-			  this.gss.getGSSCredential());
+			((GridJob)ls.get(i)).revive(this.gss.getGSSCredential());
 		}
 	}
 

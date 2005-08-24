@@ -9,7 +9,6 @@ import org.ietf.jgss.*;
 
 public class GridJob extends RSLElement implements Serializable {
 	private transient GramInt gmi;
-	private transient GridInt gdi;
 	private String host;
 	private String id;
 	private String name;
@@ -17,7 +16,6 @@ public class GridJob extends RSLElement implements Serializable {
 
 	public GridJob(String host) {
 		this.gmi = null;
-		this.gdi = null;
 		this.host = host;
 		this.qid = -1;
 		this.id = null;
@@ -53,8 +51,7 @@ public class GridJob extends RSLElement implements Serializable {
 	 */
 
 	/* Internal methods to be called by GridInt ONLY */
-	public void init(GridInt gdi, GSSCredential gss) {
-		this.gdi = gdi;
+	public void init(GSSCredential gss) {
 		this.gmi = new GramInt(gss, this.host);
 	}
 
@@ -133,9 +130,8 @@ public class GridJob extends RSLElement implements Serializable {
 	 */
 
 	/* This revive should be called ONLY after a deserialization */
-	public void revive(GridInt gdi, GSSCredential gss)
+	public void revive(GSSCredential gss)
 	    throws MalformedURLException {
-	    	this.gdi = gdi;
 		/* Revive GramInt and it's private data */
 		this.gmi = new GramInt(gss, this.host, this.toString());
 		this.gmi.createJob(this.toString());

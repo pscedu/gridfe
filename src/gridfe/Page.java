@@ -48,6 +48,7 @@ public class Page {
 	private GridInt gi;
 	private JASP jasp;
 	private OOF oof;
+	private String uid;
 
 	/* CSS class desc. */
 	public final static Object CCDESC = (Object)"desc";
@@ -69,15 +70,12 @@ public class Page {
 		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
 		this.servroot = "/gridfe/gridfe";
 		this.classCount = 1;
+		this.uid = null;
 
 		try {
 			Base64 enc = new Base64();
 			String hdr;
 
-			/*
-			 * Reparse authorization because getRemoteUser() doesn't
-			 * work.
-			 */
 			hdr = (String)req.getHeader("authorization");
 			if (hdr.startsWith("Basic "))
 				hdr = hdr.substring(6);
@@ -86,12 +84,53 @@ public class Page {
 			String kuid = auth[0];
 			UserMap m = new UserMap();
 			String uid = m.kerberosToSystem(kuid);
-			this.gi = new GridInt(BasicServices.getUserID(uid));
-			this.gi.auth();
+			this.uid = uid;
+			if (!this.restoreGI()) {
+				/*
+				 * Reparse authorization because getRemoteUser() doesn't
+				 * work.
+				 */
+				this.gi = new GridInt(BasicServices.getUserID(uid));
+				this.gi.auth();
+			}
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
 			this.error(e.getClass().getName() + ": " + e.toString());
+		}
+	}
+
+	private String getGIPath() {
+		/*
+		 * This should be safe -- we shouldn't get to a point
+		 * where we try to access the uid on an error.
+		 */
+		return ("/tmp/gridfegi_u" + this.uid);
+	}
+
+	private boolean restoreGI() {
+		try {
+			FileInputStream fin = new FileInputStream(this.getGIPath());
+			ObjectInputStream in = new ObjectInputStream(fin);
+			gi = (GridInt)(in.readObject());
+			in.close();
+			return (true);
+		} catch (Exception e) {
+			return (false);
+		}
+	}
+
+	public void end() {
+		/* This may happen on error... */
+		if (this.gi == null)
+			return;
+		/* Serialize GridInt. */
+		try {
+			FileOutputStream fout = new FileOutputStream(this.getGIPath());
+			ObjectOutputStream out = new ObjectOutputStream(fout);
+			out.writeObject(this.gi);
+			out.close();
+		} catch (Exception e) {
 		}
 	}
 
@@ -274,7 +313,7 @@ public class Page {
 		   +				"</td>"
 		   +			"</tr>"
 		   +			"<tr>"
-		   +				"<td style=\"background-color: #ffffff; padding-left: 3px; "
+		   +				"<td style=\"background-color: #ffffff; padding-left: 5px; "
 		   +				  "border-left: 1px solid black\" valign=\"top\">"
 		   +					this.oof.header(new Object[] {
 									"size", "3",

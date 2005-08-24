@@ -4,37 +4,34 @@ package gridfe.gridint.auth;
 
 import jasp.*;
 
-/* Class to Encapsulate the Location for the X.509 Certificate */
+/* Class to encapsulate the location for the X.509 certificate */
 public class CertFile {
+	public static int CF_REGCERT = (1<<1);
 	/*
-	** Certificates are normally stored in /tmp/x509up_u!!!
-	** where !!! is the userid
-	*/
-/*
-	private final String xdef = "/tmp/x509up_u";
-	private final String kdef = "/tmp/krb5cc_";
-*/
-
-	/*
-	** These are what mod_fum creates so they dont
-	** conflict with console login credentials that
-	** may exist already... Use these when deployed.
-	**
-	** XXX - put this stuff in some configuration
-	** file to be read in... kinda nasty hard coded
-	** the way it is for development purposes!
-	*/
-	private final String xdef = "/tmp/x509up_fum_u";
-	private final String kdef = "/tmp/krb5cc_fum_";
+	 * Certificates are normally stored in /tmp/x509up_u???
+	 *
+	 * However, mod_fum creates others so they don't
+	 * conflict with console login credentials that
+	 * may exist already...  Use these when deployed.
+	 *
+	 * XXX - put this stuff in some configuration
+	 * file to be read in... kinda nasty hard coded
+	 * the way it is for development purposes!
+	 */
 
 	private String xfile;
 	private String kfile;
 
-	public CertFile(Uid uid) {
-		this.xfile = this.xdef + uid.intValue();
-		this.kfile = this.kdef + uid.intValue();
+	public CertFile(Uid uid, int flags) {
+		if ((flags & CF_REGCERT) == CF_REGCERT) {
+			this.xfile = "/tmp/x509up_u" + uid.intValue();
+			this.kfile = "/tmp/krb5cc_"  + uid.intValue();
+		} else {
+			this.xfile = "/tmp/x509up_fum_u" + uid.intValue();
+			this.kfile = "/tmp/krb5cc_fum_"  + uid.intValue();
+		}
 	}
-	
+
 	public String getX509() {
 		return (this.xfile);
 	}

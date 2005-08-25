@@ -52,7 +52,7 @@ td + .data1, td + .data2 {
 	background-color: #336699;
 	color: #FFFFFF;
 	font-weight: bold;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 td.hdr, td.subhdr {
@@ -71,7 +71,7 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 	background-color: #003366;
 	color: #FFFFFF;
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .tbl {
@@ -115,4 +115,8 @@ pre {
 	border: 1px solid black;
 	background-color: #ddeeff;
 	padding: 3px;
+}
+
+form {
+	margin: 0px;
 }

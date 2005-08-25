@@ -33,7 +33,8 @@ public class output {
 				gi.stopRetrieve();
 
 				s += p.header("Job Output")
-				  +  oof.pre(p.escapeHTML(data))
+				  +  oof.pre(new Object[] { "style", "overflow: scroll; height: 400px" },
+				  		p.escapeHTML(data))
 				  +  p.footer();
 				return (s);
 			}

@@ -2,6 +2,8 @@
 
 package jasp;
 
+import javax.servlet.http.*;
+
 public class JASP {
 	private entity[] entmap = new entity[] {
 		new entity('"', "quot"),
@@ -14,13 +16,19 @@ public class JASP {
 		"abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 		"0123456789,./?;:[]{}\\|`~!@#$%^*()_+-=";
+	private HttpServletRequest req;
+	private HttpServletResponse res;
 
-	public JASP()
-	{
+	public JASP(HttpServletRequest req, HttpServletResponse res) {
+		this.req = req;
+		this.res = res;
 	}
 
-	public String escapeHTML(String s)
-	{
+	public HttpServletRequest getRequest() {
+		return (this.req);
+	}
+
+	public String escapeHTML(String s) {
 		int i, j;
 		String t = "";
 		for (i = 0; i < t.length(); i++) {

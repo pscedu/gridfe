@@ -4,7 +4,8 @@ SYSROOT = ../../../..
 
 include ${SYSROOT}/lib/mk/defs.mk
 
-CLASSES += index.class output.class status.class submit.class
+CLASSES += index.class output.class remove.class status.class
+CLASSES += submit.class
 TARGET = ${CLASSES}
 
 include ${MAINMK}

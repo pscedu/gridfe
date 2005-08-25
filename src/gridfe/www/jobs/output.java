@@ -32,6 +32,15 @@ public class output {
 				String data = gi.retrieve(size, 0);
 				gi.stopRetrieve();
 
+				String act = req.getParameter("act");
+				if (act != null && act.equals("save")) {
+					p.getResponse().setContentType("application/octet-stream");
+					p.getResponse().setHeader("Content-disposition",
+					    "attachment; filename=\"" +
+						p.getJASP().escapeAttachName(j.stdout) + "\"");
+					return (data);
+				}
+
 				s += p.header("Job Output")
 				  +  oof.pre(new Object[] { "style", "overflow: scroll; height: 400px" },
 				  		p.escapeHTML(data))

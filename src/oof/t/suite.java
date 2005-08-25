@@ -17,7 +17,7 @@ public class suite {
 	}
 
 	public static void main(String[] args) throws Exception {
-		JASP j = new JASP();
+		JASP j = new JASP(null, null);
 		OOF o = new OOF(j, "xhtml");
 
 		t("br", o.br(), "<br />");

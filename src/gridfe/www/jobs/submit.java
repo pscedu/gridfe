@@ -85,9 +85,16 @@ public class submit {
 				}
 				j.setRSL(r_keys, r_vals);
 
-				if (req.getParameter("submitted").equals("View RSL For This Submission"))
+				if (req.getParameter("submitted").equals("View RSL"))
 					rlsout = j.toString();
-				else {
+				else if (req.getParameter("submitted").equals("Save RSL")) {
+					HttpServletResponse res = p.getResponse();
+					res.setContentType("application/octet-stream");
+					res.setHeader("Content-disposition",
+					    "attachment; filename=\"" +
+						p.getJASP().escapeAttachName(label) + ".rsl\"");
+					return (j.toString());
+				} else {
 					gi.jobSubmit(j);
 
 					String s = "";
@@ -102,10 +109,16 @@ public class submit {
 		String s = "";
 		OOF oof = p.getOOF();
 
-		String hostchgjs =
-			"document.forms[0].elements['host'].value = " +
-			"	(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
-			"	'' : this.options[this.selectedIndex].value ";
+		String js_hostchg =
+			"	document.forms[0].elements['host'].value = " +
+			"		(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
+			"		'' : this.options[this.selectedIndex].value ";
+
+		String js_submit =
+			"	if (this.value == 'Submit Job') {	" +
+			"		this.value = 'Please wait...';	" +
+			"		return (true)					" +
+			"	}";
 
 		s += p.header("Submit Job")
 		   + oof.p("You can fill out the fields below and press the submit "
@@ -173,7 +186,7 @@ public class submit {
 										}) +
 										oof.input(new Object[] {
 											"type", "select",
-											"onchange", hostchgjs,
+											"onchange", js_hostchg,
 											"options", new Object[] {
 												"", "Choose a host...",
 												"test", "testhost"
@@ -241,7 +254,7 @@ public class submit {
 									"value", "" +
 										oof.input(new Object[] {
 											"type", "text",
-//											"value", p.escapeHTML(dir),
+											"value", p.escapeHTML(dir),
 											"name", "dir"
 										}) +
 										oof.br() +
@@ -296,7 +309,7 @@ public class submit {
 									"value", "" +
 										oof.input(new Object[] {
 											"type", "text",
-//											"value", p.escapeHTML(stderr),
+											"value", p.escapeHTML(stderr),
 											"name", "stderr"
 										}) +
 										oof.br() +
@@ -324,9 +337,16 @@ public class submit {
 											"type", "submit",
 											"name", "submitted",
 											"class", "button",
-											"value", "View RSL For This Submission"
+											"value", "View RSL"
 										}) +
 										oof.input(new Object[] {
+											"type", "submit",
+											"name", "submitted",
+											"class", "button",
+											"value", "Save RSL"
+										}) +
+										oof.input(new Object[] {
+											"onclick", js_submit,
 											"type", "submit",
 											"name", "submitted",
 											"class", "button",

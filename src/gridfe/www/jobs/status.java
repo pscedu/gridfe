@@ -22,6 +22,9 @@ public class status {
 		  		"jobs that you have submitted.  For completed jobs, you may follow " +
 				"the link provided to job output page to retrieve any output that " +
 				"the job may have generated.")
+		  +  oof.form_start(new Object[] {
+				"action", p.buildURL("/jobs/remove")
+			 })
 		  +  oof.table_start(new Object[] {
 			  "class", p.CCTBL,
 			  "border", "0",
@@ -39,7 +42,7 @@ public class status {
 					new Object[] { "class", p.CCSUBHDR, "value", "Host" },
 					new Object[] { "class", p.CCSUBHDR, "value", "Status" },
 					new Object[] { "class", p.CCSUBHDR, "value", "Output" },
-					new Object[] { "class", p.CCSUBHDR, "value", "Delete" }
+					new Object[] { "class", p.CCSUBHDR, "value", "Remove" }
 				});
 
 		List list = gi.getJobList().getList();
@@ -50,9 +53,18 @@ public class status {
 				new Object[] { "class", c, "value", j.getName() },
 				new Object[] { "class", c, "value", j.getHost() },
 				new Object[] { "class", c, "value", j.getStatusAsString() },
+				new Object[] { "class", c, "value", "" +
+				  oof.link("View", p.buildURL("/jobs/output?qid=" + j.getQID())) +
+				  " / " +
+				  oof.link("Save", p.buildURL("/jobs/output?qid=" + j.getQID() + "&amp;act=save"))
+				},
 				new Object[] { "class", c, "value",
-				  oof.link("view", p.buildURL("/jobs/output?qid=" + j.getQID())) },
-				new Object[] { "class", c, "value", "" },
+					oof.input(new Object[] {
+						"type", "checkbox",
+						"name", "qid",
+						"value", "" + j.getQID()
+					})
+				},
 			});
 		}
 		if (i == 0)
@@ -64,7 +76,21 @@ public class status {
 						oof.link("Submit a new job.", p.buildURL("/jobs/submit"))
 				}
 			});
-		s += oof.table_end()
+		s += ""
+		  +  oof.table_row(new Object[][] {
+				new Object[] {
+					"class", "tblftr",
+					"colspan", "5",
+					"value",
+					oof.input(new Object[] {
+						"type", "submit",
+						"class", "button",
+						"value", "Remove Checked"
+					})
+				}
+			 })
+		  +  oof.table_end()
+		  +  oof.form_end()
 		  +  p.footer();
 		return (s);
 	}

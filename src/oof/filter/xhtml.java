@@ -81,10 +81,6 @@ public class xhtml implements Filter {
 		return this.build("fieldset", (Elementable)e);
 	}
 
-	public String build(Form e) {
-		return this.build("form", (Elementable)e);
-	}
-
 	public String build(Header e) {
 		return this.build("h" + e.size, (Elementable)e);
 	}
@@ -235,7 +231,25 @@ public class xhtml implements Filter {
 		return this.build(tag, (Endable)e);
 	}
 
+	public String build(Form e) {
+		/* XXX: modify a clone */
+		if (e.getAttribute("method") == null)
+			e.addAttribute("method", "get");
+		if (e.getAttribute("enctype") == null)
+			e.addAttribute("enctype", "application/x-www-form-urlencoded");
+		if (e.getAttribute("action") == null)
+			e.addAttribute("action", this.jasp.getRequest().getRequestURI());
+		return (this.build("form", (Elementable)e));
+	}
+
 	public String build(FormStart e) {
+		/* XXX: modify a clone */
+		if (e.getAttribute("method") == null)
+			e.addAttribute("method", "get");
+		if (e.getAttribute("enctype") == null)
+			e.addAttribute("enctype", "application/x-www-form-urlencoded");
+		if (e.getAttribute("action") == null)
+			e.addAttribute("action", this.jasp.getRequest().getRequestURI());
 		return this.build("form", (Startable)e);
 	}
 

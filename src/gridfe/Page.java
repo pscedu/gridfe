@@ -295,7 +295,7 @@ public class Page {
 		   +					"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +						"<img src=\"" + wr + "/img/cog-toolkit.png\" border=\"0\" />"
 		   +					"</a>"
-		   +					"<a href=\"\">"
+		   +					"<a href=\"http://www.globus.org/toolkit/\">"
 		   +						"<img src=\"" + wr+ "/img/globus-toolkit.png\" border=\"0\" />"
 		   +					"</a>"
 		   +					"<br /><br />"

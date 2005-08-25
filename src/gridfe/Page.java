@@ -64,7 +64,7 @@ public class Page {
 	Page(HttpServletRequest req, HttpServletResponse res) {
 		this.req = req;
 		this.res = res;
-		this.jasp = new JASP();
+		this.jasp = new JASP(req, res);
 		this.menus = new LinkedList();
 		this.webroot = "/gridfe";
 		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
@@ -375,6 +375,10 @@ public class Page {
 
 	public HttpServletRequest getRequest() {
 		return (this.req);
+	}
+
+	public HttpServletResponse getResponse() {
+		return (this.res);
 	}
 
 	public String buildURL(String s) {

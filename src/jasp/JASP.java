@@ -60,6 +60,26 @@ public class JASP {
 		String t = new String(s);
 		return t;
 	}
+
+	public String escapeAttachName(String s) {
+		int idx = s.lastIndexOf('/');
+		if (idx != -1) {
+			if (s.length() <= idx)
+				s = "";
+			else
+				s = s.substring(idx);
+		}
+		String t = "";
+		for (int i = 0; i < s.length(); i++) {
+			char ch = s.charAt(i);
+			if (Character.isLetterOrDigit(ch) ||
+			    ch == '.' || ch == ' ')
+				t += ch;
+		}
+		if (t.equals(""))
+			t = "noname";
+		return (t);
+	}
 };
 
 class entity {

@@ -31,9 +31,9 @@ public class certs {
 
 		String lifetime;
 		lifetime = 
-				   days + " days, " +
-				   hours + " hours, " +
-				   min + " mins";
+				   days + " day(s), " +
+				   hours + " hour(s), " +
+				   min + " minute(s)";
 
 		s += p.header("Certificate Management")
 		   + oof.p("The following information has been extracted from the " +

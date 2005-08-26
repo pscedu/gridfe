@@ -34,7 +34,8 @@ public class submit {
 		if (args == null)
 			args = "";
 		if (dir == null)
-		if (dir == null)
+			dir = "";
+		if (stdout == null)
 			stdout = "";
 		if (stderr == null)
 			stderr = "";

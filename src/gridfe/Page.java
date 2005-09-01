@@ -5,37 +5,11 @@ package gridfe;
 import gridfe.gridint.*;
 import jasp.*;
 import java.io.*;
+import java.sql.*;
 import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
 import org.bouncycastle.util.encoders.*;
-
-class Menu {
-	private String name;
-	private String url;
-	private LinkedList items;
-
-	public Menu(String name, String url, Object[] items) {
-		this.name = name;
-		this.url = url;
-		this.items = new LinkedList();
-		if (items != null)
-			for (int i = 0; i < items.length; i++)
-				this.items.add(items[i]);
-	}
-
-	public String getName() {
-		return (this.name);
-	}
-
-	public String getURL() {
-		return (this.url);
-	}
-
-	public LinkedList getItems() {
-		return (this.items);
-	}
-}
 
 public class Page {
 	private HttpServletRequest req;
@@ -49,6 +23,13 @@ public class Page {
 	private JASP jasp;
 	private OOF oof;
 	private int uid;
+	private Connection dbh;
+
+	private static final String DB_DRIVER = "mysql";
+	private static final String DB_HOST = "localhost";
+	private static final String DB_USER = "gridfe";
+	private static final String DB_NAME = "gridfe";
+	private static final String DB_PASS = "pDMLP534AO6";
 
 	/* CSS class desc. */
 	public final static Object CCDESC = (Object)"desc";
@@ -71,11 +52,18 @@ public class Page {
 		this.servroot = "/gridfe/gridfe";
 		this.classCount = 1;
 		this.uid = -1;
+		this.dbh = null;
 
 		try {
 			Base64 enc = new Base64();
 			String hdr;
 
+			String dsn = "jdbc:" + DB_DRIVER + "://" + DB_HOST + "/" + DB_NAME;
+			DriverManager.registerDriver((Driver)Class.forName("com." +
+			    DB_DRIVER + ".jdbc.Driver").newInstance());
+			this.dbh = DriverManager.getConnection(dsn, DB_USER, DB_PASS);
+
+			/* XXX: check for errors here. */
 			hdr = (String)req.getHeader("authorization");
 			if (hdr.startsWith("Basic "))
 				hdr = hdr.substring(6);
@@ -98,6 +86,10 @@ public class Page {
 		} catch (Exception e) {
 			this.error(e.getClass().getName() + ": " + e.toString());
 		}
+	}
+
+	public int getUID() {
+		return (this.uid);
 	}
 
 	private String getGIPath() {
@@ -257,15 +249,11 @@ public class Page {
 		  +		"<body>"
 		  +			"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"bg\" width=\"827\">"
 		  +				"<tr>"
-		  +					"<td width=\"200\" align=\"center\" valign=\"top\" rowspan=\"3\" "
+		  +					"<td width=\"170\" align=\"center\" valign=\"top\" "
 		  +					  "style=\"border-bottom:1px solid black\">"
-		  +						"<br />"
-		   						/* PSC logo. */
-		  +						"<a href=\"http://www.psc.edu/\">"
-		  +							"<img src=\"" + wr + "/img/psc.png\" "
-		  +							     "alt=\"[Pittsburgh Supercomputing Center]\" "
-		  +							     "border=\"0\" />"
-		  +						"</a>"
+		  						/* GridFE logo. */
+		  +						"<img src=\"" + wr + "/img/gridfe2sm.png\" alt=\"[GridFE]\" "
+		  +						 "border=\"0\" style=\"margin-top: 5px\" />"
 		  +						"<br /><br />";
 
 		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().size();
@@ -292,32 +280,28 @@ public class Page {
 
 								/* Sponsors */
 		s +=					"<br /><br />"
+		   						/* PSC logo. */
+		   +					"<a href=\"http://www.psc.edu/\">"
+		   +						"<img src=\"" + wr + "/img/psc.png\" "
+		   +						     "alt=\"[Pittsburgh Supercomputing Center]\" "
+		   +						     "border=\"0\" />"
+		   +					"</a>"
+		   +					"<br /><br />"
 		   +					"<a href=\"http://www-unix.globus.org/cog/\">"
 		   +						"<img src=\"" + wr + "/img/cog-toolkit.png\" border=\"0\" />"
 		   +					"</a>"
 		   +					"<a href=\"http://www.globus.org/toolkit/\">"
-		   +						"<img src=\"" + wr+ "/img/globus-toolkit.png\" border=\"0\" />"
+		   +						"<img src=\"" + wr + "/img/globus-toolkit.png\" border=\"0\" />"
 		   +					"</a>"
 		   +					"<br /><br />"
 		   +				"</td>"
-		   +				"<td align=\"right\" height=\"107\" "
-		   +				    "style=\"border-right: 1px solid black; border-bottom: 1px solid black\">"
-		   +					"<img src=\"" + wr + "/img/gridfe.png\" alt=\"[GridFE]\" border=\"0\" hspace=\"0\" />"
-		   +				"</td>"
-		   +			"</tr>"
-		   +			"<tr>"
-		   +				"<td align=\"center\" height=\"7\" style=\"background-color: #ffffff; "
-		   +				  "padding-left: 213px; border-left: 1px solid black\">"
-		   +					"<img src=\"" + wr + "/img/propaganda.png\" alt=\"\" />"
-		   +				"</td>"
-		   +			"</tr>"
-		   +			"<tr>"
 		   +				"<td style=\"background-color: #ffffff; padding-left: 5px; "
 		   +				  "border-left: 1px solid black\" valign=\"top\">"
 		   +					this.oof.header(new Object[] {
 									"size", "3",
 									"style", "margin-top:0px"
-								}, title);
+								}, "<img align=\"middle\" src=\"" + wr + "/img/box.png\" " +
+									"alt=\"\" border=\"0\" />" + title);
 		return (s);
 	}
 
@@ -381,6 +365,10 @@ public class Page {
 		return (this.res);
 	}
 
+	public Connection getDBH() {
+		return (this.dbh);
+	}
+
 	public String buildURL(String s) {
 		if (s.indexOf(':') != -1) {
 			return (s);
@@ -440,5 +428,31 @@ public class Page {
 		return (t);
 	}
 };
+
+class Menu {
+	private String name;
+	private String url;
+	private LinkedList items;
+
+	public Menu(String name, String url, Object[] items) {
+		this.name = name;
+		this.url = url;
+		this.items = new LinkedList();
+		if (items != null) for (int i = 0; i < items.length; i++)
+				this.items.add(items[i]);
+	}
+
+	public String getName() {
+		return (this.name);
+	}
+
+	public String getURL() {
+		return (this.url);
+	}
+
+	public LinkedList getItems() {
+		return (this.items);
+	}
+}
 
 /* vim: set ts=4: */

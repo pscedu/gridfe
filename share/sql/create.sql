@@ -22,7 +22,7 @@ CREATE TABLE hosts (
 	uid	VARCHAR(32)	NOT NULL,
 	host	VARCHAR(255),
 
-	PRIMARY KEY(uid),
+	KEY(uid),
 	KEY(host)
 );
 

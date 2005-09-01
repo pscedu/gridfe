@@ -50,7 +50,7 @@ public class status {
 			j = (GridJob)list.get(i);
 			String c = p.genClass();
 			s += oof.table_row(new Object [][] {
-				new Object[] { "class", c, "value", j.getName() },
+				new Object[] { "class", c, "value", p.escapeHTML(j.getName()) },
 				new Object[] { "class", c, "value", j.getHost() },
 				new Object[] { "class", c, "value", j.getStatusAsString() },
 				new Object[] { "class", c, "value", "" +

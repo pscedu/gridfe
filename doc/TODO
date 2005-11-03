@@ -8,3 +8,10 @@ Add timestamp to submitted jobs.
 
 Add example suite and show equivalent of "globus-job-run" commands
 for a variety of examples
+
+Job submit:
+	- load RSL
+	- local binary
+
+overview/index page
+where to go for what to do (tutorial pages)

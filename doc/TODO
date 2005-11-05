@@ -12,6 +12,8 @@ for a variety of examples
 Job submit:
 	- load RSL
 	- local binary
+	- save list of previous commands run by user
 
 overview/index page
 where to go for what to do (tutorial pages)
+

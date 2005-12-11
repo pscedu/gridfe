@@ -8,6 +8,8 @@ X) mf_get_uid_from_ticket_cache() really isn't needed.  We could
    just keep this in case code gets switched later, we don't
    have to rely on anything except the ticket cache name.
 
+- not using something like pool_put *must* be causing memleaks
+
 Development Notes:
 
 1) currently only users with user account can use authenticate.

@@ -102,7 +102,7 @@ static void	 mf_kinit_cleanup(struct krb5_inst *);
 static void	 mf_krb5_free(struct krb5_inst *);
 static void	 mf_log(const char *, ...);
 static void	 mod_fum_hooks(apr_pool_t *);
-static int	 mf_remove_certs(char *principal);
+static int	 mf_remove_certs(char *);
 
 int do_kx509(int, char **);
 int mod_fum_main(const char *, const char *);
@@ -188,22 +188,22 @@ mf_log("auth() - valid");
 	/*
 	 * Finally check if the credentials have expired
 	 * or not.  If so, create new certs; if not, do
-	 * nothing. Mod_fum assumes that if the kerberos
-	 * ticket (created by mod_fum) is valid, that the
-	 * X.509 Ticket is as well.
+	 * nothing.  mod_fum assumes that if the Kerberos
+	 * ticket (created by mod_fum) is valid, then the
+	 * X.509 ticket is as well.
 	 */
 	if (!mf_valid_cred(user)) {
 		/*
 		 * This could also be a permissions problem.  If the
-		 * user has already a valid kerberos certificate, Apache
+		 * user already has a valid kerberos certificate, Apache
 		 * does not have permission to read it. Thus mod_fum
 		 * creates credentials with unique names.
 		 */
 		mf_log("credentials expired, removing and recreating");
 
-		/* Try and remove old certs */
+		/* Try to remove old certs */
 		mf_remove_certs(user);
-	
+
 		/* Create new certs */
 		if ((err = mod_fum_main(user, pass)) != HTTP_UNAUTHORIZED)
 			return (err);
@@ -706,27 +706,26 @@ cleanup:
 }
 
 /*
-** Remove krb5 and x509 certificates
-*/
-static int mf_remove_certs(char *principal)
+ * Remove Kerberos tickets and X.509 certificates
+ */
+static int
+mf_remove_certs(char *principal)
 {
-	char *command;
-	char *file;
-	char *uid;
+	char *command, *file, *uid;
 	int err;
 
 	/* Get uid */
-	if((err = mf_user_id_from_principal(principal, &uid)) != 0)
+	if ((err = mf_user_id_from_principal(principal, &uid)) != 0)
 		mf_log("mod_fum uid error %d", err);
-	
-	/* Remove kerberos tkt */
-	file = mf_dstrcat(_PATH_KRB5CERT, uid);
-	if((err = remove(file)) != 0)
-		mf_log("error removing KRB5CERT");
 
-	/* Remove x509 cert */
+	/* Remove Kerberos ticket. */
+	file = mf_dstrcat(_PATH_KRB5CERT, uid);
+	if ((err = remove(file)) != 0)
+		mf_log("error removing Kerberos ticket: %s", file);
+
+	/* Remove X.509 cert */
 	file = mf_dstrcat(_PATH_X509CERT, uid);
-	if((err = remove(file)) != 0)
+	if ((err = remove(file)) != 0)
 		mf_log("error removing X509CERT");
 }
 
@@ -742,7 +741,7 @@ mf_dstrcat(const char *s1, const char *s2)
 	len = strlen(s1) + strlen(s2) + 1;
 	s = (char *)apr_palloc(mf_pool, sizeof(char)*len);
 	if (s == NULL) {
-		mf_log("malloc failed");
+		mf_log("apr_palloc failed");
 		return (NULL);
 	}
 	(void)strncpy(s, s1, strlen(s1));

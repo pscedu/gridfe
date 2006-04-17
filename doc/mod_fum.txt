@@ -1,66 +1,53 @@
 $Id$
 
-About Mod_Fum
+About mod_fum
 =============
-Mod_Fum (the Module for Free Utilization and Moderation through Kerberos)
-was specificly designed for use with Grid Portal software.  Mod_Fum's purpose
-is to provide the functionality of the command line tools "kinit", "kx509", 
-and "kxlist -p" through apache. Mod_Fum will obtain a Kerberos Ticket,
-a short term  X.509 Certificate, and a Globus Proxy for the user. These
-credentials will be specific to the user, but readable only by apache (apache
-becomes the sole owner). This allows web applications, such as portals, to
-act on the users behalf.
+mod_fum (functional user Machiavellianism between Apache/Kerberos/KX509)
+was specifically designed for use with Grid Portal software.  The
+purpose was to provide the functionality of the command line tools
+kinit(1), kx509(1), and kxlist(1) from within Apache.  mod_fum obtains a
+Kerberos ticket along with a short term X.509 certificate for the user.
+These credentials are specific to the user but readable only by Apache
+(or whomever the Apache Web server runs as).  This allows Web
+applications such as portals to act on the user's behalf.
 
-Note: Mod_Fum should only be used in conjunction with Mod_SSL! Otherwise
-Kerberos passwords will be transmitted in cleartext across the wire.
+Note: mod_fum should only be used in conjunction with mod_ssl!
+Otherwise Kerberos passwords will be transmitted in cleartext.
 
-
-Mod_Fum Installation
+mod_fum Installation
 ====================
 
 Requirements:
-=============
-1) Apache 2.X
-2) Kerberos 5
-3) kx509
-	When building kx509 the configuration option
-	--enable-libkx509 must be used.  mod_fum relies on the shared
-	library libkx509.so to be in LD_LIBRARY_PATH, or for libkx509.so
-	to be properly installed, which the kx509 distribution does not
-	provide installation targets for, and must be installed
-	manually:
+  1) Apache 2.X
+  2) Kerberos 5
+  3) libkx509
+	When building KX509, the configuration option --enable-libkx509
+	must be used.  mod_fum relies on the shared library libkx509.so
+	to be in LD_LIBRARY_PATH or properly installed.  The KX509
+	distribution does not provide make targets for installing
+	libkx509.so, and so this installation must be installed manually:
 
-	# cp libkx509.so /usr/lib
-	# ldconfig
+	  # cp libkx509.so /usr/lib
+	  # ldconfig
 
-	Note:
-	The kx509 header file 'kx509.h' must also be present on the system
-	to build mod fum.
+	Note: The KX509 header file kx509.h must also be present on the
+	system to build mod_fum.
 
-
-
-Building Mod_Fum:
+Building mod_fum:
 =================
-1) Type: 'make' to compile the module
-2) Then: 'make install' to install (using apsx) into apache
-
-Other:
-3) Type: 'make clean' to remove mod_fum and scratch files
-for a fresh build.
-
+Standard 'make/make install' combo.
 
 Apache Configuration:
 =====================
-1) Add the following to your <Directory> tags in your 'httpd.conf' file
-to enable Mod_Fum authentication:
+1) Add the following to the <Directory> tags in 'httpd.conf' file
+to enable mod_fum-style authentication:
 
-	# Mod_Fum Authentication Requirements
+	# mod_fum Authentication Requirements
 	AuthName "GridFe Login"
 	AuthType Basic
 	SetHandler mod_fum_auth
 	Require Valid-User
 
-	# Use this for mod_ssl support (recommended!!)
+	# Use this for mod_ssl support (recommended)
 	SSLRequireSSL
 	SSLProtocol all -SSLv2
-

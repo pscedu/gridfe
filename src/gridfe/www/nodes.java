@@ -163,4 +163,22 @@ public class nodes {
 	}
 };
 
+class Action {
+	private String name;
+	private String m;
+
+	public Action(String name, String m) {
+		this.name = name;
+		this.m = m;
+	}
+
+	public String getName() {
+		return (this.name);
+	}
+
+	public String getMethod() {
+		return (this.m);
+	}
+};
+
 /* vim: set ts=4: */

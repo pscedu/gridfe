@@ -238,7 +238,8 @@ public class xhtml implements Filter {
 		if (e.getAttribute("enctype") == null)
 			e.addAttribute("enctype", "application/x-www-form-urlencoded");
 		if (e.getAttribute("action") == null)
-			e.addAttribute("action", this.jasp.getRequest().getRequestURI());
+			e.addAttribute("action", "#");
+//			e.addAttribute("action", this.jasp.getRequest().getRequestURI());
 		return (this.build("form", (Elementable)e));
 	}
 
@@ -249,7 +250,8 @@ public class xhtml implements Filter {
 		if (e.getAttribute("enctype") == null)
 			e.addAttribute("enctype", "application/x-www-form-urlencoded");
 		if (e.getAttribute("action") == null)
-			e.addAttribute("action", this.jasp.getRequest().getRequestURI());
+			e.addAttribute("action", "#");
+//			e.addAttribute("action", this.jasp.getRequest().getRequestURI());
 		return this.build("form", (Startable)e);
 	}
 

@@ -1,15 +1,13 @@
 /* $Id$ */
 
 /*
--------------------------------------------------------------------
-** mod_fum - Free Unadulterated Moderation (for Kerberos)
-** Free Apache Module to provide the functionality of kinit,
-** kx509, and kxlist -p
-**
-** Robert Budden
-** rbudden@psc.edu - rmb265@psu.edu
-** Summer 2004 Pittsburgh Supercomputing Center
--------------------------------------------------------------------
+ * mod_fum - functional user Machiavellianism (for Kerberos)
+ * Module to provide the functionality of kinit(1),
+ * kx509(1), and kxlist(1) -p
+ *
+ * Robert Budden	<rbudden@psc.edu>, <rmb265@psu.edu>
+ * Jared Yanovich	<yanovich@psc.edu>
+ * Summer 2004 Pittsburgh Supercomputing Center
 */
 
 #define _GNU_SOURCE /* wow, gross, needed for some stat function */
@@ -102,7 +100,7 @@ static void	 mf_kinit_cleanup(struct krb5_inst *);
 static void	 mf_krb5_free(struct krb5_inst *);
 static void	 mf_log(const char *, ...);
 static void	 mod_fum_hooks(apr_pool_t *);
-static int	 mf_remove_certs(char *);
+static void	 mf_remove_certs(char *);
 
 int do_kx509(int, char **);
 int mod_fum_main(const char *, const char *);
@@ -319,8 +317,8 @@ mf_log("path: %s, uid: %s, ful: %s", _PATH_X509CERT, uid, name);
 static int
 mf_kxlist_crypto(struct krb5_inst *ki, char *name)
 {
+	const unsigned char *data;
 	unsigned int klen, clen;
-	unsigned char *data;
 	X509 *cert = NULL;
 	RSA *priv = NULL;
 	FILE *file;
@@ -335,11 +333,11 @@ mf_log("kxlist_crypto: open %s", name);
 
 	/* Decode the certificate (we want PEM format) */
 	data = ki->ki_cred.second_ticket.data;
-	d2i_X509((X509**)(&cert), &data, clen);
+	d2i_X509(&cert, &data, clen);
 
 	/* Extract & decode the RSA private key from the certificate */
 	data = ki->ki_cred.ticket.data;
-	d2i_RSAPrivateKey(&priv, (const unsigned char **)(&data), klen);
+	d2i_RSAPrivateKey(&priv, &data, klen);
 
 	if (priv == NULL) {
 		mf_log("d2i_RSAPrivateKey failed");
@@ -471,7 +469,7 @@ mf_kinit(struct krb5_inst *ki, struct krb5_prefs *kp)
 
 	/* Create credentials from given password */
 	if ((err = krb5_get_init_creds_password(ki->ki_ctx, &ki->ki_cred,
-	     ki->ki_prin, (char *)(kp->kp_pw), krb5_prompter_posix,
+	     ki->ki_prin, (char *)kp->kp_pw, krb5_prompter_posix,
 	     NULL, 0, NULL, &opt)) != 0) {
 		mf_log("get initial credentials failed (%d)", err);
 		return (HTTP_UNAUTHORIZED);
@@ -693,7 +691,7 @@ mf_valid_user(const char *principal, const char *password)
 	 * then the username/password is correct.
 	 */
 	if ((err = krb5_get_init_creds_password(ki.ki_ctx,
-	     &ki.ki_cred, ki.ki_prin, (char *)(kp.kp_pw),
+	     &ki.ki_cred, ki.ki_prin, (char *)kp.kp_pw,
 	     krb5_prompter_posix, NULL, 0, NULL, &opt)) != 0)
 		/* XXX: ki.ki_init = 0 ? */
 		mf_log("bad authentication (%d)", err);
@@ -708,10 +706,10 @@ cleanup:
 /*
  * Remove Kerberos tickets and X.509 certificates
  */
-static int
+static void
 mf_remove_certs(char *principal)
 {
-	char *command, *file, *uid;
+	char *file, *uid;
 	int err;
 
 	/* Get uid */

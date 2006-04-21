@@ -18,3 +18,4 @@ overview/index page
 where to go for what to do (tutorial pages)
 
 move to jmk (java make) or even ant
+move MKDEP from defs.mk to local.mk

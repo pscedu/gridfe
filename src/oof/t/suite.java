@@ -21,66 +21,74 @@ public class suite {
 		OOF o = new OOF(j, "xhtml");
 
 		t("br", o.br(), "<br />");
-		t("br", o.br(new Object[] { "clear", "right" }), "<br clear=\"right\" />");
+		t("br", o.br(new Object[] { "clear", "right" }),
+		    "<br clear=\"right\" />");
 
 		t("code", o.code("sdfsf"), "<code>sdfsf</code>");
 		t("code", o.code(new Object[] { "class", "test" }, "sdfsf"),
-			"<code class=\"test\">sdfsf</code>");
+		    "<code class=\"test\">sdfsf</code>");
 
 		t("div", o.div(), "<div></div>");
 		t("div", o.div("some content"), "<div>some content</div>");
 		t("div", o.div(new Object[] { "align", "center" }, "some content"),
-			"<div align=\"center\">some content</div>");
+		    "<div align=\"center\">some content</div>");
 		t("div", o.div(new Object[] { "some content ", "and some more" }),
-			"<div>some content and some more</div>");
+		    "<div>some content and some more</div>");
 		t("div", o.div(new Object[] { "align", "right" },
-		      	   new Object[] { "content, ", "content, ", "and more" }),
-			"<div align=\"right\">content, content, and more</div>");
+		    new Object[] { "content, ", "content, ", "and more" }),
+		    "<div align=\"right\">content, content, and more</div>");
 
 		t("div_start", o.div_start(new Object[] { "class", "foo" }),
-			"<div class=\"foo\">");
+		    "<div class=\"foo\">");
 		t("div_start", o.div_start(), "<div>");
 
 		t("div_end", o.div_end(), "</div>");
 
 		t("email", o.email("foo@bar.com"),
-			"<a href=\"mailto:foo@bar.com\">foo@bar.com</a>");
+		    "<a href=\"mailto:foo@bar.com\">foo@bar.com</a>");
 		t("email", o.email("Foobar", "foo@bar.com"),
-			"<a href=\"mailto:foo@bar.com\">Foobar</a>");
+		    "<a href=\"mailto:foo@bar.com\">Foobar</a>");
 
 		t("emph", o.emph("some emphasized text"), "<em>some emphasized text</em>");
 		t("emph", o.emph(new Object[] { "class", "foo" }, "some emphasized text"),
-			"<em class=\"foo\">some emphasized text</em>");
+		    "<em class=\"foo\">some emphasized text</em>");
 		t("emph", o.emph(new Object[] { "some ", "more ", "text" }),
-			"<em>some more text</em>");
+		    "<em>some more text</em>");
 
 		t("fieldset", o.fieldset(new Object[] {
-				"field1: ", o.input(),
-				"field2: ", o.input()}),
-			"<fieldset>field1: <input />field2: <input /></fieldset>");
+			"field1: ", o.input(),
+			"field2: ", o.input()}),
+		    "<fieldset>field1: <input />field2: <input /></fieldset>");
 
 		t("form", o.form(new Object[] { "method", "post", "action", "url" },
-		      	     new Object[] {
-		      		"field1: ", o.input(),
+			new Object[] {
+				"field1: ", o.input(),
 		      		"field2: ", o.input()}),
-			"<form action=\"url\" method=\"post\">" +
-				"field1: <input />field2: <input />" +
-			"</form>");
+		    "<form action=\"url\" " +
+		      "enctype=\"application/x-www-form-urlencoded\" method=\"post\">" +
+			"field1: <input />field2: <input />" +
+		    "</form>");
 		t("form", o.form(new Object[] {
-		      		"field1: ", o.input(),
-		      		"field2: ", o.input()}),
-			"<form>field1: <input />field2: <input /></form>");
+			"field1: ", o.input(),
+			"field2: ", o.input()}),
+		    "<form action=\"#\" " +
+		      "enctype=\"application/x-www-form-urlencoded\" method=\"get\">" +
+		      "field1: <input />field2: <input />" +
+		    "</form>");
 
 		t("form_start", o.form_start(new Object[] { "method", "get" }),
-			"<form method=\"get\">");
-		t("form_start", o.form_start(), "<form>");
+			"<form action=\"#\" " +
+			  "enctype=\"application/x-www-form-urlencoded\" method=\"get\">");
+		t("form_start", o.form_start(),
+			"<form action=\"#\" enctype=\"application/x-www-form-urlencoded\" " +
+			  "method=\"get\">");
 
 		t("form_end", o.form_end(), "</form>");
 
-		try {
+	try {
 		t("header", o.header("a"), "<h>a</h>");
-		} catch (Exception e) {
-		}
+	} catch (Exception e) {
+	}
 		t("header", o.header("b", "2"), "<h2>b</h2>");
 		t("header", o.header(new Object[] { "size", "2" }, "c"),
 			"<h2>c</h2>");

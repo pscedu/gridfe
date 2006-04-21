@@ -22,7 +22,7 @@ public abstract class _End implements Endable {
 					this.oof.__getFilter(), new Object[] { this });
 		} catch (Exception e) {
 			/* Fuck */
-			return "(@@@@@ FAILED @@@@@)";
+			return "(@@@@@ _End.toString FAILED: " + e + " @@@@@)";
 		}
 	}
 };

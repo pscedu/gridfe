@@ -43,7 +43,9 @@ public abstract class _Start implements Startable {
 					this.oof.__getFilter(), new Object[] { this });
 		} catch (Exception e) {
 			/* Fuck */
-			return "(@@@@@ FAILED @@@@@)";
+			return "(@@@@@ _Start.toString FAILED: " + e + "; " +
+			    e.getCause() + "; filter: " +
+			    this.oof.__getFilter().getClass() + " @@@@@)";
 		}
 	}
 };

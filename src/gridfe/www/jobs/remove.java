@@ -4,7 +4,6 @@ package gridfe.www.jobs;
 
 import gridfe.*;
 import gridfe.gridint.*;
-import javax.servlet.http.*;
 import oof.*;
 
 public class remove {

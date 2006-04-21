@@ -3,7 +3,6 @@
 package gridfe.www;
 
 import gridfe.*;
-import java.lang.reflect.*;
 import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
@@ -12,12 +11,6 @@ public class nodes {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
-		Action[] acts = new Action[] {
-			new Action("add", "add"),
-			new Action("list", "list"),
-			new Action("status", "status"),
-			new Action("remove", "remove")
-		};
 
 		String act = req.getParameter("action");
 		if (act == null)
@@ -160,24 +153,6 @@ public class nodes {
 		   + oof.form_end()
 		   + p.footer();
 		return (s);
-	}
-};
-
-class Action {
-	private String name;
-	private String m;
-
-	public Action(String name, String m) {
-		this.name = name;
-		this.m = m;
-	}
-
-	public String getName() {
-		return (this.name);
-	}
-
-	public String getMethod() {
-		return (this.m);
 	}
 };
 

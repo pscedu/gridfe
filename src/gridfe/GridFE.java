@@ -3,13 +3,12 @@
 package gridfe;
 
 import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 public class GridFE extends HttpServlet {
-	private HttpServletRequest req;
+//	static final long serialVersionUID = 1L;
+
 	private HttpServletResponse res;
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -25,7 +24,6 @@ public class GridFE extends HttpServlet {
 	/* XXX: remove exceptions to always output a gridfe page. */
 	private void workHorse(HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
-		this.req = req;
 		this.res = res;
 
 		/* XXX: wrong */

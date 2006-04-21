@@ -15,7 +15,7 @@ public class index {
 		   + oof.p("Welcome to the GridFE portal.  GridFE provides a Web-accessible "
 		   +  "interface to various Grid technologies.")
 		   + oof.link("" + oof.img(new Object[] {
-				"src", p.buildURL(p.PATHTYPE_WEB, "/img/learn/jobs.png"),
+				"src", p.buildURL(Page.PATHTYPE_WEB, "/img/learn/jobs.png"),
 				"align", "left",
 				"border", "0",
 				"hspace", "5" }), p.buildURL("/jobs/submit"))

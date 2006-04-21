@@ -3,13 +3,8 @@
 package gridfe.www;
 
 import gridfe.*;
-import gridfe.gridint.*;
 import gridfe.gridint.auth.*;
 import oof.*;
-
-import java.io.*;
-import org.globus.gsi.GlobusCredentialException;
-import org.ietf.jgss.GSSException;
 
 public class certs {
 	public static String main(Page p)
@@ -30,7 +25,7 @@ public class certs {
 		sec -= min * 60;
 
 		String lifetime;
-		lifetime = 
+		lifetime =
 				   days + " day(s), " +
 				   hours + " hour(s), " +
 				   min + " minute(s)";
@@ -49,20 +44,20 @@ public class certs {
 					new Object[][] {
 						new Object[] {
 							"colspan", "2",
-							"class", p.CCHDR,
+							"class", Page.CCHDR,
 							"value", "Current Certificate Parameters"
 						},
 					},
 					new Object[][] {
 						new Object[] {
 							"colspan", "2",
-							"class", p.CCSUBHDR,
+							"class", Page.CCSUBHDR,
 							"value", "Location"
 						}
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Kerberos Ticket:"
 						},
 						new Object[] {
@@ -72,7 +67,7 @@ public class certs {
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "X.509 Certificate:"
 						},
 						new Object[] {
@@ -83,13 +78,13 @@ public class certs {
 					new Object[][] {
 						new Object[] {
 							"colspan", "2",
-							"class", p.CCSUBHDR,
+							"class", Page.CCSUBHDR,
 							"value", "Contents"
 						}
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Issuer:"
 						},
 						new Object[] {
@@ -99,7 +94,7 @@ public class certs {
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Subject:"
 						},
 						new Object[] {
@@ -109,7 +104,7 @@ public class certs {
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Identity:"
 						},
 						new Object[] {
@@ -119,7 +114,7 @@ public class certs {
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Type:"
 						},
 						new Object[] {
@@ -129,7 +124,7 @@ public class certs {
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Key Strength:"
 						},
 						new Object[] {
@@ -139,7 +134,7 @@ public class certs {
 					},
 					new Object[][] {
 						new Object[] {
-							"class", p.CCDESC,
+							"class", Page.CCDESC,
 							"value", "Remaining Lifetime:"
 						},
 						new Object[] {

@@ -14,7 +14,7 @@ public class index {
 		s += p.header("Job Management")
 		   + oof.p("Please select an action:")
 		   + oof.list(
-				oof.LIST_UN,
+				OOF.LIST_UN,
 				new Object[] {
 					oof.link("Submit a job", p.buildURL("/jobs/submit")),
 					oof.link("Get information about a previously submitted job", p.buildURL("/jobs/status"))

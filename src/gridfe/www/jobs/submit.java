@@ -140,7 +140,7 @@ public class submit {
 				new Object[] {
 					oof.table(
 						new Object[] {
-							"class", p.CCTBL,
+							"class", Page.CCTBL,
 							"border", "0",
 							"cellspacing", "0",
 							"cellpadding", "0"
@@ -148,14 +148,14 @@ public class submit {
 						new Object[][][] {
 							new Object[][] {
 								new Object[] {
-									"class", p.CCHDR,
+									"class", Page.CCHDR,
 									"value", "Submit Job",
 									"colspan", "2"
 								}
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Job name/label:"
 								},
 								new Object[] {
@@ -174,7 +174,7 @@ public class submit {
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Target host:"
 								},
 								new Object[] {
@@ -205,7 +205,7 @@ public class submit {
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Executable program:"
 								},
 								new Object[] {
@@ -229,7 +229,7 @@ public class submit {
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Program arguments:"
 								},
 								new Object[] {
@@ -247,7 +247,7 @@ public class submit {
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Remote directory:"
 								},
 								new Object[] {
@@ -269,7 +269,7 @@ public class submit {
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Remote standard output file:"
 								},
 								new Object[] {
@@ -302,7 +302,7 @@ public class submit {
 							},
 							new Object[][] {
 								new Object[] {
-									"class", p.CCDESC,
+									"class", Page.CCDESC,
 									"value", "Remote standard error file:"
 								},
 								new Object[] {
@@ -332,7 +332,7 @@ public class submit {
 							new Object[][] {
 								new Object[] {
 									"colspan", "2",
-									"class", p.CCTBLFTR,
+									"class", Page.CCTBLFTR,
 									"value", "" +
 										oof.input(new Object[] {
 											"type", "submit",

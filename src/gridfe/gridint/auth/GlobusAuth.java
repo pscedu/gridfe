@@ -2,18 +2,13 @@
 
 package gridfe.gridint.auth;
 
-import gridfe.gridint.*;
 import jasp.*;
-import java.security.PrivateKey;
 import org.globus.gsi.*;
-import org.globus.gsi.gssapi.*;
-import org.ietf.jgss.*;
 
 public class GlobusAuth {
 	public static final int GAF_REGCERT = (1<<1);
 
 	private GlobusCredential gc = null;
-	private Uid uid;
 	private CertFile file;
 	int flags;
 

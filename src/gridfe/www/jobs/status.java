@@ -26,23 +26,23 @@ public class status {
 				"action", p.buildURL("/jobs/remove")
 			 })
 		  +  oof.table_start(new Object[] {
-			  "class", p.CCTBL,
+			  "class", Page.CCTBL,
 			  "border", "0",
 			  "cellspacing", "0",
 			  "cellpadding", "0" })
 		  +		oof.table_row(new Object[][] {
 		  			new Object[] {
-						"class", p.CCHDR,
+						"class", Page.CCHDR,
 						"colspan", "5",
 						"value", "Job Status"
 					}
 		  		})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", p.CCSUBHDR, "value", "Name" },
-					new Object[] { "class", p.CCSUBHDR, "value", "Host" },
-					new Object[] { "class", p.CCSUBHDR, "value", "Status" },
-					new Object[] { "class", p.CCSUBHDR, "value", "Output" },
-					new Object[] { "class", p.CCSUBHDR, "value", "Remove" }
+					new Object[] { "class", Page.CCSUBHDR, "value", "Name" },
+					new Object[] { "class", Page.CCSUBHDR, "value", "Host" },
+					new Object[] { "class", Page.CCSUBHDR, "value", "Status" },
+					new Object[] { "class", Page.CCSUBHDR, "value", "Output" },
+					new Object[] { "class", Page.CCSUBHDR, "value", "Remove" }
 				});
 
 		List list = gi.getJobList().getList();

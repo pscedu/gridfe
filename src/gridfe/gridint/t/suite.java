@@ -5,18 +5,13 @@ import gridfe.gridint.*;
 import gridfe.gridint.auth.*;
 import jasp.*;
 import java.io.*;
-import java.lang.Integer;
 import java.lang.ref.*;
-import java.lang.reflect.*;
-import java.security.*;
 import java.util.*;
-import javax.security.auth.kerberos.KerberosKey;
-import javax.security.auth.Subject;
 
 public class suite {
 	public static void main(String[] args)
 	    throws Exception {
-	    	String thost = "intel2.psc.edu";
+	    	String thost = "gt4-submit.psc.teragrid.org/jobmanager-lemieux-pbs";
 	    	String stdout_dir = "gram_jobs";
 
 		GridInt gi = new GridInt(BasicServices.getUserID(), GridInt.GIF_REGCERT);

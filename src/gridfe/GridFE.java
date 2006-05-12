@@ -9,8 +9,6 @@ import javax.servlet.http.*;
 public class GridFE extends HttpServlet {
 //	static final long serialVersionUID = 1L;
 
-	private HttpServletResponse res;
-
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
 		this.workHorse(req, res);
@@ -24,8 +22,6 @@ public class GridFE extends HttpServlet {
 	/* XXX: remove exceptions to always output a gridfe page. */
 	private void workHorse(HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
-		this.res = res;
-
 		/* XXX: wrong */
 		res.setContentType("text/html");
 		PrintWriter w = res.getWriter();
@@ -51,10 +47,14 @@ public class GridFE extends HttpServlet {
 		 * For directory requests, redirect to someplace
 		 * inside so that relative path names work.
 		 */
-		if (Package.getPackage(classname) != null &&
-		    !uri.endsWith("/")) {
-			res.sendRedirect(uri + "/index");
-			return;
+		try {
+			if (!uri.endsWith("/") &&
+			  Class.forName(classname + ".index", false,
+			  this.getClass().getClassLoader()) != null) {
+				res.sendRedirect(uri + "/index");
+				return;
+			}
+		} catch (Exception e) {
 		}
 
 		String s;

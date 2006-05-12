@@ -20,7 +20,7 @@ public class status {
 		s += p.header("Job Status")
 		  +  oof.p("This page contains the status information for any jobs that " +
 		  		"jobs that you have submitted.  For completed jobs, you may follow " +
-				"the link provided to job output page to retrieve any output that " +
+				"the link provided to the job output page to retrieve any output that " +
 				"the job may have generated.")
 		  +  oof.form_start(new Object[] {
 				"action", p.buildURL("/jobs/remove")

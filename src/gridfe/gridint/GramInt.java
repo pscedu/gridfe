@@ -61,9 +61,9 @@ public class GramInt {
 			status = this.job.getStatus();
 		} catch (GramException e) {
 			/*
-			 * Job manager cannont be contacted. Therefore the job
-			 * is done. However, we do not know if the job finished
-			 * normally or terminated. -1 can stand for DONE/FAIL.
+			 * Job manager cannot be contacted.  Therefore, the job
+			 * is "done."  However, we do not know if the job finished
+			 * normally or terminated.  -1 means done, success or fail.
 			 */
 			if (e.getErrorCode() ==
 			    GramException.ERROR_CONTACTING_JOB_MANAGER)

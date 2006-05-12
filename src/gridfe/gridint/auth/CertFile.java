@@ -4,19 +4,18 @@ package gridfe.gridint.auth;
 
 import jasp.*;
 
-/* Class to encapsulate the location for the X.509 certificate */
+/*
+ * Class to encapsulate the location for the
+ * X.509 certificates and Kerberos tickets.
+ */
 public class CertFile {
 	public static int CF_REGCERT = (1<<1);
 	/*
-	 * Certificates are normally stored in /tmp/x509up_u???
+	 * Certificates are normally stored in /tmp/x509up_u$UID
 	 *
 	 * However, mod_fum creates others so they don't
 	 * conflict with console login credentials that
 	 * may exist already...  Use these when deployed.
-	 *
-	 * XXX - put this stuff in some configuration
-	 * file to be read in... kinda nasty hard coded
-	 * the way it is for development purposes!
 	 */
 
 	private String xfile;

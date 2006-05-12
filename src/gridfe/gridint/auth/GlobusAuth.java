@@ -18,7 +18,7 @@ public class GlobusAuth {
 		this.flags = flags;
 		if ((flags & GAF_REGCERT) == GAF_REGCERT)
 			cf_flags |= CertFile.CF_REGCERT;
-		this.file = new CertFile(uid, flags);
+		this.file = new CertFile(uid, cf_flags);
 	}
 
 	/* Grab the credential from the file */

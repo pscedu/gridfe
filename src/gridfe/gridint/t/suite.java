@@ -60,8 +60,8 @@ public class suite {
 
 		/* Job to test output permission */
 		GridJob j4 = new GridJob(thost);
-		j4.setRSL(new String[] {"executable", "directory", "stdout"},
-			new String[] {"/bin/date", stdout_dir, "gram.out.date"});
+		j4.setRSL(new String[] {"executable", "directory", "stdout", "stderr"},
+			new String[] {"/bin/date", stdout_dir, "gram.out.date", "gram.err.date"});
 		j4.setName("Date");
 
 		/* Submit the job to GRAM */

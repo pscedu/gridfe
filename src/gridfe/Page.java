@@ -17,7 +17,7 @@ public class Page {
 	private LinkedList menus;
 	private String servroot;
 	private String webroot;
-	private String sysroot;
+//	private String sysroot;
 	private int classCount;
 	private GridInt gi;
 	private JASP jasp;
@@ -48,14 +48,13 @@ public class Page {
 		this.jasp = new JASP(req, res);
 		this.menus = new LinkedList();
 		this.webroot = "/gridfe";
-		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
+//		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
 		this.servroot = "/gridfe/gridfe";
 		this.classCount = 1;
 		this.uid = -1;
 		this.dbh = null;
 
 		try {
-			Base64 enc = new Base64();
 			String hdr;
 
 			String dsn = "jdbc:" + DB_DRIVER + "://" + DB_HOST + "/" + DB_NAME;
@@ -67,7 +66,7 @@ public class Page {
 			hdr = (String)req.getHeader("authorization");
 			if (hdr.startsWith("Basic "))
 				hdr = hdr.substring(6);
-			String combo = new String(enc.decode(hdr));
+			String combo = new String(Base64.decode(hdr));
 			String[] auth = BasicServices.splitString(combo, ":");
 			String kuid = auth[0];
 			UserMap m = new UserMap();
@@ -97,14 +96,14 @@ public class Page {
 		 * This should be safe -- we shouldn't get to a point
 		 * where we try to access the uid on an error.
 		 */
-		return ("/tmp/gridfegi_u" + this.uid);
+		return ("/tmp/gridfe.gi_u" + this.uid);
 	}
 
 	private boolean restoreGI() {
 		try {
 			FileInputStream fin = new FileInputStream(this.getGIPath());
 			ObjectInputStream in = new ObjectInputStream(fin);
-			gi = (GridInt)(in.readObject());
+			gi = (GridInt)in.readObject();
 			in.close();
 			return (true);
 		} catch (Exception e) {
@@ -205,7 +204,6 @@ public class Page {
 		String s, name, url;
 		String wr = this.webroot;
 		Menu m;
-		int y;
 
 		/* Register menu. */
 		this.addMenu("Main", "/", null);
@@ -256,7 +254,7 @@ public class Page {
 		  +						 "border=\"0\" style=\"margin-top: 5px\" />"
 		  +						"<br /><br />";
 
-		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().size();
+//		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().size();
 		for (Iterator i = this.getMenus().iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=				"<a href=\"" + this.buildURL(m.getURL()) + "\">"
@@ -312,7 +310,7 @@ public class Page {
 		   +			"</tr>"
 		   +			"<tr>"
 		   +				"<td align=\"right\" colspan=\"3\" style=\"background-color: #ffffff\">"
-		   +					"Copyright &copy; 2004-2005 "
+		   +					"Copyright &copy; 2004-2006 "
 		   +					"<a href=\"http://www.psc.edu/\">Pittsburgh Supercomputing Center</a>"
 		   +				"</td>"
 		   +			"</tr>"

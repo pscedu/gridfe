@@ -98,6 +98,10 @@ a:link, a:visited {
 	color: #336699;
 }
 
+input, select {
+	font-family: Tahoma, sans-serif;
+}
+
 input, textarea, select {
 	background-color: #ddeeff;
 	border: 1px solid black;

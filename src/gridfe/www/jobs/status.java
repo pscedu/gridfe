@@ -86,6 +86,13 @@ public class status {
 						"type", "submit",
 						"class", "button",
 						"value", "Remove Checked"
+					} +
+					oof.input(new Object[] {
+						"type", "button",
+						"class", "button",
+						"value", "Toggle All",
+						"onclick", "for (var i in this.form.fields['qid']) " +
+						  "{i.checked = !i.checked}"
 					})
 				}
 			 })

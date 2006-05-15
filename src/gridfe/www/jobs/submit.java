@@ -4,6 +4,7 @@ package gridfe.www.jobs;
 
 import gridfe.*;
 import gridfe.gridint.*;
+import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
 
@@ -121,6 +122,36 @@ public class submit {
 			"		return (true)					" +
 			"	}";
 
+		PreparedStatement sth = p.getDBH().prepareStatement(
+			"	SELECT					" +
+			"			COUNT(*) AS cnt	" +
+			"	FROM					" +
+			"			hosts			" +
+			"	WHERE					" +
+			"			uid = ?			");	/* 1 */
+		sth.setInt(1, p.getUID());
+		ResultSet rs = sth.executeQuery();
+
+		int nhosts = 0;
+		if (rs.next())
+			nhosts = rs.getInt("cnt");
+
+		sth = p.getDBH().prepareStatement(
+			"	SELECT					" +
+			"			host			" +
+			"	FROM					" +
+			"			hosts			" +
+			"	WHERE					" +
+			"			uid = ?			");	/* 1 */
+		sth.setInt(1, p.getUID());
+		rs = sth.executeQuery();
+
+		Object[] hlist = new Object[2 * nhosts + 2];
+		hlist[0] = "";
+		hlist[1] = "Choose a resource";
+		for (int i = 2; rs.next(); i += 2)
+			hlist[i] = hlist[i + 1] = rs.getString("host");
+
 		s += p.header("Submit Job")
 		   + oof.p("You can fill out the fields below and press the submit "
 		   +   "button to send a job to another machine.  Afterwards, you can "
@@ -175,7 +206,7 @@ public class submit {
 							new Object[][] {
 								new Object[] {
 									"class", Page.CCDESC,
-									"value", "Target host:"
+									"value", "Target resource:"
 								},
 								new Object[] {
 									"class", p.genClass(),
@@ -188,10 +219,7 @@ public class submit {
 										oof.input(new Object[] {
 											"type", "select",
 											"onchange", js_hostchg,
-											"options", new Object[] {
-												"", "Choose a host...",
-												"test", "testhost"
-											}
+											"options", hlist
 										}) +
 										oof.br() +
 										"&raquo; This field should contain the host name " +

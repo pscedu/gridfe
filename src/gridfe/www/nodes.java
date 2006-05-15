@@ -63,9 +63,27 @@ public class nodes {
 
 	public static String remove(Page p)
 	  throws Exception {
+		HttpServletRequest req = p.getRequest();
 		OOF oof = p.getOOF();
 		String s = "";
+		String host = req.getParameter("host");
 
+		if (host == null)
+			host = "";
+
+		PreparedStatement sth = p.getDBH().prepareStatement(
+			"	DELETE FROM				" +
+			"		hosts				" +
+			"	WHERE					" +
+			"		uid  = ?			" +	/* 1 */
+			"	AND	host = ? 			");	/* 2 */
+		sth.setInt(1, p.getUID());
+		sth.setString(2, host);
+		sth.execute();
+
+		s += p.header("Hosts Removed")
+		   + oof.p("Hosts removed successfully.")
+		   + p.footer();
 		return (s);
 	}
 
@@ -75,12 +93,12 @@ public class nodes {
 		String s = "";
 
 		PreparedStatement sth = p.getDBH().prepareStatement(
-			"   SELECT                  " +
-			"           *				" +
-			"   FROM                    " +
-			"			hosts			" +
+			"	SELECT					" +
+			"		*					" +
+			"	FROM					" +
+			"		hosts				" +
 			"	WHERE					" +
-			"			uid = ?			");	/* 1 */
+			"		uid = ?				");	/* 1 */
 		sth.setInt(1, p.getUID());
 		ResultSet rs = sth.executeQuery();
 

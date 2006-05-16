@@ -4,7 +4,7 @@ package oof.element;
 import java.util.*;
 import oof.*;
 
-public abstract class _Element extends _Start implements Elementable {
+public class _Element extends _Start implements Elementable {
 	protected LinkedList children;
 
 	public _Element(OOF oof, Object[] attrs, Object[] os)

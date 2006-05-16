@@ -72,7 +72,7 @@ public class status {
 				new Object[] {
 					"class", "data1",
 					"colspan", "5",
-					"value", "No jobs currently in queue.  " +
+					"value", "No jobs currently in history/queue.  " +
 						oof.link("Submit a new job.", p.buildURL("/jobs/submit"))
 				}
 			});

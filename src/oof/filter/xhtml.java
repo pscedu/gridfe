@@ -97,7 +97,24 @@ public class xhtml implements Filter {
 	}
 
 	public String build(Input e) {
-		return this.build("input", (Elementable)e);
+		Object label;
+
+		label = e.getAttribute("label");
+		if (label != null) {
+			e.removeAttribute("label");
+			Elementable le = null;
+			try {
+				le = new _Element(this.oof,
+				  new Object[] {},
+				  new Object[] { e, label });
+			} catch (Exception ex) {
+				/* Impossible. */
+				System.err.println("oof input: " + ex);
+			}
+			return this.build("label", (Elementable)le);
+		} else {
+			return this.build("input", (Elementable)e);
+		}
 	}
 
 	public String build(Textarea e) {

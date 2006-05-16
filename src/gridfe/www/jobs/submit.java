@@ -23,6 +23,7 @@ public class submit {
 		String dir = req.getParameter("dir");
 		String stdout = req.getParameter("stdout");
 		String stderr = req.getParameter("stderr");
+		String mpi = req.getParameter("mpi");
 
 		if (label == null)
 			label = "";
@@ -40,6 +41,8 @@ public class submit {
 			stdout = "";
 		if (stderr == null)
 			stderr = "";
+		if (mpi == null)
+			mpi = "";
 
 		if (req.getParameter("submitted") != null) {
 			if (host.equals("") || label.equals("") ||
@@ -58,6 +61,8 @@ public class submit {
 				if (!stderr.equals(""))
 					n++;
 				if (!args.equals(""))
+					n++;
+				if (!mpi.equals(""))
 					n++;
 				String[] r_keys = new String[n];
 				String[] r_vals = new String[n];
@@ -83,6 +88,11 @@ public class submit {
 				if (!stderr.equals("")) {
 					r_keys[n] = "stderr";
 					r_vals[n] = stderr;
+					n++;
+				}
+				if (!mpi.equals("")) {
+					r_keys[n] = "jobtype";
+					r_vals[n] = "mpi";
 					n++;
 				}
 				j.setRSL(r_keys, r_vals);
@@ -271,6 +281,21 @@ public class submit {
 										oof.br() +
 										"&raquo; Any optional command-line arguments to " +
 										"the program can be placed here."
+								}
+							},
+							new Object[][] {
+								new Object[] {
+									"class", Page.CCDESC,
+									"value", "Message Passing Interface:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "checkbox",
+											"name", "mpi",
+											"label", "This job uses MPI."
+										})
 								}
 							},
 							new Object[][] {

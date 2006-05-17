@@ -255,4 +255,8 @@ public class GridInt implements Serializable {
 	public GassInt getGass() {
 		return (this.gass);
 	}
+
+	public GSSAuth getGSS() {
+		return (this.gss);
+	}
 };

@@ -176,7 +176,7 @@ public class submit {
 				new Object[] {
 					"action", "submit",
 					"method", "POST",
-					"enctype", "application/x-www-form-urlencoded"
+					"enctype", "multipart/form-data"
 				},
 				new Object[] {
 					oof.table(

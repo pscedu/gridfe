@@ -6,6 +6,7 @@ import gridfe.*;
 import gridfe.gridint.*;
 import java.util.*;
 import oof.*;
+import org.globus.gram.*;
 
 public class status {
 	public static String main(Page p)
@@ -16,6 +17,14 @@ public class status {
 
 		GridInt gi = p.getGridInt();
 		GridJob j;
+
+		String js_toggle =
+		"	var qid = this.form.elements['qid'];		" +
+		"	if (qid && qid.length == 1)					" +
+		"		qid.checked = !qid.checked;				" +
+		"	else if (qid)								" +
+		"		for (var i in qid)						" +
+		"			qid[i].checked = !qid[i].checked;	";
 
 		s += p.header("Job Status")
 		  +  oof.p("This page contains the status information for any jobs that " +
@@ -33,7 +42,7 @@ public class status {
 		  +		oof.table_row(new Object[][] {
 		  			new Object[] {
 						"class", Page.CCHDR,
-						"colspan", "5",
+						"colspan", "6",
 						"value", "Job Status"
 					}
 		  		})
@@ -42,6 +51,7 @@ public class status {
 					new Object[] { "class", Page.CCSUBHDR, "value", "Host" },
 					new Object[] { "class", Page.CCSUBHDR, "value", "Status" },
 					new Object[] { "class", Page.CCSUBHDR, "value", "Output" },
+					new Object[] { "class", Page.CCSUBHDR, "value", "Cancel" },
 					new Object[] { "class", Page.CCSUBHDR, "value", "Remove" }
 				});
 
@@ -57,6 +67,10 @@ public class status {
 				  oof.link("View", p.buildURL("/jobs/output?qid=" + j.getQID())) +
 				  " / " +
 				  oof.link("Save", p.buildURL("/jobs/output?qid=" + j.getQID() + "&amp;act=save"))
+				},
+				new Object[] { "class", c, "value",
+				  j.getStatus() == GramJob.STATUS_ACTIVE ? "" +
+				  oof.link("Cancel", p.buildURL("/jobs/cancel?qid=" + j.getQID())) : ""
 				},
 				new Object[] { "class", c, "value",
 					oof.input(new Object[] {
@@ -80,7 +94,7 @@ public class status {
 		  +  oof.table_row(new Object[][] {
 				new Object[] {
 					"class", "tblftr",
-					"colspan", "5",
+					"colspan", "6",
 					"value",
 					oof.input(new Object[] {
 						"type", "submit",
@@ -91,8 +105,7 @@ public class status {
 						"type", "button",
 						"class", "button",
 						"value", "Toggle All",
-						"onclick", "for (var i in this.form.elements['qid']) " +
-						  "{ this.form.elements[i].checked = !this.form.elements[i].checked}"
+						"onclick", js_toggle
 					})
 				}
 			 })

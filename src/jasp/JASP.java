@@ -31,13 +31,16 @@ public class JASP {
 	public String escapeHTML(String s) {
 		int i, j;
 		String t = "";
-		for (i = 0; i < t.length(); i++) {
+		for (i = 0; i < s.length(); i++) {
 			/* Entity names. */
 			for (j = 0; j < entmap.length; j++)
 				if (entmap[j].getRaw() == s.charAt(i)) {
 					t += entmap[j].getEsc();
-					continue;
+					break;
 				}
+			if (j < entmap.length)
+				continue;
+
 			/*
 			 * Characters that do not need to be
 			 * represented by entities.
@@ -45,8 +48,11 @@ public class JASP {
 			for (j = 0; j < validHTML.length(); j++)
 				if (validHTML.charAt(j) == s.charAt(i)) {
 					t += s.charAt(i);
-					continue;
+					break;
 				}
+			if (j < validHTML.length())
+				continue;
+
 			/*
 			 * Character not allowed; use ASCII
 			 * value.

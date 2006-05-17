@@ -19,12 +19,14 @@ public class status {
 		GridJob j;
 
 		String js_toggle =
-		"	var qid = this.form.elements['qid'];		" +
-		"	if (qid && qid.length == 1)					" +
-		"		qid.checked = !qid.checked;				" +
-		"	else if (qid)								" +
-		"		for (var i in qid)						" +
-		"			qid[i].checked = !qid[i].checked;	";
+		"	var qid = this.form.elements['qid'];			" +
+		"	if (qid) {										" +
+		"		if (qid.length)								" +
+		"			for (var i in qid)						" +
+		"				qid[i].checked = !qid[i].checked;	" +
+		"		else										" +
+		"			qid.checked = !qid.checked;				" +
+		"	}												";
 
 		s += p.header("Job Status")
 		  +  oof.p("This page contains the status information for any jobs that " +

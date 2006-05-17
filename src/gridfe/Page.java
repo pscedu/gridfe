@@ -293,7 +293,7 @@ public class Page {
 		   +					"</a>"
 		   +					"<br /><br />"
 		   +				"</td>"
-		   +				"<td style=\"background-color: #ffffff; padding-left: 5px; "
+		   +				"<td style=\"background-color: #eeeeff; padding-left: 5px; "
 		   +				  "border-left: 1px solid black\" valign=\"top\">"
 		   +					this.oof.header(new Object[] {
 									"size", "3",
@@ -309,7 +309,7 @@ public class Page {
 		s +=				"</td>"
 		   +			"</tr>"
 		   +			"<tr>"
-		   +				"<td align=\"right\" colspan=\"3\" style=\"background-color: #ffffff\">"
+		   +				"<td align=\"right\" colspan=\"3\" style=\"background-color: #eeeeff\">"
 		   +					"Copyright &copy; 2004-2006 "
 		   +					"<a href=\"http://www.psc.edu/\">Pittsburgh Supercomputing Center</a>"
 		   +				"</td>"

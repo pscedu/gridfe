@@ -126,11 +126,11 @@ module fum_module = {
 void
 mod_fum_hooks(apr_pool_t *p)
 {
-#ifndef STANDALONE
+# ifndef STANDALONE
 	/* We need to be the first to intercept the password. */
 	ap_hook_check_user_id(mod_fum_auth, NULL, NULL, APR_HOOK_MIDDLE);
 	ap_add_version_component(p, MF_VERSION);
-#endif /* STANDALONE */
+# endif /* STANDALONE */
 }
 #endif
 
@@ -205,11 +205,13 @@ mf_log("auth() - valid");
 		/* Create new certs */
 		if ((err = mod_fum_main(user, pass)) != HTTP_UNAUTHORIZED)
 			return (err);
-	}
-
-	/* Without this, auth always fails with previous credentails */
-	else
+	} else {
+		/*
+		 * Without this, auth always fails with
+		 * previous credentails.
+		 */
 		return OK;
+}
 
 failed_auth:
 	name = ap_auth_name(r);

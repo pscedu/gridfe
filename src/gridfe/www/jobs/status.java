@@ -87,7 +87,7 @@ public class status {
 			s += oof.table_row(new Object[][] {
 				new Object[] {
 					"class", "data1",
-					"colspan", "5",
+					"colspan", "6",
 					"value", "No jobs currently in history/queue.  " +
 						oof.link("Submit a new job.", p.buildURL("/jobs/submit"))
 				}

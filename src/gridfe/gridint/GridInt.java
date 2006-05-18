@@ -259,4 +259,8 @@ public class GridInt implements Serializable {
 	public GSSAuth getGSS() {
 		return (this.gss);
 	}
+
+	public Uid getUID() {
+		return (this.uid);
+	}
 };

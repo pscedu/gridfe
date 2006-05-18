@@ -3,9 +3,12 @@
 package gridfe.www;
 
 import gridfe.*;
+import gridfe.gridint.auth.*;
 import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
+import org.globus.gram.*;
+import org.ietf.jgss.*;
 
 public class nodes {
 	public static String main(Page p)
@@ -121,11 +124,24 @@ public class nodes {
 
 		int i = 0;
 		for (; rs.next(); i++) {
+			String host = rs.getString("host");
+
+			boolean up = true;
+			try {
+				Gram.ping(p.getGridInt().getGSS().getGSSCredential(), host);
+			} catch (Exception e) {
+				up = false;
+			}
+			String path = p.getWebRoot() + "/img/";
+
 			String cl = p.genClass();
 			s += 	oof.table_row(new Object[][] {
-						new Object[] { "class", cl, "value",
-							p.escapeHTML(rs.getString("host")) },
-						new Object[] { "class", cl, "value", "?" },
+						new Object[] { "class", cl, "value", p.escapeHTML(host) },
+						new Object[] { "class", cl, "style", "text-align: center",
+							"value", oof.img(new Object[] {
+								"src", path + (up ? "on.png" : "off.png"),
+								"alt", (up ? "[up]" : "[down]")
+							}) },
 						new Object[] { "class", cl, "value", oof.input(new Object[] {
 								"type", "checkbox",
 								"name", "host",

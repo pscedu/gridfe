@@ -23,6 +23,7 @@ public class Page {
 	private JASP jasp;
 	private OOF oof;
 	private int uid;
+	private String kuid;
 	private Connection dbh;
 
 	private static final String DB_DRIVER = "mysql";
@@ -68,11 +69,13 @@ public class Page {
 				hdr = hdr.substring(6);
 			String combo = new String(Base64.decode(hdr));
 			String[] auth = BasicServices.splitString(combo, ":");
-			String kuid = auth[0];
-			UserMap m = new UserMap();
-			String uid = m.kerberosToSystem(kuid);
-			this.uid = BasicServices.getUserID(uid);
+			this.kuid = auth[0];
+
 			if (!this.restoreGI()) {
+				UserMap m = new UserMap();
+				String user = m.kerberosToSystem(kuid);
+				this.uid = BasicServices.getUserID(user);
+
 				/*
 				 * Reparse authorization because getRemoteUser() doesn't
 				 * work.
@@ -92,19 +95,17 @@ public class Page {
 	}
 
 	private String getGIPath() {
-		/*
-		 * This should be safe -- we shouldn't get to a point
-		 * where we try to access the uid on an error.
-		 */
-		return ("/tmp/gridfe.gi_u" + this.uid);
+		return ("/tmp/gridfe.gi_" + this.kuid);
 	}
 
 	private boolean restoreGI() {
 		try {
 			FileInputStream fin = new FileInputStream(this.getGIPath());
 			ObjectInputStream in = new ObjectInputStream(fin);
-			gi = (GridInt)in.readObject();
+			this.gi = (GridInt)in.readObject();
 			in.close();
+
+			this.uid = this.gi.getUID().intValue();
 			return (true);
 		} catch (Exception e) {
 			return (false);

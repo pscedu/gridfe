@@ -1,6 +1,6 @@
 /* $Id$ */
 
-package gridfe.gridftp;
+package gridfe.gridint;
 
 import java.io.*;
 import java.net.*;
@@ -8,11 +8,11 @@ import org.ietf.jgss.*;
 import org.globus.io.urlcopy.*;
 import org.globus.util.*;
 
-public class GridFtp {
+public class GridFTP {
 	
 	private GSSCredential gss;
 
-	public GridFtp(GSSCredential gss) {
+	public GridFTP(GSSCredential gss) {
 		this.gss = gss;	
 	}
 

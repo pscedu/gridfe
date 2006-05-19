@@ -146,8 +146,6 @@ mod_fum_auth(request_rec *r)
 	mf_pool = r->pool;
 	mf_rec = r;
 
-mf_log("auth()");
-
 	if ((type = ap_auth_type(r)) == NULL ||
 	    strcasecmp(type, "fum") != 0)
 		return (DECLINED);
@@ -171,7 +169,6 @@ mf_log("creating new credentials");
 			return (err);
 	}
 
-mf_log("auth() - cred");
 	/*
 	 * They exist, make sure the user/pass is correct;
 	 * otherwise, a correct username and wrong password
@@ -182,7 +179,6 @@ mf_log("auth() - cred");
 		goto failed_auth;
 	}
 
-mf_log("auth() - valid");
 	/*
 	 * Finally check if the credentials have expired
 	 * or not.  If so, create new certs; if not, do

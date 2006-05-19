@@ -22,8 +22,7 @@ public class output {
 			/* This should never throw an exception since we just checked it. */
 			GridJob j = jl.get(Integer.parseInt(s_qid));
 			if (j != null) {
-				String fn_stdout = (j.dir == null ? "" : j.dir) + j.stdout;
-				gi.startRetrieve(j, fn_stdout, 28000, 28255);
+				gi.startRetrieve(j, j.stdout, 28000, 28255);
 				int size = (int)gi.getGass().getSize();
 /*
 				if (size > )

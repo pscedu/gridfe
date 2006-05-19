@@ -72,9 +72,15 @@ public class Page {
 			this.kuid = auth[0];
 
 			if (!this.restoreGI()) {
-				UserMap m = new UserMap();
-				String user = m.kerberosToSystem(kuid);
-				this.uid = BasicServices.getUserID(user);
+//				UserMap m = new UserMap();
+//				String user = m.kerberosToSystem(kuid);
+//				this.uid = BasicServices.getUserID(user);
+
+				/*
+				 * XXX - Assume user's Kerberos principal
+				 * and system username are the same.
+				 */
+				this.uid = BasicServices.getUserID(kuid);
 
 				/*
 				 * Reparse authorization because getRemoteUser() doesn't

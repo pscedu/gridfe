@@ -16,7 +16,7 @@ public class index {
 		   + oof.list(
 				OOF.LIST_UN,
 				new Object[] {
-					oof.link("Simple copy", p.buildURL("/gridftp/copy")),
+					oof.link("URL copy", p.buildURL("/gridftp/copy")),
 				}
 		     )
 		   + p.footer();

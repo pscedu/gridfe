@@ -231,6 +231,10 @@ public class Page {
 				"Search Catalogs",	"/rls/search",
 				"Add Resource",		"/rls/addres"
 			});
+		this.addMenu("GridFTP", "/gridftp",
+			new Object[] {
+				"URL Copy",		"/gridftp/copy"
+			});
 		this.addMenu("Node Availability", "/nodes", null);
 
 		/* Start page output. */

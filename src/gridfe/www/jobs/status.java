@@ -22,7 +22,7 @@ public class status {
 		"	var qid = this.form.elements['qid'];			" +
 		"	if (qid) {										" +
 		"		if (qid.length)								" +
-		"			for (var i in qid)						" +
+		"			for (var i = 0; i < qid.length; i++)	" +
 		"				qid[i].checked = !qid[i].checked;	" +
 		"		else										" +
 		"			qid.checked = !qid.checked;				" +

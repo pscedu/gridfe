@@ -237,7 +237,7 @@ public class submit {
 										"your job to run.  You may select a previously " +
 										"configured host from the drop-down box on the " +
 										"right, which may be done through the " +
-										oof.link("Node Availibility", p.buildURL("/nodes")) +
+										oof.link("Node Availability", p.buildURL("/nodes")) +
 										" page."
 								}
 							},

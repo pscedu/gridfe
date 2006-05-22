@@ -13,6 +13,9 @@ public class copy {
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
 		String errmsg = null;
+		String s = "";
+		OOF oof = p.getOOF();
+
 		String shost = req.getParameter("shost");
 		String dhost = req.getParameter("dhost");
 		String sfile = req.getParameter("sfile");
@@ -28,31 +31,28 @@ public class copy {
 			dfile = "";
 
 		if (req.getParameter("submitted") != null) {
-			if (shost.equals("") || dhost.equals("")
-				|| sfile.equals("") || dfile.equals(""))
+			if (shost.equals("") || dhost.equals("") ||
+			  sfile.equals("") || dfile.equals(""))
 				errmsg = "Please specify all required form fields.";
 			if (errmsg == null) {
 				GridInt gi = p.getGridInt();
 
 				/* Copy the file */
-				GridFTP.urlCopy(gi.getGSS().getGSSCredential(), shost, dhost, sfile, dfile);
+				GridFTP.urlCopy(gi.getGSS().getGSSCredential(),
+				  shost, dhost, sfile, dfile);
 
-				String s = "";
-				s += p.header("urlCopy")
-				   + p.getOOF().p("The file has been copied successfully.")
+				s += p.header("URL Copy")
+				   + oof.p("The file has been copied successfully.")
 				   + p.footer();
 				return s;
 			}
 		}
 
-		String s = "";
-		OOF oof = p.getOOF();
-
 		String js_submit =
-			"	if (this.value == 'Copy') {	" +
+			"	if (this.value == 'Copy') {			" +
 			"		this.value = 'Please wait...';	" +
 			"		return (true)					" +
-			"	}";
+			"	}									";
 
 		PreparedStatement sth = p.getDBH().prepareStatement(
 			"	SELECT					" +
@@ -84,11 +84,12 @@ public class copy {
 		for (int i = 2; rs.next(); i += 2)
 			hlist[i] = hlist[i + 1] = rs.getString("host");
 
-		s += p.header("urlCopy")
+		s += p.header("URL Copy")
 		   + oof.p("You can fill out the fields below and press the copy "
-		   +   "button to copy a file to another machine. Afterwards you can "
-		   +   "navigate the menu on the left side of the page to view the file "
-		   +   "structure using the GridFTP Browser.");
+		   +   "button to copy a file to another machine.  Alternatively, "
+		   +   "you can use the "
+		   +   oof.link("GridFTP browser", "/gridftp/browser")
+		   +   "to navigate the host file system.");
 		if (errmsg != null)
 			s += oof.p(new Object[] { "class", "err" },
 			  "" + oof.strong("An error has occurred while processing your copy: ") +
@@ -111,7 +112,7 @@ public class copy {
 							new Object[][] {
 								new Object[] {
 									"class", Page.CCHDR,
-									"value", "urlCopy",
+									"value", "URL Copy",
 									"colspan", "2"
 								}
 							},
@@ -135,11 +136,11 @@ public class copy {
 										}) +
 										oof.br() +
 										"&raquo; This field should contain the host name " +
-										"of the source machine on which you would " +
-										"copy from.  You may select a previously " +
-										"configured host from the drop-down box on the " +
-										"right, which may be done through the " +
-										oof.link("Node Availibility", p.buildURL("/nodes")) +
+										"of the source machine from which the copy will be" +
+										"made.  You may select a previously configured host " +
+										"from the drop-down box on the right, which may be " +
+										"done through the " +
+										oof.link("Node Availability", p.buildURL("/nodes")) +
 										" page."
 								}
 							},
@@ -163,29 +164,11 @@ public class copy {
 										}) +
 										oof.br() +
 										"&raquo; This field should contain the host name " +
-										"of the target machine on which you would " +
-										"copy to.  You may select a previously " +
-										"configured host from the drop-down box on the " +
-										"right."
+										"of the target machine to which the copy will be " +
+										"made.  You may select a previously configured host " +
+										"from the drop-down box on the right."
 								}
 							},
-/*
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCDESC,
-									"value", "Message Passing Interface:"
-								},
-								new Object[] {
-									"class", p.genClass(),
-									"value", "" +
-										oof.input(new Object[] {
-											"type", "checkbox",
-											"name", "mpi",
-											"label", "This job uses MPI."
-										})
-								}
-							},
-*/
 							new Object[][] {
 								new Object[] {
 									"class", Page.CCDESC,
@@ -200,10 +183,11 @@ public class copy {
 											"name", "sfile"
 										}) +
 										oof.br() +
-										"&raquo; This field specifies the location of the" +
-										"source file you want to copy. Use the checkbox to" +
-										"specify if the path is relative to your home directory." +
-										"Otherwise, the path is considered absolute."
+										"&raquo; This field specifies the location of the " +
+										"source file on the source host that will be copied.  " +
+										"Use the checkbox to specify whether the path is " +
+										"relative to your home directory or is an absolute " +
+										"system path."
 								}
 							},
 							new Object[][] {
@@ -220,10 +204,10 @@ public class copy {
 											"name", "dfile"
 										}) +
 										oof.br() +
-										"&raquo; This field specifies the location of the" +
-										"target file. Use the checkbox to specify if the" +
-										"path is relative to your home directory." +
-										"Otherwise, the path is considered absolute."
+										"&raquo; This field specifies the location of the " +
+										"target file on the target host.  Use the checkbox " +
+										"to specify whether the path is relative to your " +
+										"home directory or is an absolute system path."
 								}
 							},
 							new Object[][] {
@@ -256,10 +240,10 @@ public class copy {
 
 	public static String js_hostchg(String host) {
 		String s =
-			"	document.forms[0].elements['"+host+"'].value = " +
+			"	document.forms[0].elements['" + host + "'].value = " +
 			"		(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
 			"		'' : this.options[this.selectedIndex].value ";
-			return s;
+		return s;
 	}
 };
 

@@ -115,7 +115,7 @@ input, textarea, select {
 	color: #ffffff;
 	border: 1px solid black;
 	font-weight: bold;
-	cursor: hand;
+	cursor: pointer;
 	padding-left: 8px;
 	padding-right: 8px;
 }

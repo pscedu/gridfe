@@ -15,11 +15,13 @@ public class browser {
 		String errmsg = null;
 
 		/* ++++++++++ Host drop down code +++++++++ */
-		String js_submit =
-			"	if (this.value == 'Log in') {	" +
+/*
+		String js_logout =
+			"	if (this.value == 'Log out') {	" +
 			"		this.value = 'Please wait...';	" +
 			"		return (true)					" +
 			"	}";
+*/
 
 		PreparedStatement sth = p.getDBH().prepareStatement(
 			"	SELECT					" +
@@ -65,9 +67,38 @@ public class browser {
 		if(lhost == null) lhost = "";
 		if(rhost == null) rhost = "";
 
+		String llogin = "";
+		String rlogin = "";
+		String lbrowse = "";
+		String rbrowse = "";
+
+		/*
+		** Set the content to display - login table if not logged in, otherwise browser
+		*/
+		if(lactive == null)
+			llogin += browser.loginTable(p, oof, lhost, "lhost", browser.js_subval("Log In"), "lactive", hlist);
+		else if(lactive.equals("Log out")) {
+			/* XXX - do any necessary logout stuff */
+//			llogin += "logged out";
+			llogin += browser.loginTable(p, oof, lhost, "lhost", browser.js_subval("Log In"), "lactive", hlist);
+
+		} else {
+			llogin += "llogin is active";
+		}
+
+		if(ractive == null)
+			rlogin = browser.loginTable(p, oof, rhost, "rhost", browser.js_subval("Log In"), "ractive", hlist);
+		else if(ractive.equals("Log Out")) {
+			/* XXX - do any necessary logout stuff */
+//			rlogin += "logged out";
+			rlogin = browser.loginTable(p, oof, rhost, "rhost", browser.js_subval("Log In"), "ractive", hlist);
+		} else {
+			rlogin += "rlogin is active";
+		}
+			
+
 		/* Setup the nested table garbage */
 		/* ------------------------------------------------------------- */
-/*
 		s += oof.table(
 				new Object[] {
 				"class", Page.CCTBL,
@@ -77,6 +108,7 @@ public class browser {
 			},
 			new Object[][][]
 			{
+				/* 1st Row */
 				new Object[][]
 				{
 					new Object[] {
@@ -85,87 +117,64 @@ public class browser {
 						"colspan", "2"
 					}
 				},
+				/* 2nd Row */
 				new Object[][]
 				{
 					new Object[]
 					{
-						"class", Page.CCDESC,
-						"value", "Hostname:"
+						"value", llogin
 					},
 					new Object[]
 					{
-						"class", p.genClass(),
-						"value", "" +
-							oof.input(new Object[] {
-								"type", "text",
-								"value", p.escapeHTML(lhost),
-								"name", "lhost"
-							}) +
-							oof.input(new Object[] {
-								"type", "select",
-								"onchange", copy.js_hostchg("lhost"),
-								"options", hlist
-							}) +
-							oof.br() +
-							"&raquo; This field should contain the host name " +
-							"of the machine you wish to browse"
+						"value", rlogin
 					}
 				},
+				/* 3rd Row */
 				new Object[][]
 				{
 					new Object[]
 					{
-						"colspan", "2",
+						"colspan", "1",
 						"class", Page.CCTBLFTR,
 						"value", "" +
 							oof.input(new Object[]
 							{
-								"onclick", js_submit,
+								"onclick", browser.js_subval("Log Out"),
 								"type", "submit",
 								"name", "lactive",
 								"class", "button",
-								"value", "Log in"
+								"value", "Log out"
+							})
+					},
+					new Object[]
+					{
+						"colspan", "1",
+						"class", Page.CCTBLFTR,
+						"value", "" +
+							oof.input(new Object[]
+							{
+								"onclick", browser.js_subval("Log Out"),
+								"type", "submit",
+								"name", "ractive",
+								"class", "button",
+								"value", "Log out"
 							})
 					}
 				}
 			}
 		);
-*/
 		/* ------------------------------------------------------------- */
-
-		/* Right hand side file browser logged in */
-/*
-		if(ractive != null)
-		{
-		}
-		else
-		{
-		}
-*/
-
-		/* Right hand side file browser logged in */
-		if(lactive != null)
-		{
-				GridInt gi = p.getGridInt();
-
-		}
-		else
-		{
-/*
-			if (errmsg != null)
-				s += oof.p(new Object[] { "class", "err" },
-				  "" + oof.strong("An error has occurred while processing your copy: ") +
-				  errmsg);
-*/
-			s += browser.loginTable();
-		}
 
 		return s;
 	}
 
-	/* loginTable(oof, lhost, "lhost", ... ) */
-	public static String loginTable(OOF oof, String host, String shost)
-	{
+	/*
+	** login table for the gridftp structure 
+	** Example: loginTable(oof, lhost, "lhost", ... )
+	*/
+	public static String loginTable(Page p, OOF oof, String varHost, String strHost,
+					String js_submit, String subName, Object[] hlist)
+					throws OOFBadElementFormException {
 		String s = "";
 
 		/* Form field for logging in */
@@ -210,12 +219,12 @@ public class browser {
 								"value", "" +
 									oof.input(new Object[] {
 										"type", "text",
-										"value", p.escapeHTML(lhost),
-										"name", "lhost"
+										"value", p.escapeHTML(varHost),
+										"name", strHost
 									}) +
 									oof.input(new Object[] {
 										"type", "select",
-										"onchange", browser.js_hostchg("lhost"),
+										"onchange", browser.js_hostchg(strHost),
 										"options", hlist
 									}) +
 									oof.br() +
@@ -234,7 +243,7 @@ public class browser {
 									{
 										"onclick", js_submit,
 										"type", "submit",
-										"name", "lactive",
+										"name", subName,
 										"class", "button",
 										"value", "Log in"
 									})
@@ -244,176 +253,22 @@ public class browser {
 				)
 			}
 		 );
+
+		 return s;
 	}
 		
-/*
-		s += oof.form(
-				new Object[] {
-					"action", "copy",
-					"method", "POST",
-					"enctype", "application/x-www-form-urlencoded"
-				},
-				new Object[] {
-					oof.table(
-							new Object[] {
-							"class", Page.CCTBL,
-							"border", "0",
-							"cellspacing", "0",
-							"cellpadding", "0"
-						},
-						new Object[][][] {
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCHDR,
-									"value", "urlCopy",
-									"colspan", "2"
-								}
-							},
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCDESC,
-									"value", "Source resource:"
-								},
-								new Object[] {
-									"class", p.genClass(),
-									"value", "" +
-										oof.input(new Object[] {
-											"type", "text",
-											"value", p.escapeHTML(shost),
-											"name", "shost"
-										}) +
-										oof.input(new Object[] {
-											"type", "select",
-											"onchange", copy.js_hostchg("shost"),
-											"options", hlist
-										}) +
-										oof.br() +
-										"&raquo; This field should contain the host name " +
-										"of the source machine on which you would " +
-										"copy from.  You may select a previously " +
-										"configured host from the drop-down box on the " +
-										"right, which may be done through the " +
-										oof.link("Node Availibility", p.buildURL("/nodes")) +
-										" page."
-								}
-							},
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCDESC,
-									"value", "Target resource:"
-								},
-								new Object[] {
-									"class", p.genClass(),
-									"value", "" +
-										oof.input(new Object[] {
-											"type", "text",
-											"value", p.escapeHTML(dhost),
-											"name", "dhost"
-										}) +
-										oof.input(new Object[] {
-											"type", "select",
-											"onchange", copy.js_hostchg("dhost"),
-											"options", hlist
-										}) +
-										oof.br() +
-										"&raquo; This field should contain the host name " +
-										"of the target machine on which you would " +
-										"copy to.  You may select a previously " +
-										"configured host from the drop-down box on the " +
-										"right."
-								}
-							},
-*/
-/*
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCDESC,
-									"value", "Message Passing Interface:"
-								},
-								new Object[] {
-									"class", p.genClass(),
-									"value", "" +
-										oof.input(new Object[] {
-											"type", "checkbox",
-											"name", "mpi",
-											"label", "This job uses MPI."
-										})
-								}
-							},
-*/
-/*
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCDESC,
-									"value", "Source File:"
-								},
-								new Object[] {
-									"class", p.genClass(),
-									"value", "" +
-										oof.input(new Object[] {
-											"type", "text",
-											"value", p.escapeHTML(sfile),
-											"name", "sfile"
-										}) +
-										oof.br() +
-										"&raquo; This field specifies the location of the" +
-										"source file you want to copy. Use the checkbox to" +
-										"specify if the path is relative to your home directory." +
-										"Otherwise, the path is considered absolute."
-								}
-							},
-							new Object[][] {
-								new Object[] {
-									"class", Page.CCDESC,
-									"value", "Target File:"
-								},
-								new Object[] {
-									"class", p.genClass(),
-									"value", "" +
-										oof.input(new Object[] {
-											"type", "text",
-											"value", p.escapeHTML(dfile),
-											"name", "dfile"
-										}) +
-										oof.br() +
-										"&raquo; This field specifies the location of the" +
-										"target file. Use the checkbox to specify if the" +
-										"path is relative to your home directory." +
-										"Otherwise, the path is considered absolute."
-								}
-							},
-							new Object[][] {
-								new Object[] {
-									"colspan", "2",
-									"class", Page.CCTBLFTR,
-									"value", "" +
-										oof.input(new Object[] {
-											"onclick", js_submit,
-											"type", "submit",
-											"name", "submitted",
-											"class", "button",
-											"value", "Copy"
-										}) +
-										oof.input(new Object[] {
-											"type", "reset",
-											"class", "button",
-											"value", "Reset Fields"
-										})
-								}
-							}
-						}
-					)
-				}
-			 );
+	public static String js_subval(String value) {
+		String js_submit =
+			"	if (this.value == '"+value+"') {	" +
+			"		this.value = 'Please wait...';	" +
+			"		return (true)					" +
+			"	}";
 
-		s += p.footer();
-		return (s);
+		return js_submit;
 	}
-*/
-
 	public static String js_hostchg(String host) {
 		String s =
-			"	document.forms[0].elements['"+host+"'].value = " +
+			"	this.form.elements['"+host+"'].value = " +
 			"		(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
 			"		'' : this.options[this.selectedIndex].value ";
 			return s;

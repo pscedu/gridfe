@@ -13,48 +13,10 @@ public class browser {
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
 		String errmsg = null;
-
-		/* ++++++++++ Host drop down code +++++++++ */
-/*
-		String js_logout =
-			"	if (this.value == 'Log out') {	" +
-			"		this.value = 'Please wait...';	" +
-			"		return (true)					" +
-			"	}";
-*/
-
-		PreparedStatement sth = p.getDBH().prepareStatement(
-			"	SELECT					" +
-			"			COUNT(*) AS cnt	" +
-			"	FROM					" +
-			"			hosts			" +
-			"	WHERE					" +
-			"			uid = ?			");	/* 1 */
-		sth.setInt(1, p.getUID());
-		ResultSet rs = sth.executeQuery();
-
-		int nhosts = 0;
-		if (rs.next())
-			nhosts = rs.getInt("cnt");
-
-		sth = p.getDBH().prepareStatement(
-			"	SELECT					" +
-			"			host			" +
-			"	FROM					" +
-			"			hosts			" +
-			"	WHERE					" +
-			"			uid = ?			");	/* 1 */
-		sth.setInt(1, p.getUID());
-		rs = sth.executeQuery();
-
-		Object[] hlist = new Object[2 * nhosts + 2];
-		hlist[0] = "";
-		hlist[1] = "Choose a resource";
-		for (int i = 2; rs.next(); i += 2)
-			hlist[i] = hlist[i + 1] = rs.getString("host");
-
-		/* ++++++++++++++++++++++++++++++++++++++++++++++++++++ */
-
+		Object[] hlist;
+		
+		hlist = browser.createHostList(p);
+		
 		String lhost = req.getParameter("lhost");
 		String rhost = req.getParameter("rhost");
 		String lactive = req.getParameter("lactive");
@@ -272,6 +234,43 @@ public class browser {
 			"		(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
 			"		'' : this.options[this.selectedIndex].value ";
 			return s;
+	}
+
+	/* Retrieve the list of hostname for the host drop down menu */
+	public static Object[] createHostList(Page p)
+		throws SQLException {
+
+		PreparedStatement sth = p.getDBH().prepareStatement(
+			"	SELECT					" +
+			"			COUNT(*) AS cnt	" +
+			"	FROM					" +
+			"			hosts			" +
+			"	WHERE					" +
+			"			uid = ?			");	/* 1 */
+		sth.setInt(1, p.getUID());
+		ResultSet rs = sth.executeQuery();
+
+		int nhosts = 0;
+		if (rs.next())
+			nhosts = rs.getInt("cnt");
+
+		sth = p.getDBH().prepareStatement(
+			"	SELECT					" +
+			"			host			" +
+			"	FROM					" +
+			"			hosts			" +
+			"	WHERE					" +
+			"			uid = ?			");	/* 1 */
+		sth.setInt(1, p.getUID());
+		rs = sth.executeQuery();
+
+		Object[] hlist = new Object[2 * nhosts + 2];
+		hlist[0] = "";
+		hlist[1] = "Choose a resource";
+		for (int i = 2; rs.next(); i += 2)
+			hlist[i] = hlist[i + 1] = rs.getString("host");
+
+		return hlist;
 	}
 };
 

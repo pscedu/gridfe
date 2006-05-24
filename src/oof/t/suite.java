@@ -72,16 +72,16 @@ public class suite {
 			"field1: ", o.input(),
 			"field2: ", o.input()}),
 		    "<form action=\"#\" " +
-		      "enctype=\"application/x-www-form-urlencoded\" method=\"get\">" +
+		      "enctype=\"application/x-www-form-urlencoded\" method=\"GET\">" +
 		      "field1: <input />field2: <input />" +
 		    "</form>");
 
-		t("form_start", o.form_start(new Object[] { "method", "get" }),
+		t("form_start", o.form_start(new Object[] { "method", "GET" }),
 			"<form action=\"#\" " +
-			  "enctype=\"application/x-www-form-urlencoded\" method=\"get\">");
+			  "enctype=\"application/x-www-form-urlencoded\" method=\"GET\">");
 		t("form_start", o.form_start(),
 			"<form action=\"#\" enctype=\"application/x-www-form-urlencoded\" " +
-			  "method=\"get\">");
+			  "method=\"GET\">");
 
 		t("form_end", o.form_end(), "</form>");
 
@@ -190,8 +190,18 @@ public class suite {
 					"<td>r2c2</td>" +
 				"</tr>" +
 			"</table>");
-		t("table_start", o.table_start(new Object[] { "width", "500" }),
-			"<table width=\"500\">");
+		t("table_start", o.table_start(new Object[] {
+			"width", "500",
+			"cols", new Object[][] {
+				new Object[] { "width", "1" },
+				new Object[] { "width", "3" }
+			}
+		    }),
+			"<table width=\"500\">" +
+				"<colgroup>" +
+					"<col width=\"1\" />" +
+					"<col width=\"3\" />" +
+				"</colgroup>");
 		t("table_end", o.table_end(), "</table>");
 		t("table_row", o.table_row(new Object[][] {
 					new Object[] { "c1p1k", "c1p1v" },

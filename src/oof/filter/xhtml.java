@@ -194,12 +194,13 @@ public class xhtml implements Filter {
 		return this.build("strong", (Elementable)e);
 	}
 
-	public String build(Table e) {
+	private String _fix_table_cols(Startable e) {
+		String s = "";
+
 		/* XXX: modify clone */
 		Object dcols = e.removeAttribute("cols");
 		if (dcols != null) {
 			Object[][] cols = (Object[][])dcols;
-			String s = "";
 			s += "<colgroup>";
 			for (int i = 0; i < cols.length; i++) {
 				s += "<col";
@@ -209,8 +210,12 @@ public class xhtml implements Filter {
 				s += " />";
 			}
 			s += "</colgroup>";
-			e.prepend(s);
 		}
+		return (s);
+	}
+
+	public String build(Table e) {
+		e.prepend(_fix_table_cols(e));
 		return this.build("table", (Elementable)e);
 	}
 
@@ -251,7 +256,7 @@ public class xhtml implements Filter {
 	public String build(Form e) {
 		/* XXX: modify a clone */
 		if (e.getAttribute("method") == null)
-			e.addAttribute("method", "get");
+			e.addAttribute("method", "GET");
 		if (e.getAttribute("enctype") == null)
 			e.addAttribute("enctype", "application/x-www-form-urlencoded");
 		if (e.getAttribute("action") == null)
@@ -263,7 +268,7 @@ public class xhtml implements Filter {
 	public String build(FormStart e) {
 		/* XXX: modify a clone */
 		if (e.getAttribute("method") == null)
-			e.addAttribute("method", "get");
+			e.addAttribute("method", "GET");
 		if (e.getAttribute("enctype") == null)
 			e.addAttribute("enctype", "application/x-www-form-urlencoded");
 		if (e.getAttribute("action") == null)
@@ -277,7 +282,8 @@ public class xhtml implements Filter {
 	}
 
 	public String build(TableStart e) {
-		return this.build("table", (Startable)e);
+		String cols = _fix_table_cols(e);
+		return this.build("table", (Startable)e) + cols;
 	}
 
 	public String build(TableEnd e) {

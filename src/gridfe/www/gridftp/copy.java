@@ -89,7 +89,7 @@ public class copy {
 		   +   "button to copy a file to another machine.  Alternatively, "
 		   +   "you can use the "
 		   +   oof.link("GridFTP browser", "/gridftp/browser")
-		   +   "to navigate the host file system.");
+		   +   " to navigate the host file system.");
 		if (errmsg != null)
 			s += oof.p(new Object[] { "class", "err" },
 			  "" + oof.strong("An error has occurred while processing your copy: ") +

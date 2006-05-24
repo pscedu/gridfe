@@ -8,6 +8,8 @@ import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
 import java.util.*;
+import java.io.*;
+import org.globus.ftp.exception.*;
 
 public class browser {
 	public static String main(Page p)
@@ -38,34 +40,17 @@ public class browser {
 		*/
 		if(lactive == null) {
 			lbrowser += browser.login(p, oof, lhost, "lhost", browser.js_subval("Login"), "lactive", "Machine 1", hlist);
-		} else if(lactive.equals("Log out")) {
+		} else if(lactive.equals("Logout")) {
 			/* XXX - do any necessary logout stuff */
 			lbrowser += browser.login(p, oof, lhost, "lhost", browser.js_subval("Login"), "lactive", "Machine 1", hlist);
 
 		} else {
-
-			/* Grab the GridInt and make the GridFTP connection */
-			GridInt gi = p.getGridInt();
-			GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(), lhost, 2811);
-
-			Vector v = gftp.gls();
-			GridFile gf;
-			String data = "";
-			
-			/* Put each file (with size, perm, date, time) on a separte line */
-			// XXX - name should become a link for chdir or download file
-			for(int i = 0; i < v.size(); i++)
-			{
-				gf = (GridFile)(v.get(i));
-				data += oof.p(gf.toString());
-			}
-			
-			lbrowser += browser.browse(p, oof, "Logout", "lactive", "Machine 1", data);
+			lbrowser += browser.browse(p, oof, "Logout", "lactive", lhost);
 		}
 
 		if(ractive == null) {
 			rbrowser += browser.login(p, oof, rhost, "rhost", browser.js_subval("Login"), "ractive", "Machine 2", hlist);
-		} else if(ractive.equals("Log Out")) {
+		} else if(ractive.equals("Logout")) {
 			/* XXX - do any necessary logout stuff */
 			rbrowser += browser.login(p, oof, rhost, "rhost", browser.js_subval("Login"), "ractive", "Machine 2", hlist);
 		} else {
@@ -201,12 +186,43 @@ public class browser {
 		 return s;
 	}
 
-	public static String browse(Page p, OOF oof, String subStr, String subName, String title, String data)
-					throws OOFBadElementFormException {
+	public static String browse(Page p, OOF oof, String subStr, String subName, String hostname)
+		throws OOFBadElementFormException, IOException, ServerException, ClientException{
 		String s = "";
 
+		/* Title - XXX should be the hostname */
+		Object[][] header = new Object[][]
+		{
+			new Object[] {
+			"class", Page.CCHDR,
+			"value", "Hostname should be here",
+			"colspan", "2"
+			}
+		};
+
+		/* XXX - Logout button */
+		Object[][] footer = new Object[][]
+		{
+			new Object[] {
+			"class", Page.CCHDR,
+			"value", "Testing - Logout Button",
+			"colspan", "2"
+			}
+		};
+
+		/* Grab the GridInt and make the GridFTP connection */
+		GridInt gi = p.getGridInt();
+		GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(), hostname, 2811);
+
+		Vector v = gftp.gls();
+			
+		/* Parse the list and put each file (with size, perm, date, time) on a table row */
+		// XXX - name should become a link for chdir or download file
+		Object[][][] data = browser.parse(v, header, footer);
+
 		/* Form field for logging in */
-		s += oof.p("Enter a hostname to browse");
+		// XXX - this should be the current working directory
+		s += oof.p("Click on a file to download or a directory to view.");
 		s += oof.form(
 				new Object[]
 				{
@@ -224,47 +240,47 @@ public class browser {
 						"cellspacing", "0",
 						"cellpadding", "0"
 					},
-					new Object[][][]
-					{
-						new Object[][]
-						{
-							new Object[] {
-							"class", Page.CCHDR,
-							"value", title,
-							"colspan", "2"
-							}
-						},
-						new Object[][]
-						{
-							new Object[]
-							{
-								"value", data
-							}
-						},
-						new Object[][]
-						{
-							new Object[]
-							{
-								"colspan", "2",
-								"class", Page.CCTBLFTR,
-								"value", "" +
-									oof.input(new Object[] {
-										"onclick", browser.js_subval("Logout"),
-										"type", "submit",
-										"name", subName,
-										"class", "button",
-										"value", "Logout"
-									})
-							}
-						}
-					}
-				)
-			}
+					data
+					)
+				}
 		 );
 
 		 return s;
 	}
-		
+
+	public static Object[][][] parse(Vector v, Object[][] header, Object[][] footer) {
+
+		Object[][][] obj;
+
+		obj = new Object[v.size()+2][][];
+
+		obj[0] = header;
+
+		GridFile gf;
+
+		/* Compile each row from the list */
+		for(int i = 0; i < v.size(); i++)
+		{
+			gf = (GridFile)(v.get(i));
+			obj[i+1] = browser.build(gf);
+		}
+
+		obj[v.size()+1] = footer;
+
+		return obj;
+	}
+
+	/* Build a row of the file list */
+	private static Object[][] build(GridFile f) {
+		return new Object[][] {
+			new Object[]{"value", f.perm},
+			new Object[]{"value", Long.toString(f.size)},
+			new Object[]{"value", f.date},
+			new Object[]{"value", f.time},
+			new Object[]{"value", f.name}
+		};
+	}
+	
 	public static String js_subval(String value) {
 		String js_submit =
 			"	if (this.value == '"+value+"') {	" +

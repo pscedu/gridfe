@@ -103,11 +103,19 @@ input, select {
 	font-family: Tahoma, sans-serif;
 }
 
+input[type="text"] {
+	width: 300px;
+}
+
 input, textarea, select {
 	background-color: #ddeeff;
 	border: 1px solid black;
 	padding: 1px;
 	margin-right: 1px;
+}
+
+option {
+	border-bottom: 1px solid black;
 }
 
 .button, button {
@@ -118,6 +126,10 @@ input, textarea, select {
 	cursor: pointer;
 	padding-left: 8px;
 	padding-right: 8px;
+}
+
+label, input[type="checkbox"] {
+	cursor: pointer;
 }
 
 .err {

@@ -4,298 +4,227 @@ package gridfe.www.gridftp;
 
 import gridfe.*;
 import gridfe.gridint.*;
+import java.io.*;
 import java.sql.*;
+import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
-import java.util.*;
-import java.io.*;
 import org.globus.ftp.exception.*;
 
 public class browser {
+	public static final int GRIDFTP_PORT = 2811;
+
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
 		String errmsg = null;
 		Object[] hlist;
-		
+
 		hlist = browser.createHostList(p);
-		
+
 		String lhost = req.getParameter("lhost");
 		String rhost = req.getParameter("rhost");
-		String lactive = req.getParameter("lactive");
-		String ractive = req.getParameter("ractive");
+		String action = req.getParameter("action");
 
 		String s = "";
 		OOF oof = p.getOOF();
 		s += p.header("GridFTP File Browser");
-		
-		if(lhost == null) lhost = "";
-		if(rhost == null) rhost = "";
 
-		String lbrowser = "";
-		String rbrowser = "";
+		if (lhost == null)
+			lhost = "";
+		if (rhost == null)
+			rhost = "";
 
 		/*
-		** Set the content to display - login table if not logged in, otherwise browser
-		*/
-		if(lactive == null) {
-			lbrowser += browser.login(p, oof, lhost, "lhost", browser.js_subval("Login"), "lactive", "Machine 1", hlist);
-		} else if(lactive.equals("Logout")) {
-			/* XXX - do any necessary logout stuff */
-			lbrowser += browser.login(p, oof, lhost, "lhost", browser.js_subval("Login"), "lactive", "Machine 1", hlist);
-
+		 * Set the content to display - login table if
+		 * not logged in, otherwise browser
+		 */
+		if (lhost.equals("")) {
+			s += oof.p("This GridFTP interface allows you to browse two " +
+					"resources simultaneously and provides the ability to " +
+					"transfer files between them.  Alternatively, you may " +
+					"connect to only one resource if you wish to transfer " +
+					"files between your local machine and that target resource.")
+			  +  browser.login(p, "lhost", hlist);
 		} else {
-			lbrowser += browser.browse(p, oof, "Logout", "lactive", lhost);
+			s += browser.browse(p, lhost);
 		}
-
-		if(ractive == null) {
-			rbrowser += browser.login(p, oof, rhost, "rhost", browser.js_subval("Login"), "ractive", "Machine 2", hlist);
-		} else if(ractive.equals("Logout")) {
-			/* XXX - do any necessary logout stuff */
-			rbrowser += browser.login(p, oof, rhost, "rhost", browser.js_subval("Login"), "ractive", "Machine 2", hlist);
+		s += oof.hr();
+		if (rhost.equals("")) {
+			s += browser.login(p, "rhost", hlist);
 		} else {
-			rbrowser += "right browser is active";
+			s += "right browser is active";
 		}
-			
-
-		/* Setup the layout */
-		s += oof.table(
-			new Object[]
-			{
-				"class", Page.CCTBL,
-				"border", "0",
-				"cellspacing", "0",
-				"cellpadding", "0"
-			},
-			new Object[][][]
-			{
-				new Object[][]
-				{
-					new Object[]
-					{
-						"class", Page.CCHDR,
-						"value", "File Browsers",
-						"colspan", "2"
-					}
-				},
-				new Object[][]
-				{
-					new Object[]
-					{
-						"value", lbrowser
-					},
-				},
-				new Object[][]
-				{
-					new Object[]
-					{
-						"value", rbrowser
-					}
-				}
-			}
-		);
-
-		return s;
+		s += p.footer();
+		return (s);
 	}
 
 	/*
-	** login table for the gridftp structure 
-	** Example: loginTable(oof, lhost, "lhost", ... )
-	*/
-	public static String login(Page p, OOF oof, String varHost, String strHost,
-					String js_submit, String subName, String title, Object[] hlist)
-					throws OOFBadElementFormException {
+	 * Login table for the gridftp structure
+	 * Example: loginTable(oof, lhost, "lhost", ... )
+	 */
+	public static String login(Page p, String hfname, Object[] hlist)
+	  throws Exception {
 		String s = "";
+		OOF oof = p.getOOF();
+
+		String js_submit =
+			"	var el = this.form.elements[3];		" +
+			"	var bv = 'Please wait...';			" +
+			"	if (el.value != bv) {				" +
+			"		el.value = bv;					" +
+			"		return (true)					" +
+			"	}									";
 
 		/* Form field for logging in */
-		s += oof.p("Enter a hostname to browse");
 		s += oof.form(
-				new Object[]
-				{
+				new Object[] {
 					"action", "browser",
-					"method", "POST",
-					"enctype", "application/x-www-form-urlencoded"
+					"onsubmit", js_submit
 				},
-				new Object[]
-				{
-					oof.table(
-					new Object[]
-					{
-						"class", Page.CCTBL,
-						"border", "0",
-						"cellspacing", "0",
-						"cellpadding", "0"
-					},
-					new Object[][][]
-					{
-						new Object[][]
-						{
-							new Object[] {
-							"class", Page.CCHDR,
-							"value", title,
-							"colspan", "2"
-							}
-						},
-						new Object[][]
-						{
-							new Object[]
-							{
-								"class", Page.CCDESC,
-								"value", "Hostname:"
-							},
-							new Object[]
-							{
-								"class", p.genClass(),
-								"value", "" +
-									oof.input(new Object[] {
-										"type", "text",
-										"value", p.escapeHTML(varHost),
-										"name", strHost
-									}) +
-									oof.input(new Object[] {
-										"type", "select",
-										"onchange", browser.js_hostchg(strHost),
-										"options", hlist
-									}) +
-									oof.br() +
-									"&raquo; This field should contain the host name " +
-									"of the machine you wish to browse"
-							}
-						},
-						new Object[][]
-						{
-							new Object[]
-							{
-								"colspan", "2",
-								"class", Page.CCTBLFTR,
-								"value", "" +
-									oof.input(new Object[] {
-										"onclick", js_submit,
-										"type", "submit",
-										"name", subName,
-										"class", "button",
-										"value", "Login"
-									})
-							}
-						}
-					}
-				)
-			}
-		 );
-
-		 return s;
+				new Object[] {
+					"Hostname: " +
+					oof.input(new Object[] {
+						"type", "text",
+						"name", hfname
+					}) +
+					oof.input(new Object[] {
+						"type", "select",
+						"onchange", js_hostchg(hfname),
+						"options", hlist
+					}) +
+					oof.p("&raquo; Enter the host name of the resource " +
+					"that you would like to browse over GridFTP.") +
+					oof.input(new Object[] {
+						"type", "submit",
+						"class", "button",
+						"value", "Login"
+					})
+				});
+		 return (s);
 	}
 
-	public static String browse(Page p, OOF oof, String subStr, String subName, String hostname)
-		throws OOFBadElementFormException, IOException, ServerException, ClientException{
+	public static String browse(Page p, String hostname)
+	  throws Exception {
 		String s = "";
-
-		/* Title - XXX should be the hostname */
-		Object[][] header = new Object[][]
-		{
-			new Object[] {
-			"class", Page.CCHDR,
-			"value", "Hostname should be here",
-			"colspan", "2"
-			}
-		};
-
-		/* XXX - Logout button */
-		Object[][] footer = new Object[][]
-		{
-			new Object[] {
-			"class", Page.CCHDR,
-			"value", "Testing - Logout Button",
-			"colspan", "2"
-			}
-		};
+		OOF oof = p.getOOF();
 
 		/* Grab the GridInt and make the GridFTP connection */
 		GridInt gi = p.getGridInt();
-		GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(), hostname, 2811);
-
-		Vector v = gftp.gls();
-			
-		/* Parse the list and put each file (with size, perm, date, time) on a table row */
-		// XXX - name should become a link for chdir or download file
-		Object[][][] data = browser.parse(v, header, footer);
+		GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(),
+		  hostname, GRIDFTP_PORT);
 
 		/* Form field for logging in */
-		// XXX - this should be the current working directory
-		s += oof.p("Click on a file to download or a directory to view.");
-		s += oof.form(
-				new Object[]
-				{
-					"action", "browser",
-					"method", "POST",
-					"enctype", "application/x-www-form-urlencoded"
-				},
-				new Object[]
-				{
-					oof.table(
-					new Object[]
-					{
-						"class", Page.CCTBL,
-						"border", "0",
-						"cellspacing", "0",
-						"cellpadding", "0"
-					},
-					data
-					)
+		s += ""
+		  + oof.p("Click on a file to download or a directory to view it's contents.")
+		  + oof.form_start(new Object[] {
+				"action", "browser",
+				"method", "GET",
+				"enctype", "application/x-www-form-urlencoded"
+			})
+		  + oof.table_start(new Object[] {
+				"class", Page.CCTBL,
+				"border", "0",
+				"cellspacing", "0",
+				"cellpadding", "0",
+				"cols", new Object[][] {
+					new Object[] { },
+					new Object[] { "align", "char", "char", "." },
+					new Object[] { },
+					new Object[] { },
 				}
-		 );
-
-		 return s;
+			})
+		  + oof.table_row(new Object[][] {
+				new Object[] {
+					"class", Page.CCHDR,
+					"value", "Viewing gridftp://" + hostname + gftp.getCurrentDir(),
+					"colspan", "4"
+				}
+			})
+		  + oof.table_row(new Object[][] {
+				new Object[] { "class", Page.CCSUBHDR, "value", "Name" },
+				new Object[] { "class", Page.CCSUBHDR, "value", "Size" },
+				new Object[] { "class", Page.CCSUBHDR, "value", "Date" },
+				new Object[] { "class", Page.CCSUBHDR, "value", "Modes" }
+			})
+		/*
+		 * Parse the list and put each file (with size, perm,
+		 * date/time) on a table row.
+		 */
+		  + parse(p, gftp.gls())
+		  + oof.table_row(new Object[][] {
+				new Object[] {
+					"class", Page.CCHDR,
+					"value", "Testing - Logout Button",
+					"colspan", "4"
+				}
+			})
+		  + oof.table_end();
+		 return (s);
 	}
 
-	public static Object[][][] parse(Vector v, Object[][] header, Object[][] footer) {
-
-		Object[][][] obj;
-
-		obj = new Object[v.size()+2][][];
-
-		obj[0] = header;
-
+	public static String parse(Page p, Vector v) throws Exception {
+		String s = "";
 		GridFile gf;
 
-		/* Compile each row from the list */
-		for(int i = 0; i < v.size(); i++)
-		{
-			gf = (GridFile)(v.get(i));
-			obj[i+1] = browser.build(gf);
+		Collections.sort(v);
+
+		for (int j = 0; j < v.size(); j++) {
+			gf = (GridFile)v.get(j);
+			if (gf.name.equals("."))
+				continue;
+			s += browser.build(gf, p);
 		}
-
-		obj[v.size()+1] = footer;
-
-		return obj;
+		return (s);
 	}
 
 	/* Build a row of the file list */
-	private static Object[][] build(GridFile f) {
-		return new Object[][] {
-			new Object[]{"value", f.perm},
-			new Object[]{"value", Long.toString(f.size)},
-			new Object[]{"value", f.date},
-			new Object[]{"value", f.time},
-			new Object[]{"value", f.name}
-		};
-	}
-	
-	public static String js_subval(String value) {
-		String js_submit =
-			"	if (this.value == '"+value+"') {	" +
-			"		this.value = 'Please wait...';	" +
-			"		return (true)					" +
-			"	}";
+	private static String build(GridFile f, Page p)
+	  throws Exception {
+		String c = p.genClass();
+		OOF oof = p.getOOF();
 
-		return js_submit;
+		return "" + oof.table_row(new Object[][] {
+			new Object[] { "class", c,
+			  "value", oof.link(p.escapeHTML(f.name) +
+			  (f.isDirectory() ? "/" : ""), "?") },
+			new Object[] { "class", c,
+			  "value", humansiz(f.size),
+			  "align", "right" },
+			new Object[] { "class", c, "value", f.date + " " + f.time },
+			new Object[] { "class", c, "value", f.perm }
+		});
 	}
+
+	public static String humansiz(long n) {
+		String sufx = "BKMGTP";
+		int idx = 0;
+
+		double m = (double)n;
+		while (m > 1024.0) {
+			idx++;
+			m /= 1024.0;
+		}
+		if (idx >= sufx.length())
+			return "" + n;
+		else
+			return "" + (((long)(m * 10)) / 10.0) + sufx.charAt(idx);
+	}
+
 	public static String js_hostchg(String host) {
+		/*
+		 * XXX: use options[0].value instead
+		 * of hardcoding option value.
+		 */
 		String s =
-			"	this.form.elements['"+host+"'].value = " +
-			"		(this.options[this.selectedIndex].value == 'Choose a host...') ? " +
-			"		'' : this.options[this.selectedIndex].value ";
-			return s;
+			"	var idx = this.selectedIndex;				" +
+			"	var bv = 'Choose a resource...';			" +
+			"	this.form.elements['" + host + "'].value =	" +
+			"		(this.options[idx].value == bv) ?		" +
+			"		'' : this.options[idx].value;			" +
+			"	if (this.options[idx].value != bv)			" +
+			"		this.form.submit();						";
+		return (s);
 	}
 
 	/* Retrieve the list of hostname for the host drop down menu */
@@ -328,7 +257,7 @@ public class browser {
 
 		Object[] hlist = new Object[2 * nhosts + 2];
 		hlist[0] = "";
-		hlist[1] = "Choose a resource";
+		hlist[1] = "Choose a resource...";
 		for (int i = 2; rs.next(); i += 2)
 			hlist[i] = hlist[i + 1] = rs.getString("host");
 

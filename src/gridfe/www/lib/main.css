@@ -133,3 +133,7 @@ pre {
 form {
 	margin: 0px;
 }
+
+.mono {
+	font-family: monospace;
+}

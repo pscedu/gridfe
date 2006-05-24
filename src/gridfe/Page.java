@@ -38,6 +38,8 @@ public class Page {
 	public final static Object CCSUBHDR = (Object)"subhdr";
 	public final static Object CCTBL = (Object)"tbl";
 	public final static Object CCTBLFTR = (Object)"tblftr";
+	public final static Object CCMONO = (Object)"mono";
+
 	public final static int MENU_ITEM_HEIGHT = 35;
 
 	public final static int PATHTYPE_WEB = 0;
@@ -222,7 +224,6 @@ public class Page {
 			});
 		this.addMenu("Certificate Management", "/certs", null);
 //		this.addMenu("MDS/LDAP", "/ldap", null);
-//		this.addMenu("GridFTP", "/gridftp", null);
 //		this.addMenu("GRIS/GIIS", "/gris", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
@@ -233,7 +234,8 @@ public class Page {
 			});
 		this.addMenu("GridFTP", "/gridftp",
 			new Object[] {
-				"URL Copy",		"/gridftp/copy"
+				"URL Copy",		"/gridftp/copy",
+				"Browser",		"/gridftp/browser"
 			});
 		this.addMenu("Node Availability", "/nodes", null);
 

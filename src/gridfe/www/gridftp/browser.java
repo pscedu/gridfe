@@ -7,6 +7,7 @@ import gridfe.gridint.*;
 import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
+import java.util.*;
 
 public class browser {
 	public static String main(Page p)
@@ -29,40 +30,53 @@ public class browser {
 		if(lhost == null) lhost = "";
 		if(rhost == null) rhost = "";
 
-		String llogin = "";
-		String rlogin = "";
-		String lbrowse = "";
-		String rbrowse = "";
+		String lbrowser = "";
+		String rbrowser = "";
 
 		/*
 		** Set the content to display - login table if not logged in, otherwise browser
 		*/
-		if(lactive == null)
-			llogin += browser.loginTable(p, oof, lhost, "lhost", browser.js_subval("Log In"), "lactive", hlist);
-		else if(lactive.equals("Log out")) {
+		if(lactive == null) {
+			lbrowser += browser.login(p, oof, lhost, "lhost", browser.js_subval("Login"), "lactive", "Machine 1", hlist);
+		} else if(lactive.equals("Log out")) {
 			/* XXX - do any necessary logout stuff */
-//			llogin += "logged out";
-			llogin += browser.loginTable(p, oof, lhost, "lhost", browser.js_subval("Log In"), "lactive", hlist);
+			lbrowser += browser.login(p, oof, lhost, "lhost", browser.js_subval("Login"), "lactive", "Machine 1", hlist);
 
 		} else {
-			llogin += "llogin is active";
+
+			/* Grab the GridInt and make the GridFTP connection */
+			GridInt gi = p.getGridInt();
+			GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(), lhost, 2811);
+
+			Vector v = gftp.gls();
+			GridFile gf;
+			String data = "";
+			
+			/* Put each file (with size, perm, date, time) on a separte line */
+			// XXX - name should become a link for chdir or download file
+			for(int i = 0; i < v.size(); i++)
+			{
+				gf = (GridFile)(v.get(i));
+				data += oof.p(gf.toString());
+			}
+			
+			lbrowser += browser.browse(p, oof, "Logout", "lactive", "Machine 1", data);
 		}
 
-		if(ractive == null)
-			rlogin = browser.loginTable(p, oof, rhost, "rhost", browser.js_subval("Log In"), "ractive", hlist);
-		else if(ractive.equals("Log Out")) {
+		if(ractive == null) {
+			rbrowser += browser.login(p, oof, rhost, "rhost", browser.js_subval("Login"), "ractive", "Machine 2", hlist);
+		} else if(ractive.equals("Log Out")) {
 			/* XXX - do any necessary logout stuff */
-//			rlogin += "logged out";
-			rlogin = browser.loginTable(p, oof, rhost, "rhost", browser.js_subval("Log In"), "ractive", hlist);
+			rbrowser += browser.login(p, oof, rhost, "rhost", browser.js_subval("Login"), "ractive", "Machine 2", hlist);
 		} else {
-			rlogin += "rlogin is active";
+			rbrowser += "right browser is active";
 		}
 			
 
-		/* Setup the nested table garbage */
-		/* ------------------------------------------------------------- */
+		/* Setup the layout */
 		s += oof.table(
-				new Object[] {
+			new Object[]
+			{
 				"class", Page.CCTBL,
 				"border", "0",
 				"cellspacing", "0",
@@ -70,62 +84,31 @@ public class browser {
 			},
 			new Object[][][]
 			{
-				/* 1st Row */
 				new Object[][]
 				{
-					new Object[] {
+					new Object[]
+					{
 						"class", Page.CCHDR,
 						"value", "File Browsers",
 						"colspan", "2"
 					}
 				},
-				/* 2nd Row */
 				new Object[][]
 				{
 					new Object[]
 					{
-						"value", llogin
+						"value", lbrowser
 					},
-					new Object[]
-					{
-						"value", rlogin
-					}
 				},
-				/* 3rd Row */
 				new Object[][]
 				{
 					new Object[]
 					{
-						"colspan", "1",
-						"class", Page.CCTBLFTR,
-						"value", "" +
-							oof.input(new Object[]
-							{
-								"onclick", browser.js_subval("Log Out"),
-								"type", "submit",
-								"name", "lactive",
-								"class", "button",
-								"value", "Log out"
-							})
-					},
-					new Object[]
-					{
-						"colspan", "1",
-						"class", Page.CCTBLFTR,
-						"value", "" +
-							oof.input(new Object[]
-							{
-								"onclick", browser.js_subval("Log Out"),
-								"type", "submit",
-								"name", "ractive",
-								"class", "button",
-								"value", "Log out"
-							})
+						"value", rbrowser
 					}
 				}
 			}
 		);
-		/* ------------------------------------------------------------- */
 
 		return s;
 	}
@@ -134,8 +117,8 @@ public class browser {
 	** login table for the gridftp structure 
 	** Example: loginTable(oof, lhost, "lhost", ... )
 	*/
-	public static String loginTable(Page p, OOF oof, String varHost, String strHost,
-					String js_submit, String subName, Object[] hlist)
+	public static String login(Page p, OOF oof, String varHost, String strHost,
+					String js_submit, String subName, String title, Object[] hlist)
 					throws OOFBadElementFormException {
 		String s = "";
 
@@ -164,7 +147,7 @@ public class browser {
 						{
 							new Object[] {
 							"class", Page.CCHDR,
-							"value", "File Browser",
+							"value", title,
 							"colspan", "2"
 							}
 						},
@@ -201,13 +184,76 @@ public class browser {
 								"colspan", "2",
 								"class", Page.CCTBLFTR,
 								"value", "" +
-									oof.input(new Object[]
-									{
+									oof.input(new Object[] {
 										"onclick", js_submit,
 										"type", "submit",
 										"name", subName,
 										"class", "button",
-										"value", "Log in"
+										"value", "Login"
+									})
+							}
+						}
+					}
+				)
+			}
+		 );
+
+		 return s;
+	}
+
+	public static String browse(Page p, OOF oof, String subStr, String subName, String title, String data)
+					throws OOFBadElementFormException {
+		String s = "";
+
+		/* Form field for logging in */
+		s += oof.p("Enter a hostname to browse");
+		s += oof.form(
+				new Object[]
+				{
+					"action", "browser",
+					"method", "POST",
+					"enctype", "application/x-www-form-urlencoded"
+				},
+				new Object[]
+				{
+					oof.table(
+					new Object[]
+					{
+						"class", Page.CCTBL,
+						"border", "0",
+						"cellspacing", "0",
+						"cellpadding", "0"
+					},
+					new Object[][][]
+					{
+						new Object[][]
+						{
+							new Object[] {
+							"class", Page.CCHDR,
+							"value", title,
+							"colspan", "2"
+							}
+						},
+						new Object[][]
+						{
+							new Object[]
+							{
+								"value", data
+							}
+						},
+						new Object[][]
+						{
+							new Object[]
+							{
+								"colspan", "2",
+								"class", Page.CCTBLFTR,
+								"value", "" +
+									oof.input(new Object[] {
+										"onclick", browser.js_subval("Logout"),
+										"type", "submit",
+										"name", subName,
+										"class", "button",
+										"value", "Logout"
 									})
 							}
 						}

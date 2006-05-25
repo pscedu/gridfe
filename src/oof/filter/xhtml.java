@@ -148,11 +148,11 @@ public class xhtml implements Filter {
 			if (((String)opts[i]).equals(value))
 				e_optopts = new Object[] {
 					"selected", "selected",
-					"name", opts[i]
+					"value", opts[i]
 				};
 			else
 				e_optopts = new Object[] {
-					"name", opts[i]
+					"value", opts[i]
 				};
 			Option e_opt = new Option(this.oof, e_optopts,
 			    new Object[] { opts[i + 1] });

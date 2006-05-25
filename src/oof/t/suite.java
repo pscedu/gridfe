@@ -111,8 +111,8 @@ public class suite {
 			"name", "sel", "value", "b", "options", new Object[] {
 				"a", "1", "b", "2" } }),
 			"<select size=\"1\" name=\"sel\">" +
-				"<option name=\"a\">1</option>" +
-				"<option selected=\"selected\" name=\"b\">2</option>" +
+				"<option value=\"a\">1</option>" +
+				"<option value=\"b\" selected=\"selected\">2</option>" +
 			"</select>");
 
 		t("link", o.link("supername"), "<a name=\"supername\"></a>");

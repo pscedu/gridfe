@@ -11,18 +11,23 @@ import org.globus.util.*;
 import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
 
-public class GridFile {
-	
+public class GridFile implements Comparable {
 	public String name;
 	public String date;
 	public String time;
 	public String perm;
 	public long size;
 	private FileInfo file;
-	
+	private boolean isDir;
+	private boolean isFile;
+
 	public GridFile() {}
 	public GridFile(FileInfo file) {
 		this.set(file);
+	}
+
+	public boolean isDirectory() {
+		return (this.isDir);
 	}
 
 	public void set(FileInfo file) {
@@ -32,6 +37,8 @@ public class GridFile {
 		this.time = file.getTime();
 		this.size = file.getSize();
 		this.calcPerm();
+		this.isDir = file.isDirectory();
+		this.isFile = file.isFile();
 	}
 
 	private void calcPerm() {
@@ -48,7 +55,7 @@ public class GridFile {
 		this.perm += this.file.allCanExecute()	? 'x' : '-';
 	}
 
-	/* I.e - "-rw-rw--r-- 6234 May 17 15:04" */ 
+	/* I.e - "-rw-rw--r-- 6234 May 17 15:04" */
 	public String longList() {
 		String s = "";
 		s += this.perm+"\t"+this.size+"\t"+this.date+"\t"+this.time;
@@ -57,5 +64,9 @@ public class GridFile {
 
 	public String toString() {
 		return this.longList() + "\t" + this.name;
+	}
+
+	public int compareTo(Object o) {
+		return (this.name.compareTo(((GridFile)o).name));
 	}
 }

@@ -431,7 +431,8 @@ public class Page {
 			ch = s.charAt(i);
 			if (ch == ' ')
 				t += '+';
-			else if (Character.isLetterOrDigit(ch))
+			else if (Character.isLetterOrDigit(ch) ||
+			  ch == '.' || ch == '/')
 				t += ch;
 			else
 				t += "%" + Integer.toHexString(ch);

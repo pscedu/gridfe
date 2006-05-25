@@ -5,20 +5,13 @@ package gridfe.gridint;
 import java.io.*;
 
 public class RSLElement implements Serializable {
-	/* Strings in the form "&(executable=`which hostname`)..." */
-	private final static String b = "(";
-	private final static String m = "=";
-	private final static String e = ")";
-	private final static String s = " ";
-	private final static String q = "\"";
-
 	/*
-	** Request Type
-	** Specification:
-	**	multi		+
-	**	conjunct	&
-	**	disjunct	|
-	*/
+	 * Request Type
+	 * Specification:
+	 *	multi		+
+	 *	conjunct	&
+	 *	disjunct	|
+	 */
 	private String req = "&";
 
 	private String[] gParam, gValue;
@@ -26,9 +19,9 @@ public class RSLElement implements Serializable {
 	private String vParam, kParam;
 
 	/*
-	** transient date will be reconstructed
-	** during revive() calls from GridJob
-	*/
+	 * Transient date will be reconstructed
+	 * during revive() calls from GridJob.
+	 */
 	private transient StringBuffer data;
 
 	/* stdout and stderr default to null */
@@ -39,9 +32,9 @@ public class RSLElement implements Serializable {
 	public transient String dir = null;
 
 	/*
-	** Build RSL Strings that have args, env variables, and
-	** standard parameters.
-	*/
+	 * Build RSL Strings that have args, env variables, and
+	 * standard parameters.
+	 */
 	public void setRSL(String[] param, String[] value) {
 		this.gParam = (String[])param.clone();
 		this.gValue = (String[])value.clone();
@@ -73,18 +66,18 @@ public class RSLElement implements Serializable {
 	}
 
 	/*
-	** Change whether it's Multi, Conjunct, or Disjunct
-	** (default is conjunct, see request type above...)
-	*/
+	 * Change whether it's multi, conjunct, or disjunct
+	 * (default is conjunct, see request type above...)
+	 */
 	public void setRequestType(String s) {
 		this.req = s;
 	}
 
 	/* Generic build for "(param=value)" */
 	private void buildGenerics(String[] param, String[] value) {
-		for(int i = 0; i < param.length; i++) {
-			this.data.append(b + param[i] + m + q +
-			    value[i] + q + e);
+		for (int i = 0; i < param.length; i++) {
+			this.data.append("(" + param[i] + "=" +
+			    '"' + value[i] + "\")");
 
 			/* Save some parameters to retrieve job output/err */
 			if (param[i].equals("stdout"))
@@ -97,35 +90,35 @@ public class RSLElement implements Serializable {
 	}
 
 	/*
-	** Build in the form of '(param="arg1" "arg2")'
-	** Example: (arguments="arg1" "arg number 2");
-	*/
+	 * Build in the form of '(param="arg1" "arg2")'
+	 * Example: (arguments="arg1" "arg number 2")
+	 */
 	private void buildVarArgs(String param, String[] value) {
 		int i;
-		this.data.append(b + param + m);
+
+		this.data.append("(" + param + "=");
 
 		/* Quote all args to be safe */
-		for(i = 0; i < value.length - 1; i++)
-			this.data.append(q + value[i] + q + s);
+		for (i = 0; i < value.length - 1; i++)
+			this.data.append('"' + value[i] + "\" ");
 
 		/* Manually add last one to avoid extra " )" */
-		this.data.append(q + value[i] + q);
-		this.data.append(e);
+		this.data.append('"' + value[i] + "\")");
 	}
 
 	/*
-	** Build in the form of "(param=(key1 value1)(key2 value2))"
-	** Example: (environment=(MANPATH /usr/man)(EDITOR vi));
+	 * Build in the form of "(param=(key1 value1)(key2 value2))"
+	 * Example: (environment=(MANPATH /usr/man)(EDITOR vi))
 	*/
 	private void buildKeyPairs(String param, String[] key,
 	    String[] value) {
-		this.data.append(b+param+m);
+		this.data.append("(" + param + "=");
 
 		/* Quote all args to be safe */
 		for (int i = 0; i < key.length; i++)
-			this.data.append(b + key[i] + s + q + value[i] +
-			    q + e);
-		this.data.append(e);
+			this.data.append("(" + key[i] + " " +
+			  '"' + value[i] + "\")");
+		this.data.append(")");
 	}
 
 	public void build() {
@@ -160,5 +153,58 @@ public class RSLElement implements Serializable {
 		if (this.data == null)
 			this.build();
 		return (this.data.toString());
+	}
+
+/*
+	(* this is a comment *)
+	& (executable = a.out (* <-- that is an unquoted literal *))
+	  (directory  = /home/nobody )
+	  (arguments  = arg1 "arg 2")
+	  (count = 1)
+
+	& (rsl_substitution  = (TOPDIR  "/home/nobody")
+	                (DATADIR $(TOPDIR)"/data")
+	                (EXECDIR $(TOPDIR)/bin) )
+	  (executable = $(EXECDIR)/a.out
+	        (* ^-- implicit concatenation *))
+	  (directory  = $(TOPDIR) )
+	  (arguments  = $(DATADIR)/file1
+	        (* ^-- implicit concatenation *)
+	                $(DATADIR) # /file2
+	        (* ^-- explicit concatenation *)
+	                '$(FOO)'            (* <-- a quoted literal *))
+	  (environment = (DATADIR $(DATADIR)))
+	  (count = 1)
+*/
+	public void parse(String rsl) {
+		int level = 0;
+		boolean dquot = false;
+		boolean squot = false;
+
+		for (int i = 0; i < rsl.length(); i++) {
+			char c = rsl.charAt(i);
+
+			switch (c) {
+			case '(':
+				if (!squot && !dquot)
+					level++;
+				break;
+			case ')':
+				if (!squot && !dquot)
+					level--;
+				break;
+			case '\'':
+				if (!dquot)
+					dquot = !dquot;
+				break;
+			case '"':
+				if (!squot)
+					squot = !squot;
+				break;
+			case '=':
+				break;
+			}
+
+		}
 	}
 };

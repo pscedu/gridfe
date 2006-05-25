@@ -17,27 +17,74 @@ public class browser {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
-		String errmsg = null;
-		Object[] hlist;
-
-		hlist = browser.createHostList(p);
 
 		String lhost = req.getParameter("lhost");
 		String rhost = req.getParameter("rhost");
+		String lcwd = req.getParameter("lcwd");
+		String rcwd = req.getParameter("rcwd");
 		String action = req.getParameter("action");
-
-		String s = "";
-		OOF oof = p.getOOF();
-		s += p.header("GridFTP File Browser");
 
 		if (lhost == null)
 			lhost = "";
 		if (rhost == null)
 			rhost = "";
+		if (lcwd == null)
+			lcwd = "";
+		if (rcwd == null)
+			rcwd = "";
+		if (action == null)
+			action = "";
+
+		int len = 0;
+
+		if (!lhost.equals(""))
+			len++;
+		if (!rhost.equals(""))
+			len++;
+		if (!lcwd.equals(""))
+			len++;
+		if (!rcwd.equals(""))
+			len++;
+		if (!action.equals(""))
+			len++;
+
+		String[] params = new String[2 * len];
+
+		int j = 0;
+
+		if (!lhost.equals("")) {
+			params[j++] = "lhost";
+			params[j++] = lhost;
+		}
+		if (!rhost.equals("")) {
+			params[j++] = "rhost";
+			params[j++] = rhost;
+		}
+		if (!lcwd.equals("")) {
+			params[j++] = "lcwd";
+			params[j++] = lcwd;
+		}
+		if (!rcwd.equals("")) {
+			params[j++] = "rcwd";
+			params[j++] = rcwd;
+		}
+		if (!action.equals("")) {
+			params[j++] = "action";
+			params[j++] = action;
+		}
+
+		if (action.equals("download")) {
+		}
+
+		Object[] hlist = browser.createHostList(p);
+
+		String s = "";
+		OOF oof = p.getOOF();
+		s += p.header("GridFTP File Browser");
 
 		/*
-		 * Set the content to display - login table if
-		 * not logged in, otherwise browser
+		 * Set the content to display -- browser if
+		 * connected, otherwise login table.
 		 */
 		if (lhost.equals("")) {
 			s += oof.p("This GridFTP interface allows you to browse two " +
@@ -47,15 +94,47 @@ public class browser {
 					"files between your local machine and that target resource.")
 			  +  browser.login(p, "lhost", hlist);
 		} else {
-			s += browser.browse(p, lhost);
+			s += browser.browse(p, "l", lhost, params, lcwd);
 		}
+
 		s += oof.hr();
+
 		if (rhost.equals("")) {
 			s += browser.login(p, "rhost", hlist);
 		} else {
-			s += "right browser is active";
+			s += browser.browse(p, "r", rhost, params, rcwd);
 		}
 		s += p.footer();
+		return (s);
+	}
+
+	/* Construct a query string (?foo=bar&...). */
+	public static String buildQS(Page page, String[] p, String[] pnew) {
+		String s, key, val;
+
+		s = "?";
+		for (int j = 0; j + 1 < p.length; j += 2) {
+			val = p[j + 1];
+			for (int k = 0; k + 1 < pnew.length; k += 2)
+				if (pnew[k].equals(p[j])) {
+					val = pnew[k + 1];
+					break;
+				}
+			s += p[j] + "=" + page.escapeURL(val) + "&amp;";
+		}
+
+		boolean found;
+		for (int k = 0; k + 1 < pnew.length; k += 2) {
+			found = false;
+			for (int j = 0; j + 1 < p.length; j += 2)
+				if (p[j].equals(pnew[k])) {
+					found = true;
+					break;
+				}
+			if (found)
+				continue;
+			s += pnew[k] + "=" + page.escapeURL(pnew[k + 1]) + "&amp;";
+		}
 		return (s);
 	}
 
@@ -69,11 +148,11 @@ public class browser {
 		OOF oof = p.getOOF();
 
 		String js_submit =
-			"	var el = this.form.elements[3];		" +
+			"	var el = this.form.elements[2];		" +
 			"	var bv = 'Please wait...';			" +
 			"	if (el.value != bv) {				" +
 			"		el.value = bv;					" +
-			"		return (true)					" +
+			"		return (true);					" +
 			"	}									";
 
 		/* Form field for logging in */
@@ -104,8 +183,8 @@ public class browser {
 		 return (s);
 	}
 
-	public static String browse(Page p, String hostname)
-	  throws Exception {
+	public static String browse(Page p, String display, String hostname,
+	  String[] params, String cwd) throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
 
@@ -113,6 +192,8 @@ public class browser {
 		GridInt gi = p.getGridInt();
 		GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(),
 		  hostname, GRIDFTP_PORT);
+		if (!cwd.equals(""))
+			gftp.changeDir(cwd);
 
 		/* Form field for logging in */
 		s += ""
@@ -151,11 +232,30 @@ public class browser {
 		 * Parse the list and put each file (with size, perm,
 		 * date/time) on a table row.
 		 */
-		  + parse(p, gftp.gls())
+		  + listing(display, p, gftp, params)
 		  + oof.table_row(new Object[][] {
 				new Object[] {
-					"class", Page.CCHDR,
-					"value", "Testing - Logout Button",
+					"class", Page.CCTBLFTR,
+					"value", "" + oof.form(new Object[] {
+							"action", "?",
+							"style", "display: inline"
+						}, new Object[] {
+							oof.input(new Object[] {
+								"type", "submit",
+								"class", "button",
+								"value", "Logout"
+							}),
+						}) +
+						oof.form(new Object[] {
+							"action", "?",
+							"style", "display: inline"
+						}, new Object[] {
+							oof.input(new Object[] {
+								"type", "submit",
+								"class", "button",
+								"value", "Upload"
+							}),
+						}),
 					"colspan", "4"
 				}
 			})
@@ -163,37 +263,59 @@ public class browser {
 		 return (s);
 	}
 
-	public static String parse(Page p, Vector v) throws Exception {
-		String s = "";
+	public static final int MAXFNLEN = 40;
+
+	public static String listing(String display, Page p, GridFTP gftp,
+	  String[] params) throws Exception {
+		OOF oof = p.getOOF();
 		GridFile gf;
 
+		Vector v = gftp.gls();
 		Collections.sort(v);
+		String cwd = gftp.getCurrentDir();
 
+		String prefix = p.getWebRoot() + "/img/";
+
+		String s = "", qs;
 		for (int j = 0; j < v.size(); j++) {
 			gf = (GridFile)v.get(j);
 			if (gf.name.equals("."))
 				continue;
-			s += browser.build(gf, p);
+
+			String cl = p.CCMONO + p.genClass();
+			String fn = p.escapeHTML(gf.name.length() > MAXFNLEN ?
+			  gf.name.substring(0, MAXFNLEN) + "..." : gf.name) +
+			  (gf.isDirectory() ? "/" : "");
+			String img = "" + oof.img(new Object[] {
+				"src", prefix + (gf.isDirectory() ? "folder.png" : "file.png"),
+				"alt", "[img]",
+				"align", "middle",
+				"border", "0"
+			});
+
+			if (gf.isDirectory())
+				qs = buildQS(p, params, new String[] {
+					display + "cwd", cwd + "/" + gf.name
+				});
+			else
+				qs = buildQS(p, params, new String[] {
+					"action", "download",
+					"file", gf.name
+				});
+
+			s += "" + oof.table_row(new Object[][] {
+				new Object[] { "class", cl,
+					"value", oof.link(img + " " + fn, qs) },
+				new Object[] { "class", cl,
+					"value", humansiz(gf.size),
+					"align", "right" },
+				new Object[] { "class", cl, "value",
+					/* XXX: escapeHTML() these? */
+					gf.date + " " + gf.time },
+				new Object[] { "class", cl, "value", gf.perm }
+			});
 		}
 		return (s);
-	}
-
-	/* Build a row of the file list */
-	private static String build(GridFile f, Page p)
-	  throws Exception {
-		String c = p.genClass();
-		OOF oof = p.getOOF();
-
-		return "" + oof.table_row(new Object[][] {
-			new Object[] { "class", c,
-			  "value", oof.link(p.escapeHTML(f.name) +
-			  (f.isDirectory() ? "/" : ""), "?") },
-			new Object[] { "class", c,
-			  "value", humansiz(f.size),
-			  "align", "right" },
-			new Object[] { "class", c, "value", f.date + " " + f.time },
-			new Object[] { "class", c, "value", f.perm }
-		});
 	}
 
 	public static String humansiz(long n) {
@@ -217,13 +339,15 @@ public class browser {
 		 * of hardcoding option value.
 		 */
 		String s =
-			"	var idx = this.selectedIndex;				" +
-			"	var bv = 'Choose a resource...';			" +
-			"	this.form.elements['" + host + "'].value =	" +
-			"		(this.options[idx].value == bv) ?		" +
-			"		'' : this.options[idx].value;			" +
-			"	if (this.options[idx].value != bv)			" +
-			"		this.form.submit();						";
+			"	var idx = this.selectedIndex;						" +
+			"	var bv = 'Choose a resource...';					" +
+			"	this.form.elements['" + host + "'].value =			" +
+			"		(this.options[idx].value == bv) ?				" +
+			"		'' : this.options[idx].value;					" +
+			"	if (this.options[idx].value != bv) {				" +
+			"		this.form.submit();								" +
+			"		this.form.elements[2].value = 'Please wait...';	" +
+			"	}													";
 		return (s);
 	}
 

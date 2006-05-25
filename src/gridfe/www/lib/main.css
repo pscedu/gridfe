@@ -29,7 +29,7 @@ body {
 	vertical-align: top;
 }
 
-.data1 {
+.data1, .monodata1 {
 	background-color: #FFFFFF;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
@@ -37,7 +37,7 @@ body {
 	padding: 2px;
 }
 
-.data2 {
+.data2, .monodata2 {
 	background-color: #EEEEFF;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
@@ -45,7 +45,7 @@ body {
 	padding: 2px;
 }
 
-td + .data1, td + .data2 {
+td + .data1, td + .monodata1, td + .data2, td + .monodata2 {
 	border-left: 0px;
 }
 
@@ -146,6 +146,10 @@ form {
 	margin: 0px;
 }
 
-.mono {
+.monodata1, .monodata2 {
 	font-family: monospace;
+}
+
+.monodata1 a, .monodata2 a {
+	text-decoration: none;
 }

@@ -175,39 +175,6 @@ public class Page {
 		return (t);
 	}
 
-	public String buildMenu() {
-		String name, url, p, t = "var menus = [";
-		Menu m;
-		Iterator i, j;
-
-		for (i = this.getMenus().iterator();
-		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
-			t += " [ '" + divName(m.getName()) + "', ";
-			if (m.getItems() != null) {
-				t += "menu" + divName(m.getName());
-				p = "var menu" + divName(m.getName()) + " = [";
-				for (j = m.getItems().iterator();
-				     j.hasNext() && (name = (String)j.next()) != null &&
-				     j.hasNext() && (url  = (String)j.next()) != null; ) {
-					p += "'" + divName(m.getName() + name) +
-					     "'";
-					if (j.hasNext())
-						p += ",";
-				}
-				p += "];";
-				t = p + t;
-			} else {
-				t += "null";
-			}
-			t += " ]";
-			if (i.hasNext())
-				t += ",";
-		}
-
-		t += "];";
-		return (t);
-	}
-
 	public String header(String title)
 	  throws OOFException {
 		String s, name, url;
@@ -251,10 +218,7 @@ public class Page {
 		  +			"<script type=\"text/javascript\" src=\"" + wr + "/lib/Global.js\"></script>"
 		  +			this.addScript(
 		   				"include('" + wr + "/lib/Browser.js');" +
-		   				"include('" + wr + "/lib/util.js');")
-		  +			this.addScript(this.buildMenu())
-		  +			this.addScript(
-		   				/* This must be loaded last. */
+		   				"include('" + wr + "/lib/util.js');" +
 		   				"include('" + wr + "/lib/main.js');")
 		  +		"</head>"
 		  +		"<body>"

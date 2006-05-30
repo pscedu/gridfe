@@ -4,6 +4,7 @@ package gridfe.www;
 
 import gridfe.*;
 import gridfe.gridint.auth.*;
+import gridfe.gridint.*;
 import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
@@ -132,6 +133,15 @@ public class nodes {
 			} catch (Exception e) {
 				up = false;
 			}
+
+			boolean fup = true;
+			try {
+				GridFTP ftp;
+				ftp = new GridFTP(p.getGridInt().getGSS().getGSSCredential(), host, 2811);
+			} catch (Exception e) {
+				fup = false;
+			}
+			
 			String path = p.getWebRoot() + "/img/";
 
 			String cl = p.genClass();
@@ -140,8 +150,11 @@ public class nodes {
 						new Object[] { "class", cl, "style", "text-align: center",
 							"value", oof.img(new Object[] {
 								"src", path + (up ? "on.png" : "off.png"),
-								"alt", (up ? "[up]" : "[down]")
-							}) },
+								"alt", (up ? "[up]" : "[down]")}) + "GRAM&nbsp&nbsp&nbsp" + //XXX - this is gross, table? 
+									oof.img(new Object[] {
+								"src", path + (fup ? "on.png" : "off.png"),
+								"alt", (fup ? "[up]" : "[down]")}) + "GridFTP"
+						},
 						new Object[] { "class", cl, "value", oof.input(new Object[] {
 								"type", "checkbox",
 								"name", "host",

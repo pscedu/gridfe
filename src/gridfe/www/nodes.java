@@ -12,6 +12,8 @@ import org.globus.gram.*;
 import org.ietf.jgss.*;
 
 public class nodes {
+	public static final int GRIDFTP_PORT = 2811;
+
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
@@ -119,7 +121,8 @@ public class nodes {
 				})
 		   +		oof.table_row(new Object[][] {
 		   				new Object[] { "class", "subhdr", "value", "Host" },
-		   				new Object[] { "class", "subhdr", "value", "Status" },
+		   				new Object[] { "class", "subhdr", "value", "GRAM" },
+		   				new Object[] { "class", "subhdr", "value", "GridFTP" },
 		   				new Object[] { "class", "subhdr", "value", "Remove" }
 		   			});
 
@@ -136,12 +139,13 @@ public class nodes {
 
 			boolean fup = true;
 			try {
-				GridFTP ftp;
-				ftp = new GridFTP(p.getGridInt().getGSS().getGSSCredential(), host, 2811);
+				GSSAuth gss = p.getGridInt().getGSS();
+				GridFTP ftp = new GridFTP(gss.getGSSCredential(),
+				  host, GRIDFTP_PORT);
 			} catch (Exception e) {
 				fup = false;
 			}
-			
+
 			String path = p.getWebRoot() + "/img/";
 
 			String cl = p.genClass();
@@ -150,10 +154,12 @@ public class nodes {
 						new Object[] { "class", cl, "style", "text-align: center",
 							"value", oof.img(new Object[] {
 								"src", path + (up ? "on.png" : "off.png"),
-								"alt", (up ? "[up]" : "[down]")}) + "GRAM&nbsp&nbsp&nbsp" + //XXX - this is gross, table? 
-									oof.img(new Object[] {
+								"alt", (up ? "[up]" : "[down]")})
+						},
+						new Object[] { "class", cl, "style", "text-align: center",
+							"value", oof.img(new Object[] {
 								"src", path + (fup ? "on.png" : "off.png"),
-								"alt", (fup ? "[up]" : "[down]")}) + "GridFTP"
+								"alt", (fup ? "[up]" : "[down]")})
 						},
 						new Object[] { "class", cl, "value", oof.input(new Object[] {
 								"type", "checkbox",
@@ -166,7 +172,7 @@ public class nodes {
 			s += 	oof.table_row(new Object [][] {
 						new Object[] {
 							"class", "data1",
-							"colspan", "3",
+							"colspan", "4",
 							"value", "You do not have any hosts configured at this time."
 						}
 					 });
@@ -174,7 +180,7 @@ public class nodes {
 			s += 	oof.table_row(new Object [][] {
 						new Object[] {
 							"class", "tblftr",
-							"colspan", "3",
+							"colspan", "4",
 							"value", "" +
 								oof.input(new Object[] {
 									"type", "hidden",

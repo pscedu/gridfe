@@ -73,6 +73,40 @@ public class browser {
 			params[j++] = action;
 		}
 
+		/* Grab the GridInt and make the GridFTP connection */
+		GridFTP lgftp = null, rgftp = null;
+		GridInt gi = p.getGridInt();
+		if (!lhost.equals("")) {
+			try {
+				lgftp = new GridFTP(gi.getGSS().getGSSCredential(),
+				  lhost, GRIDFTP_PORT);
+			} catch (Exception e) {
+			}
+
+			if (!lcwd.equals("")) {
+				try {
+					lgftp.changeDir(lcwd);
+				} catch (Exception e) {
+				}
+			}
+		}
+
+		if (!rhost.equals("")) {
+			try {
+				rgftp = new GridFTP(gi.getGSS().getGSSCredential(),
+				  rhost, GRIDFTP_PORT);
+			} catch (Exception e) {
+			}
+
+			if (!rcwd.equals("")) {
+				try {
+					rgftp.changeDir(rcwd);
+				} catch (Exception e) {
+				}
+			}
+		}
+
+
 		if (action.equals("download")) {
 		}
 
@@ -92,20 +126,27 @@ public class browser {
 					"transfer files between them.  Alternatively, you may " +
 					"connect to only one resource if you wish to transfer " +
 					"files between your local machine and that target resource.")
-			  +  browser.login(p, "lhost", hlist);
+			  +  browser.login(p, "l", params, hlist, lgftp);
 		} else {
-			s += browser.browse(p, "l", lhost, params, lcwd);
+			s += browser.browse(p, "l", lhost, params, lcwd, lgftp);
 		}
 
 		s += oof.hr();
 
 		if (rhost.equals("")) {
-			s += browser.login(p, "rhost", hlist);
+			s += browser.login(p, "r", params, hlist, rgftp);
 		} else {
-			s += browser.browse(p, "r", rhost, params, rcwd);
+			s += browser.browse(p, "r", rhost, params, rcwd, rgftp);
 		}
 		s += p.footer();
 		return (s);
+	}
+
+	public static String getParam(String param, String[] params) {
+		for (int j = 0; j + 1 < params.length; j += 2)
+			if (params[j].equals(param))
+				return (params[j + 1]);
+		return (null);
 	}
 
 	/* Construct a query string (?foo=bar&...). */
@@ -140,20 +181,38 @@ public class browser {
 
 	/*
 	 * Login table for the gridftp structure
-	 * Example: loginTable(oof, lhost, "lhost", ... )
 	 */
-	public static String login(Page p, String hfname, Object[] hlist)
-	  throws Exception {
+	public static String login(Page p, String display, String[] params,
+	  Object[] hlist, GridFTP gftp) throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
 
 		String js_submit =
-			"	var el = this.form.elements[2];		" +
-			"	var bv = 'Please wait...';			" +
-			"	if (el.value != bv) {				" +
-			"		el.value = bv;					" +
-			"		return (true);					" +
-			"	}									";
+			"	var n = this.form.elements.length - 1;	" +
+			"	var el = this.form.elements[n];			" +
+			"	var bv = 'Please wait...';				" +
+			"	if (el.value != bv) {					" +
+			"		el.value = bv;						" +
+			"		return (true);						" +
+			"	}										";
+
+		String extra = "";
+		String other = (display.equals("r") ? "l" : "r");
+		String ohost, ocwd;
+		if ((ohost = getParam(other + "host", params)) != null) {
+			extra += "" + oof.input(new Object[] {
+					"type", "hidden",
+					"name", other + "host",
+					"value", ohost
+				});
+
+			if ((ocwd = getParam(other + "cwd", params)) != null)
+				extra += "" + oof.input(new Object[] {
+						"type", "hidden",
+						"name", other + "cwd",
+						"value", ocwd
+					});
+		}
 
 		/* Form field for logging in */
 		s += oof.form(
@@ -165,15 +224,16 @@ public class browser {
 					"Hostname: " +
 					oof.input(new Object[] {
 						"type", "text",
-						"name", hfname
+						"name", display + "host"
 					}) +
 					oof.input(new Object[] {
 						"type", "select",
-						"onchange", js_hostchg(hfname),
+						"onchange", js_hostchg(display + "host"),
 						"options", hlist
 					}) +
 					oof.p("&raquo; Enter the host name of the resource " +
 					"that you would like to browse over GridFTP.") +
+					extra +
 					oof.input(new Object[] {
 						"type", "submit",
 						"class", "button",
@@ -184,16 +244,9 @@ public class browser {
 	}
 
 	public static String browse(Page p, String display, String hostname,
-	  String[] params, String cwd) throws Exception {
+	  String[] params, String cwd, GridFTP gftp) throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
-
-		/* Grab the GridInt and make the GridFTP connection */
-		GridInt gi = p.getGridInt();
-		GridFTP gftp = new GridFTP(gi.getGSS().getGSSCredential(),
-		  hostname, GRIDFTP_PORT);
-		if (!cwd.equals(""))
-			gftp.changeDir(cwd);
 
 		/* Form field for logging in */
 		s += ""
@@ -219,14 +272,15 @@ public class browser {
 				new Object[] {
 					"class", Page.CCHDR,
 					"value", "Viewing gridftp://" + hostname + gftp.getCurrentDir(),
-					"colspan", "4"
+					"colspan", "5"
 				}
 			})
 		  + oof.table_row(new Object[][] {
 				new Object[] { "class", Page.CCSUBHDR, "value", "Name" },
 				new Object[] { "class", Page.CCSUBHDR, "value", "Size" },
 				new Object[] { "class", Page.CCSUBHDR, "value", "Date" },
-				new Object[] { "class", Page.CCSUBHDR, "value", "Modes" }
+				new Object[] { "class", Page.CCSUBHDR, "value", "Modes" },
+				new Object[] { "class", Page.CCSUBHDR, "value", "" }
 			})
 		/*
 		 * Parse the list and put each file (with size, perm,
@@ -256,7 +310,7 @@ public class browser {
 								"value", "Upload"
 							}),
 						}),
-					"colspan", "4"
+					"colspan", "5"
 				}
 			})
 		  + oof.table_end();
@@ -276,7 +330,7 @@ public class browser {
 
 		String prefix = p.getWebRoot() + "/img/";
 
-		String s = "", qs;
+		String s = "", qs, type;
 		for (int j = 0; j < v.size(); j++) {
 			gf = (GridFile)v.get(j);
 			if (gf.name.equals("."))
@@ -286,8 +340,15 @@ public class browser {
 			String fn = p.escapeHTML(gf.name.length() > MAXFNLEN ?
 			  gf.name.substring(0, MAXFNLEN) + "..." : gf.name) +
 			  (gf.isDirectory() ? "/" : "");
+
+			if (gf.name.equals(".."))
+				type = "parentdir";
+			else if (gf.isDirectory())
+				type = "folder";
+			else
+				type = "file";
 			String img = "" + oof.img(new Object[] {
-				"src", prefix + (gf.isDirectory() ? "folder.png" : "file.png"),
+				"src", prefix + type + ".png",
 				"alt", "[img]",
 				"align", "middle",
 				"border", "0"
@@ -311,8 +372,18 @@ public class browser {
 					"align", "right" },
 				new Object[] { "class", cl, "value",
 					/* XXX: escapeHTML() these? */
-					gf.date + " " + gf.time },
-				new Object[] { "class", cl, "value", gf.perm }
+					gf.date + " " + gf.time,
+					"align", "center" },
+				new Object[] { "class", cl,
+					"value", gf.perm,
+					"align", "center" },
+				new Object[] { "class", cl,
+					"align", "center",
+					"value", "" + oof.input(new Object[] {
+						"type", "checkbox",
+						"name", p.escapeHTML(cwd + "/" + gf.name)
+					})
+				}
 			});
 		}
 		return (s);
@@ -323,6 +394,7 @@ public class browser {
 		int idx = 0;
 
 		double m = (double)n;
+		/* XXX: use log(m, 1024) */
 		while (m > 1024.0) {
 			idx++;
 			m /= 1024.0;
@@ -344,9 +416,10 @@ public class browser {
 			"	this.form.elements['" + host + "'].value =			" +
 			"		(this.options[idx].value == bv) ?				" +
 			"		'' : this.options[idx].value;					" +
-			"	if (this.options[idx].value != bv) {				" +
+			"	if (this.options[idx].value != '') {				" +
 			"		this.form.submit();								" +
-			"		this.form.elements[2].value = 'Please wait...';	" +
+			"		var n = this.form.elements.length - 1;			" +
+			"		this.form.elements[n].value = 'Please wait...';	" +
 			"	}													";
 		return (s);
 	}

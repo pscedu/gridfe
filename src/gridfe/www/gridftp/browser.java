@@ -17,12 +17,14 @@ public class browser {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
+		String emsg = "";
 
 		String lhost = req.getParameter("lhost");
 		String rhost = req.getParameter("rhost");
 		String lcwd = req.getParameter("lcwd");
 		String rcwd = req.getParameter("rcwd");
 		String action = req.getParameter("action");
+		String display = req.getParameter("display");
 
 		if (lhost == null)
 			lhost = "";
@@ -34,19 +36,29 @@ public class browser {
 			rcwd = "";
 		if (action == null)
 			action = "";
+		if (display == null ||
+		    (!display.equals("l") && !display.equals("r")))
+			display = "";
+
+		if (action.equals("Logout")) {
+			if (display.equals("l"))
+				lhost = "";
+			else if (display.equals("r"))
+				rhost = "";
+		}
 
 		int len = 0;
 
-		if (!lhost.equals(""))
+		if (!lhost.equals("")) {
 			len++;
-		if (!rhost.equals(""))
+			if (!lcwd.equals(""))
+				len++;
+		}
+		if (!rhost.equals("")) {
 			len++;
-		if (!lcwd.equals(""))
-			len++;
-		if (!rcwd.equals(""))
-			len++;
-		if (!action.equals(""))
-			len++;
+			if (!rcwd.equals(""))
+				len++;
+		}
 
 		String[] params = new String[2 * len];
 
@@ -55,22 +67,18 @@ public class browser {
 		if (!lhost.equals("")) {
 			params[j++] = "lhost";
 			params[j++] = lhost;
+			if (!lcwd.equals("")) {
+				params[j++] = "lcwd";
+				params[j++] = lcwd;
+			}
 		}
 		if (!rhost.equals("")) {
 			params[j++] = "rhost";
 			params[j++] = rhost;
-		}
-		if (!lcwd.equals("")) {
-			params[j++] = "lcwd";
-			params[j++] = lcwd;
-		}
-		if (!rcwd.equals("")) {
-			params[j++] = "rcwd";
-			params[j++] = rcwd;
-		}
-		if (!action.equals("")) {
-			params[j++] = "action";
-			params[j++] = action;
+			if (!rcwd.equals("")) {
+				params[j++] = "rcwd";
+				params[j++] = rcwd;
+			}
 		}
 
 		/* Grab the GridInt and make the GridFTP connection */
@@ -106,8 +114,27 @@ public class browser {
 			}
 		}
 
-
 		if (action.equals("download")) {
+		} else if (action.equals("Upload")) {
+		} else if (action.equals("Delete Checked")) {
+		} else if (action.equals("Create Directory")) {
+			String dir = req.getParameter("newdir");
+
+			if (dir == null)
+				dir = "";
+			try {
+				if (dir.equals("") || dir.matches("/"))
+					throw new Exception("invalid directory name");
+
+				if (display.equals("l"))
+					lgftp.makeDir(dir);
+				else if (display.equals("r"))
+					rgftp.makeDir(dir);
+			} catch (Exception e) {
+				emsg += "Error while trying to create a new directory: " +
+				  e.getMessage();
+			}
+		} else if (action.equals("Copy Checked To Other Host")) {
 		}
 
 		Object[] hlist = browser.createHostList(p);
@@ -115,6 +142,8 @@ public class browser {
 		String s = "";
 		OOF oof = p.getOOF();
 		s += p.header("GridFTP File Browser");
+		if (!emsg.equals(""))
+			s += oof.p(emsg);
 
 		/*
 		 * Set the content to display -- browser if
@@ -128,7 +157,8 @@ public class browser {
 					"files between your local machine and that target resource.")
 			  +  browser.login(p, "l", params, hlist, lgftp);
 		} else {
-			s += browser.browse(p, "l", lhost, params, lcwd, lgftp);
+			s += browser.browse(p, "l", lhost, params, lcwd,
+			  lgftp, rgftp != null);
 		}
 
 		s += oof.hr();
@@ -136,7 +166,8 @@ public class browser {
 		if (rhost.equals("")) {
 			s += browser.login(p, "r", params, hlist, rgftp);
 		} else {
-			s += browser.browse(p, "r", rhost, params, rcwd, rgftp);
+			s += browser.browse(p, "r", rhost, params, rcwd,
+			  rgftp, lgftp != null);
 		}
 		s += p.footer();
 		return (s);
@@ -244,7 +275,8 @@ public class browser {
 	}
 
 	public static String browse(Page p, String display, String hostname,
-	  String[] params, String cwd, GridFTP gftp) throws Exception {
+	  String[] params, String cwd, GridFTP gftp, boolean oconn)
+	  throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
 
@@ -265,6 +297,25 @@ public class browser {
 						"value", ocwd
 					});
 		}
+
+		String rctl = "";
+		if (oconn)
+			rctl += "" + oof.input(new Object[] {
+					"type", "submit",
+					"class", "button",
+					"name", "action",
+					"value", "Copy Checked To Other Host"
+				});
+
+		String js_toggle =
+		  "	var f = this.form.elements['file'];				" +
+		  "	if (f) {										" +
+		  "		if (f.length)								" +
+		  "			for (var i = 0; i < f.length; i++)		" +
+		  "				f[i].checked = !f[i].checked;		" +
+		  "		else										" +
+		  "			f.checked = !f.checked;					" +
+		  "	}												";
 
 		/* Form field for logging in */
 		s += ""
@@ -310,30 +361,6 @@ public class browser {
 					"class", Page.CCTBLFTR,
 					"colspan", "5",
 					"value", extra +
-					    "Upload file: " +
-						oof.input(new Object[] {
-							"type", "file",
-							"name", "file"
-						}) +
-						oof.input(new Object[] {
-							"type", "submit",
-							"class", "button",
-							"name", "action",
-							"value", "Upload"
-						}) +
-						oof.input(new Object[] {
-							"type", "submit",
-							"class", "button",
-							"name", "action",
-							"value", "Delete Checked"
-						}) +
-						oof.input(new Object[] {
-							"type", "submit",
-							"class", "button",
-							"name", "action",
-							"value", "Logout"
-						}) +
-						oof.br() +
 						"Create directory: " +
 						oof.input(new Object[] {
 							"type", "text",
@@ -345,15 +372,52 @@ public class browser {
 							"name", "action",
 							"value", "Create Directory"
 						}) +
+						oof.br() +
+						oof.input(new Object[] {
+							"type", "button",
+							"class", "button",
+							"value", "Toggle All",
+							"onclick", js_toggle
+						}) +
+						oof.input(new Object[] {
+							"type", "hidden",
+							"name", "display",
+							"value", display
+						}) +
+						rctl +
 						oof.input(new Object[] {
 							"type", "submit",
 							"class", "button",
 							"name", "action",
-							"value", "Copy Checked To Remote Host"
+							"value", "Delete Checked"
+						}) +
+						oof.input(new Object[] {
+							"type", "submit",
+							"class", "button",
+							"name", "action",
+							"value", "Logout"
 						})
 				}
 			})
-		  + oof.table_end();
+		  + oof.table_end()
+		  + oof.form_end()
+		  + oof.form(new Object[] {
+				"action", "browser",
+				"enctype", "multipart/form-data"
+			}, new Object[] {
+			    "Upload file: " +
+				oof.input(new Object[] {
+					"type", "file",
+					"name", "upfile"
+				}) +
+				extra +
+				oof.input(new Object[] {
+					"type", "submit",
+					"class", "button",
+					"name", "action",
+					"value", "Upload"
+				})
+			});
 		 return (s);
 	}
 
@@ -401,7 +465,8 @@ public class browser {
 			else
 				qs = buildQS(p, params, new String[] {
 					"action", "download",
-					"file", gf.name
+					"file", gf.name,
+					"display", display
 				});
 
 			String cbox = "";

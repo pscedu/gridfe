@@ -93,6 +93,7 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 	border-bottom: 1px solid black;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
+	color: #ffffff;
 }
 
 a:link, a:visited {
@@ -112,6 +113,7 @@ input, textarea, select {
 	border: 1px solid black;
 	padding: 1px;
 	margin-right: 1px;
+	margin-bottom: 1px;
 }
 
 option {

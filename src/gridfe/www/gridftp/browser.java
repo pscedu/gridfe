@@ -248,6 +248,24 @@ public class browser {
 		String s = "";
 		OOF oof = p.getOOF();
 
+		String extra = "";
+		String other = (display.equals("r") ? "l" : "r");
+		String ohost, ocwd;
+		if ((ohost = getParam(other + "host", params)) != null) {
+			extra += "" + oof.input(new Object[] {
+					"type", "hidden",
+					"name", other + "host",
+					"value", ohost
+				});
+
+			if ((ocwd = getParam(other + "cwd", params)) != null)
+				extra += "" + oof.input(new Object[] {
+						"type", "hidden",
+						"name", other + "cwd",
+						"value", ocwd
+					});
+		}
+
 		/* Form field for logging in */
 		s += ""
 		  + oof.p("Click on a file to download or a directory to view it's contents.")
@@ -290,27 +308,49 @@ public class browser {
 		  + oof.table_row(new Object[][] {
 				new Object[] {
 					"class", Page.CCTBLFTR,
-					"value", "" + oof.form(new Object[] {
-							"action", "?",
-							"style", "display: inline"
-						}, new Object[] {
-							oof.input(new Object[] {
-								"type", "submit",
-								"class", "button",
-								"value", "Logout"
-							}),
+					"colspan", "5",
+					"value", extra +
+					    "Upload file: " +
+						oof.input(new Object[] {
+							"type", "file",
+							"name", "file"
 						}) +
-						oof.form(new Object[] {
-							"action", "?",
-							"style", "display: inline"
-						}, new Object[] {
-							oof.input(new Object[] {
-								"type", "submit",
-								"class", "button",
-								"value", "Upload"
-							}),
-						}),
-					"colspan", "5"
+						oof.input(new Object[] {
+							"type", "submit",
+							"class", "button",
+							"name", "action",
+							"value", "Upload"
+						}) +
+						oof.input(new Object[] {
+							"type", "submit",
+							"class", "button",
+							"name", "action",
+							"value", "Delete Checked"
+						}) +
+						oof.input(new Object[] {
+							"type", "submit",
+							"class", "button",
+							"name", "action",
+							"value", "Logout"
+						}) +
+						oof.br() +
+						"Create directory: " +
+						oof.input(new Object[] {
+							"type", "text",
+							"name", "newdir"
+						}) +
+						oof.input(new Object[] {
+							"type", "submit",
+							"class", "button",
+							"name", "action",
+							"value", "Create Directory"
+						}) +
+						oof.input(new Object[] {
+							"type", "submit",
+							"class", "button",
+							"name", "action",
+							"value", "Copy Checked To Remote Host"
+						})
 				}
 			})
 		  + oof.table_end();
@@ -364,6 +404,14 @@ public class browser {
 					"file", gf.name
 				});
 
+			String cbox = "";
+			if (!gf.name.equals(".."))
+				cbox = "" + oof.input(new Object[] {
+					"type", "checkbox",
+					"name", "file",
+					"value", p.escapeHTML(cwd + "/" + gf.name)
+				});
+
 			s += "" + oof.table_row(new Object[][] {
 				new Object[] { "class", cl,
 					"value", oof.link(img + " " + fn, qs) },
@@ -373,16 +421,13 @@ public class browser {
 				new Object[] { "class", cl, "value",
 					/* XXX: escapeHTML() these? */
 					gf.date + " " + gf.time,
-					"align", "center" },
+					"style", "text-align: center; white-space: nowrap" },
 				new Object[] { "class", cl,
 					"value", gf.perm,
 					"align", "center" },
 				new Object[] { "class", cl,
 					"align", "center",
-					"value", "" + oof.input(new Object[] {
-						"type", "checkbox",
-						"name", p.escapeHTML(cwd + "/" + gf.name)
-					})
+					"value", cbox
 				}
 			});
 		}

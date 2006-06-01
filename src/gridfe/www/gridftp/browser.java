@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
+import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
 
 public class browser {
@@ -111,6 +112,29 @@ public class browser {
 		if (action.equals("download")) {
 		} else if (action.equals("Upload")) {
 		} else if (action.equals("Delete Checked")) {
+			String[] files = req.getParameterValues("file");
+
+			GridFTP gftp = null;
+			if (display.equals("l"))
+				gftp = lgftp;
+			else if (display.equals("r"))
+				gftp = rgftp;
+			if (gftp != null && files != null && files.length > 0) {
+				for (int k = 0; k < files.length; k++) {
+					try {
+						MlsxEntry mx = gftp.mlst(files[k]);
+						if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
+								gftp.deleteFile(files[k]);
+						else if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_DIR))
+								gftp.deleteDir(files[k]);
+						else
+							throw new Exception("unknown file type");
+					} catch (Exception e) {
+						emsg += "Error while trying to delete " +
+						  files[k] + ": " + e.getMessage();
+					}
+				}
+			}
 		} else if (action.equals("Create Directory")) {
 			String dir = req.getParameter("newdir");
 
@@ -479,7 +503,7 @@ public class browser {
 				cbox = "" + oof.input(new Object[] {
 					"type", "checkbox",
 					"name", "file",
-					"value", p.escapeHTML(cwd + "/" + gf.name)
+					"value", p.escapeHTML(gf.name)
 				});
 
 			s += "" + oof.table_row(new Object[][] {

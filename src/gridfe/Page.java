@@ -275,7 +275,7 @@ public class Page {
 		   +					this.oof.header(new Object[] {
 									"size", "3",
 									"style", "margin-top:0px"
-								}, "<img align=\"middle\" src=\"" + wr + "/img/box.png\" " +
+								}, "<img align=\"absmiddle\" src=\"" + wr + "/img/box.png\" " +
 									"alt=\"\" border=\"0\" />" + title);
 		return (s);
 	}

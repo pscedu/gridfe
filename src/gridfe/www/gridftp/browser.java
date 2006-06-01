@@ -124,9 +124,9 @@ public class browser {
 					try {
 						MlsxEntry mx = gftp.mlst(files[k]);
 						if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
-								gftp.deleteFile(files[k]);
+							gftp.deleteFile(files[k]);
 						else if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_DIR))
-								gftp.deleteDir(files[k]);
+							gftp.deleteDir(files[k]);
 						else
 							throw new Exception("unknown file type");
 					} catch (Exception e) {

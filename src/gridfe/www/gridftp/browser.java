@@ -88,30 +88,24 @@ public class browser {
 			try {
 				lgftp = new GridFTP(gi.getGSS().getGSSCredential(),
 				  lhost, GRIDFTP_PORT);
+				if (!lcwd.equals(""))
+					lgftp.changeDir(lcwd);
 			} catch (Exception e) {
 			}
-
-			if (!lcwd.equals("")) {
-				try {
-					lgftp.changeDir(lcwd);
-				} catch (Exception e) {
-				}
-			}
+			if (lgftp != null && !lcwd.equals(""))
+				lcwd = lgftp.getCurrentDir();
 		}
 
 		if (!rhost.equals("")) {
 			try {
 				rgftp = new GridFTP(gi.getGSS().getGSSCredential(),
 				  rhost, GRIDFTP_PORT);
+				if (!rcwd.equals(""))
+					rgftp.changeDir(rcwd);
 			} catch (Exception e) {
 			}
-
-			if (!rcwd.equals("")) {
-				try {
-					rgftp.changeDir(rcwd);
-				} catch (Exception e) {
-				}
-			}
+			if (rgftp != null && !rcwd.equals(""))
+				rcwd = rgftp.getCurrentDir();
 		}
 
 		if (action.equals("download")) {
@@ -280,7 +274,18 @@ public class browser {
 		String s = "";
 		OOF oof = p.getOOF();
 
-		String extra = "";
+		String extra = "" + oof.input(new Object[] {
+				"type", "hidden",
+				"name", display + "host",
+				"value", hostname
+			});
+		if (cwd != null)
+			extra += "" + oof.input(new Object[] {
+					"type", "hidden",
+					"name", display + "cwd",
+					"value", cwd
+				});
+
 		String other = (display.equals("r") ? "l" : "r");
 		String ohost, ocwd;
 		if ((ohost = getParam(other + "host", params)) != null) {
@@ -454,7 +459,7 @@ public class browser {
 			String img = "" + oof.img(new Object[] {
 				"src", prefix + type + ".png",
 				"alt", "[img]",
-				"align", "middle",
+				"align", "absmiddle",
 				"border", "0"
 			});
 

@@ -102,6 +102,10 @@ public class Page {
 		return (this.uid);
 	}
 
+	public String getUserName() {
+		return this.kuid;
+	}
+
 	private String getGIPath() {
 		return ("/tmp/gridfe.gi_" + this.kuid);
 	}

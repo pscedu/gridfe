@@ -11,7 +11,7 @@ import java.util.*;
 public class suite {
 	public static void main(String[] args)
 	    throws Exception {
-	    	String thost = "gt4-submit.psc.teragrid.org/jobmanager-lemieux-pbs";
+		String thost = "gridfe.psc.edu";
 	    	String stdout_dir = "gram_jobs";
 
 		GridInt gi = new GridInt(BasicServices.getUserID(), GridInt.GIF_REGCERT);

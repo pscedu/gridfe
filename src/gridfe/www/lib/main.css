@@ -113,7 +113,7 @@ input, textarea, select {
 	border: 1px solid black;
 	padding: 1px;
 	margin-right: 1px;
-	margin-bottom: 1px;
+	margin-top: 1px;
 }
 
 option {
@@ -154,4 +154,9 @@ form {
 
 .monodata1 a, .monodata2 a {
 	text-decoration: none;
+}
+
+hr {
+	border: 0px;
+	border-top: 1px solid #336699;
 }

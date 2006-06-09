@@ -17,7 +17,6 @@ public class submit {
 
 		String label = req.getParameter("label");
 		String host = req.getParameter("host");
-		String localexec = req.getParameter("localexec");
 		String remoteexec = req.getParameter("remoteexec");
 		String args = req.getParameter("args");
 		String dir = req.getParameter("dir");
@@ -29,8 +28,6 @@ public class submit {
 			label = "";
 		if (host == null)
 			host = "";
-		if (localexec == null)
-			localexec = "";
 		if (remoteexec == null)
 			remoteexec = "";
 		if (args == null)
@@ -45,8 +42,7 @@ public class submit {
 			mpi = "";
 
 		if (req.getParameter("submitted") != null) {
-			if (host.equals("") || label.equals("") ||
-			  (remoteexec.equals("") && localexec.equals("")))
+			if (host.equals("") || label.equals("") || remoteexec.equals(""))
 				errmsg = "Please specify all required form fields.";
 			if (errmsg == null) {
 				GridJob j = new GridJob(host);
@@ -244,25 +240,16 @@ public class submit {
 							new Object[][] {
 								new Object[] {
 									"class", Page.CCDESC,
-									"value", "Executable program:"
+									"value", "Remote executable program:"
 								},
 								new Object[] {
 									"class", p.genClass(),
-									"value", "Choose a local program: " +
-										oof.input(new Object[] {
-											"type", "file",
-											"name", "localexec"
-										}) +
-										oof.br() +
-										"Or enter remote program path: " +
+									"value",
 										oof.input(new Object[] {
 											"type", "text",
 											"value", p.escapeHTML(remoteexec),
 											"name", "remoteexec"
 										})
-/*
-										[x] Relative to my home directory
-*/
 								}
 							},
 							new Object[][] {
@@ -346,11 +333,6 @@ public class submit {
 										oof.br() +
 										"Leaving this field blank will result in no output " +
 										"being saved."
-/*
-										checkbox
-										[x] Download to local machine?
-										[x] Display output on retrieval page.
-*/
 								}
 							},
 							new Object[][] {
@@ -375,11 +357,6 @@ public class submit {
 										oof.br() +
 										"Leaving this field blank will result in no output " +
 										"being saved."
-/*
-										checkbox
-										[x] Download to local machine?
-										[x] Display output on retrieval page.
-*/
 								}
 							},
 							new Object[][] {

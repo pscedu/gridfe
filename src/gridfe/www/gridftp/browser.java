@@ -153,6 +153,43 @@ public class browser {
 				  e.getMessage();
 			}
 		} else if (action.equals("Copy Checked To Other Host")) {
+			String shost = null, dhost = null, scwd = null, dcwd = null;
+			GridFTP sgftp = null, dgftp = null;
+
+			if (display.equals("l")) {
+				shost = lhost;
+				dhost = rhost;
+				scwd = lcwd;
+				dcwd = rcwd;
+				sgftp = lgftp;
+				dgftp = rgftp;
+			} else if (display.equals("r")) {
+				shost = rhost;
+				dhost = lhost;
+				scwd = rcwd;
+				dcwd = lcwd;
+				sgftp = rgftp;
+				dgftp = lgftp;
+			}
+
+			String[] files = req.getParameterValues("file");
+
+			try  {
+				if (shost == null || files == null || files.length == 0)
+					throw new Exception("no files specified");
+				for (int k = 0; k < files.length; k++) {
+					if (files[k].equals(".") || files[k].equals(".."))
+						continue;
+					MlsxEntry mx = sgftp.mlst(files[k]);
+					if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
+						continue;
+					GridFTP.urlCopy(gi.getGSS().getGSSCredential(),
+					  shost, dhost, scwd + "/" + files[k], dcwd + "/" + files[k]);
+				}
+			} catch (Exception e) {
+				emsg += "Error while trying to transfer files: " +
+				  e.getMessage();
+			}
 		}
 
 		Object[] hlist = browser.createHostList(p);

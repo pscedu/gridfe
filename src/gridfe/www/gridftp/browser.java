@@ -93,7 +93,7 @@ public class browser {
 					lgftp.changeDir(lcwd);
 			} catch (Exception e) {
 			}
-			if (lgftp != null && !lcwd.equals(""))
+			if (lgftp != null)
 				lcwd = lgftp.getCurrentDir();
 		}
 
@@ -105,7 +105,7 @@ public class browser {
 					rgftp.changeDir(rcwd);
 			} catch (Exception e) {
 			}
-			if (rgftp != null && !rcwd.equals(""))
+			if (rgftp != null)
 				rcwd = rgftp.getCurrentDir();
 		}
 
@@ -175,7 +175,8 @@ public class browser {
 			String[] files = req.getParameterValues("file");
 
 			try  {
-				if (shost == null || files == null || files.length == 0)
+				if (sgftp == null || dgftp == null ||
+				  files == null || files.length == 0)
 					throw new Exception("no files specified");
 				for (int k = 0; k < files.length; k++) {
 					if (files[k].equals(".") || files[k].equals(".."))

@@ -1,35 +1,35 @@
 $Id$
 
-How to setup GridFE under Tomcat
-================================
+Configuration Tomcat for GridFE
+===============================
 
 Overview
 ========
 
-There are several ways to setup Tomcat to serve GridFE, an ability that
-most servlets support:
+There are two ways to setup Tomcat to serve GridFE:
 
 (1) Tomcat runs standalone.  Under this mode, Tomcat listens on a
     port that Web browsers connect to directly.
 (2) Apache delegates special requests to Tomcat.  Apache must be
-    be configured to acknowledge such requests, and is done so through
-    a "connector."
+    be configured to acknowledge such requests, which is enabled through
+    the use of a "connector."
 
 Tomcat must be made known of the GridFE root, which is done so through
-a "context" (and must be so, else it would only work in standalone
-mode).
+a "context".
 
-File					Edit	Description
+File					Edit?	Description
 ===============================================================================
+/etc/tomcat/server.xml			Yes	Server-related configuration
+/etc/tomcat/tomcat5.conf		Yes	System-related configuration
 /etc/tomcat/web.xml				Web-related configuration
-/etc/tomcat/server.xml			*	Server-related configuration
-/etc/sysconfig/tomcat				System-related configuration
-/etc/init.d/tomcat				Tomcat execution control
+/etc/tomcat/workers2.properties		Yes	Tomcat connector configuration
 /usr/share/tomcat				Tomcat general home
 /var/www/gridfe					GridFE base
-/var/www/gridfe/WEB-INF/web.xml		*	GridFE servlet configuration
-/var/lib/tomcat					Tomcat Web home
-/etc/httpd/conf/workers2.properties	*	Tomcat connector configuration
+/var/www/gridfe/WEB-INF/web.xml		Yes	GridFE servlet configuration
+
+Since GridFE requires many Java packages which currently do not work with
+GNU Java, Sun Java must be installed at tomcat5.conf must be adjusted to
+force Tomcat to use Sun Java.
 
 Details
 =======
@@ -40,7 +40,7 @@ under Apache, Apache can handle SSL duties and let Tomcat and the applications
 it hosts worry about something other than SSL encryption/decryption.
 
 To configure the Tomcat servlet runner service through Apache, add the
-following to /etc/httpd/conf/workers2.properties:
+following to workers2.properties:
 
 	========================================================================
 	[uri:/gridfe]
@@ -52,38 +52,36 @@ following to /etc/httpd/conf/workers2.properties:
 	info=Map all of GridFE
 	========================================================================
 
-Next, configure Tomcat to acknowledge GridFE, specified in
-/etc/tomcat/server.xml:
+Next, configure Tomcat to serve GridFE, specified in server.xml:
 
 	========================================================================
-	<Context path="/gridfe" docBase="gridfe" debug="0" reloadable="true"
-	 crossContext="true">
-	  <Logger className="com.redhat.tomcat.Logger" filename="gridfe.log"
-	   timestamp="true"/>
+	<Context path="/gridfe" docBase="gridfe" debug="0" reloadable="false"
+	 crossContext="true" allowLinking="true">
+	  <Logger className="org.apache.catalina.logger.FileLogger"
+	   prefix="gridfe." suffix=".log" timestamp="true" />
+	  <Resources className="org.apache.naming.resources.FileDirContext"
+	   allowLinking="true" />
 	</Context>
 	========================================================================
 
-Since this will be inside the encompassing <Host> element, the `docBase' will
-be relative to `Host appBase', so a symbolic link (or something) must be
-created to point from the appBase to the real GridFE root location.
+Since this must be in an encompassing <Host> block, the `docBase' will
+be relative to `Host appBase', so a symbolic link (or the actual GridFE
+deployment) must be created to point from the appBase to the real GridFE
+root location:
+
+	# ln -s /var/www/gridfe /usr/share/tomcat
 
 Apache Configuration
 ====================
-The mod_jk2 Apache module must be activated.  This provides the communication
-between Apache and Tomcat, using the configuration specified worker2.properties.
+The mod_jk2 Apache module must be activated, which will read
+worker2.properties to set up the necessary Tomcat connectors.
 
-Sample Apache configuration to require SSL for GridFE for encrypted
-communication:
+	================================================================
+	LoadModule jk2_module modules/mod_jk2.so
+	================================================================
 
-LoadModule fum_module modules/mod_fum.so
-LoadModule jk2_module modules/mod_jk2.so
-
-<Location "/gridfe/gridfe">
-        AuthName "GridFE Login"
-        AuthType Fum
-        Require valid-user
-        SSLRequireSSL
-</Location>
+Consult doc/mod_fum.txt for instructions on installing/configuration
+mod_fum with Apache.
 
 Site Layout and Installation
 ============================

@@ -240,29 +240,26 @@ public class browser {
 		if (!emsg.equals(""))
 			s += oof.p(emsg);
 
-		w.print(s);
-
 		/*
 		 * Set the content to display -- browser if
 		 * connected, otherwise login table.
 		 */
 		if (lhost.equals(""))
-			s = oof.p("This GridFTP interface allows you to browse two " +
+			s += oof.p("This GridFTP interface allows you to browse two " +
 					"resources simultaneously and provides the ability to " +
 					"transfer files between them.  Alternatively, you may " +
 					"connect to only one resource if you wish to transfer " +
 					"files between your local machine and that target resource.")
 			  +  login(p, "l", params, hlist, lgftp);
 		else
-			s = browse(p, "l", lhost, params, lcwd, lgftp, rgftp != null);
+			s += browse(p, "l", lhost, params, lcwd, lgftp, rgftp != null);
 
 		s += oof.hr();
-		w.print(s);
 
 		if (rhost.equals(""))
-			s = login(p, "r", params, hlist, rgftp);
+			s += login(p, "r", params, hlist, rgftp);
 		else
-			s = browse(p, "r", rhost, params, rcwd, rgftp, lgftp != null);
+			s += browse(p, "r", rhost, params, rcwd, rgftp, lgftp != null);
 		s += p.footer();
 		return (s);
 	}

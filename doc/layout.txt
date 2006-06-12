@@ -1,16 +1,20 @@
 $Id$
 
 /doc				Documentation.
+/www				Non-interactive Web root.
 /lib				Library routines.
 /lib/mk				make(1) routines.
+/share/sql			SQL routines for database setup.
 /src				Main source code.
 /src/gridfe			Main backend/GridFE code.
 /src/gridfe/gridint		Grid internals.
 /src/gridfe/grinint/auth	Grid authentication internals.
-/src/gridfe/www			Web-accessible content.
+/src/gridfe/www			Web-accessible classes.
+/src/gridfe/www/gridftp		Grid internals.
+/src/gridfe/www/jobs		Grid internals.
 /src/jasp			JASP (Java Application Suite for Programming).
+/src/oof			OOF (Object Output Formatting).
 /src/oof/element		OOF elements.
 /src/oof/filter			OOF filters.
-/src/oof			OOF (Object Output Formatting).
 /tools/jdep			Java dependency builder.
 /tools/mod_fum			mod_fum KX509 Apache module.

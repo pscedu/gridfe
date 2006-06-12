@@ -5,30 +5,27 @@ Robert Budden, Jared Yanovich
 
 Below are our proposed specifications for a grid-savvy Web portal.
 The purpose of this portal will be to allow grid users to login and
-perform all the commonly used features of the globus toolkit from any
-Internet connected computer.  This portal will be designed primarily
-so that minimal knowledge of technical detail is required.  This will
-be accomplished through a powerful, yet simplistic graphical interface.
+perform all the commonly used features of the Globus toolkit from
+anywhere on the Internet.  This portal will be designed primarily
+so that minimal knowledge of technical detail on behalf of the grid
+user is required.  This will be accomplished through a powerful yet
+simplistic graphical Web interface.
 
-List of technologies used:
-	1) Programming languages: Java, C, HTML
-	2) Database option: MySQL
+Code will be written in Java, C, HTML.
 
-List of proposed portal features:
-	1) Logins – handle the login of users through a clean and
-	   concise Web interface
-	2) Certificate and proxy management – handle grid
-	   authentication
-	3) Status – current status of jobs and list of previously
-	   completed jobs
-	4) Run job – interface to globus-job-run(1)
-	5) Schedule job – interface to globus-job-submit(1)
-	6) Collect job output – interface to globus-job-get-output(1)
-	7) Maintenance – allow maintenance of grid-mapfile including
-	   addition & deletion of entries, and consistency checks.
-	8) Machine status – view a list of machines/nodes currently
-	   on the grid and their current status
-	9) Daemon/service status – view of what services are currently
-	   running (MDS, GRAM, GridFTP, etc...)
-	10) Possible side portal for advanced administration of the
-	    above
+GridFE will require database capabilities for storage through any
+JDBC-enabled RDBMS, such as MySQL.
+
+Feature		Description					Status
+========================================================================
+Login		Authenticate users to the grid			Complete
+Certificate mgt	Provide authentication details/abilities	Complete
+Job status	List of current/previously completed jobs	Complete
+Submit job	Interface to globus-job-submit/run(1)		Complete
+ - Schedule job
+Collect output	Interface to globus-job-get-output(1)		Complete
+DN Maintenance	Maintain grid-mapfile: add/delete DNs
+Resource status	Grid resource/service and status list		Complete
+
+Possible side portal for advanced administration of the
+above

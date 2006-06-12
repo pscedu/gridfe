@@ -92,6 +92,8 @@ public class browser {
 				if (!lcwd.equals(""))
 					lgftp.changeDir(lcwd);
 			} catch (Exception e) {
+				emsg += "Error connecting to " +
+				  p.escapeHTML(lhost) + ": " + e.getMessage();
 			}
 			if (lgftp != null)
 				lcwd = lgftp.getCurrentDir();
@@ -104,12 +106,49 @@ public class browser {
 				if (!rcwd.equals(""))
 					rgftp.changeDir(rcwd);
 			} catch (Exception e) {
+				emsg += "Error connecting to " +
+				  p.escapeHTML(rhost) + ": " + e.getMessage();
 			}
 			if (rgftp != null)
 				rcwd = rgftp.getCurrentDir();
 		}
 
 		if (action.equals("download")) {
+			String file = req.getParameter("file");
+			String cwd = null;
+			GridFTP gftp = null;
+
+			if (display.equals("l")) {
+				gftp = lgftp;
+				cwd = lcwd;
+			} else if (display.equals("r")) {
+				gftp = rgftp;
+				cwd = rcwd;
+			}
+
+			try {
+				if (gftp == null)
+					throw new Exception("not connected to host");
+
+				File tmpf = File.createTempFile("gridfe.dl", null);
+				gftp.get(cwd + "/" + file, tmpf);
+
+				p.getResponse().setContentType("application/octet-stream");
+				p.getResponse().setHeader("Content-disposition",
+				    "attachment; filename=\"" +
+					p.getJASP().escapeAttachName(file) + "\"");
+
+				BufferedReader r = new BufferedReader(new FileReader(tmpf));
+				PrintWriter w = p.getResponse().getWriter();
+				int c;
+				while ((c = r.read()) != -1)
+					w.write(c);
+
+				return ("");
+			} catch (Exception e) {
+				emsg += "Error while trying to fetch " +
+				  p.escapeHTML(file) + ": " + e.getMessage();
+			}
 		} else if (action.equals("Upload")) {
 		} else if (action.equals("Delete Checked")) {
 			String[] files = req.getParameterValues("file");
@@ -131,7 +170,7 @@ public class browser {
 							throw new Exception("unknown file type");
 					} catch (Exception e) {
 						emsg += "Error while trying to delete " +
-						  files[k] + ": " + e.getMessage();
+						  p.escapeHTML(files[k]) + ": " + e.getMessage();
 					}
 				}
 			}

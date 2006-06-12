@@ -18,6 +18,7 @@ public class browser {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
+		PrintWriter w = p.getResponse().getWriter();
 		String emsg = "";
 
 		String lhost = req.getParameter("lhost");
@@ -139,7 +140,6 @@ public class browser {
 					p.getJASP().escapeAttachName(file) + "\"");
 
 				BufferedReader r = new BufferedReader(new FileReader(tmpf));
-				PrintWriter w = p.getResponse().getWriter();
 				int c;
 				while ((c = r.read()) != -1)
 					w.write(c);
@@ -240,30 +240,29 @@ public class browser {
 		if (!emsg.equals(""))
 			s += oof.p(emsg);
 
+		w.print(s);
+
 		/*
 		 * Set the content to display -- browser if
 		 * connected, otherwise login table.
 		 */
-		if (lhost.equals("")) {
-			s += oof.p("This GridFTP interface allows you to browse two " +
+		if (lhost.equals(""))
+			s = oof.p("This GridFTP interface allows you to browse two " +
 					"resources simultaneously and provides the ability to " +
 					"transfer files between them.  Alternatively, you may " +
 					"connect to only one resource if you wish to transfer " +
 					"files between your local machine and that target resource.")
-			  +  browser.login(p, "l", params, hlist, lgftp);
-		} else {
-			s += browser.browse(p, "l", lhost, params, lcwd,
-			  lgftp, rgftp != null);
-		}
+			  +  login(p, "l", params, hlist, lgftp);
+		else
+			s = browse(p, "l", lhost, params, lcwd, lgftp, rgftp != null);
 
 		s += oof.hr();
+		w.print(s);
 
-		if (rhost.equals("")) {
-			s += browser.login(p, "r", params, hlist, rgftp);
-		} else {
-			s += browser.browse(p, "r", rhost, params, rcwd,
-			  rgftp, lgftp != null);
-		}
+		if (rhost.equals(""))
+			s = login(p, "r", params, hlist, rgftp);
+		else
+			s = browse(p, "r", rhost, params, rcwd, rgftp, lgftp != null);
 		s += p.footer();
 		return (s);
 	}

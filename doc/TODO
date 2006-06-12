@@ -1,23 +1,23 @@
 $Id$
 
-Add configuration to apache to not permit SSLv2... should be
-the command "SSLProtocol all -SSLv2" but figure out where it goes
-(this should be a real quick fix)
+Add configuration to Apache to not permit SSLv2.
+	- should be the command "SSLProtocol all -SSLv2" but figure
+	  out where it goes (this should be a real quick fix)
 
 Add timestamp to submitted jobs.
 
 Add example suite and show equivalent of "globus-job-run" commands
-for a variety of examples
+for a variety of examples.
 
 Job submit:
 	- load RSL
-	- local binary
-	- save list of previous commands run by user
+	- local binary/staging
 
 overview/index page
-where to go for what to do (tutorial pages)
+- where to go for what to do (tutorial pages)
 
 move to jmk (java make) or even ant
+
 move MKDEP from defs.mk to local.mk
 
 job get output both stdout and stderr, not just stdout

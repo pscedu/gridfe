@@ -2,14 +2,16 @@ $Id$
 
 About mod_fum
 =============
-mod_fum (functional user Machiavellianism between Apache/Kerberos/KX509)
-was specifically designed for use with Grid Portal software.  The
-purpose was to provide the functionality of the command line tools
-kinit(1), kx509(1), and kxlist(1) from within Apache.  mod_fum obtains a
-Kerberos ticket along with a short term X.509 certificate for the user.
-These credentials are specific to the user but readable only by Apache
-(or whomever the Apache Web server runs as).  This allows Web
-applications such as portals to act on the user's behalf.
+mod_fum ("functional user Machiavellianism", for Apache/Kerberos/KX509
+integration) was specifically designed for use with grid portal software.
+The purpose was to provide the functionality of the command line tools
+kinit(1), kx509(1), and kxlist(1) from within Apache.
+
+mod_fum obtains a Kerberos ticket along with a short term X.509
+certificate for the authenticating user.  These credentials are
+specific to the user but readable only by Apache (or whomever the Apache
+Web server runs as).  This allows Web applications such as portals to
+act on the user's behalf.
 
 Note: mod_fum should only be used in conjunction with mod_ssl!
 Otherwise Kerberos passwords will be transmitted in cleartext.
@@ -35,19 +37,21 @@ Requirements:
 
 Building mod_fum:
 =================
-Standard 'make/make install' combo.
+  Standard 'make/make install' combo.
 
 Apache Configuration:
 =====================
-1) Add the following to the <Directory> tags in 'httpd.conf' file
-to enable mod_fum-style authentication:
+  1) Add the following to httpd.conf to enable fum-style authentication:
 
 	# mod_fum Authentication Requirements
 	AuthName "GridFe Login"
-	AuthType Basic
+	AuthType Fum
 	SetHandler mod_fum_auth
 	Require Valid-User
 
 	# Use this for mod_ssl support (recommended)
 	SSLRequireSSL
 	SSLProtocol all -SSLv2
+
+      For GridFE, this chunk is added in the <Directory> or <Location>
+      GridFE Apache configuration block.

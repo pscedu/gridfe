@@ -23,6 +23,7 @@ public class submit {
 		String stdout = req.getParameter("stdout");
 		String stderr = req.getParameter("stderr");
 		String mpi = req.getParameter("mpi");
+		String queue = req.getParameter("queue");
 
 		if (label == null)
 			label = "";
@@ -40,6 +41,8 @@ public class submit {
 			stderr = "";
 		if (mpi == null)
 			mpi = "";
+		if(queue == null)
+			queue = "";
 
 		if (req.getParameter("submitted") != null) {
 			if (host.equals("") || label.equals("") || remoteexec.equals(""))
@@ -59,6 +62,8 @@ public class submit {
 				if (!args.equals(""))
 					n++;
 				if (!mpi.equals(""))
+					n++;
+				if(!queue.equals(""))
 					n++;
 				String[] r_keys = new String[n];
 				String[] r_vals = new String[n];
@@ -89,6 +94,11 @@ public class submit {
 				if (!mpi.equals("")) {
 					r_keys[n] = "jobtype";
 					r_vals[n] = "mpi";
+					n++;
+				}
+				if (!queue.equals("")) {
+					r_keys[n] = "queue";
+					r_vals[n] = queue;
 					n++;
 				}
 				j.setRSL(r_keys, r_vals);
@@ -235,6 +245,24 @@ public class submit {
 										"right, which may be done through the " +
 										oof.link("Node Availability", p.buildURL("/nodes")) +
 										" page."
+								}
+							},
+							new Object[][] {
+								new Object[] {
+									"class", Page.CCDESC,
+									"value", "Target queue:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "text",
+											"value", p.escapeHTML(queue),
+											"name", "queue"
+										}) +
+										oof.br() +
+										"&raquo; This field should contain the queue name " +
+										"on the target machine on which you wish to submit."
 								}
 							},
 							new Object[][] {

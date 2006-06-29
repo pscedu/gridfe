@@ -3,8 +3,9 @@
 package gridfe.www;
 
 import gridfe.*;
-import gridfe.gridint.auth.*;
 import gridfe.gridint.*;
+import gridfe.gridint.auth.*;
+import java.io.*;
 import java.sql.*;
 import javax.servlet.http.*;
 import oof.*;
@@ -133,6 +134,10 @@ public class nodes {
 		   				new Object[] { "class", "subhdr", "value", "Remove" }
 		   			});
 
+		PrintWriter w = p.getResponse().getWriter();
+		w.print(s);
+		s = "";
+
 		int i = 0;
 		for (; rs.next(); i++) {
 			String host = rs.getString("host");
@@ -157,7 +162,7 @@ public class nodes {
 			String path = p.getWebRoot() + "/img/";
 
 			String cl = p.genClass();
-			s += 	oof.table_row(new Object[][] {
+			s = oof.table_row(new Object[][] {
 						new Object[] { "class", cl, "value", p.escapeHTML(host) },
 						new Object[] { "class", cl, "value", type },
 						new Object[] { "class", cl, "style", "text-align: center",
@@ -176,6 +181,7 @@ public class nodes {
 								"value", p.escapeHTML(rs.getString("host"))
 							}) }
 					 });
+			w.print(s);
 		}
 		if (i == 0)
 			s += 	oof.table_row(new Object [][] {
@@ -217,10 +223,10 @@ public class nodes {
 		   			"type", "select",
 					"name", "type",
 					"options", new Object[] {
-						"other", "Other"
+						"other", "Other",
 						"archiver", "Archiver",
 						"gridftp", "GridFTP",
-						"scratch", "Scratch",
+						"scratch", "Scratch"
 					}
 				})
 		   +	oof.input(new Object[] {

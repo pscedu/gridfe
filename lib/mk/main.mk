@@ -82,3 +82,6 @@ clean:
 			echo "<=== ${DIRPREFIX}" | sed 's!/$$!!';		\
 		fi;								\
 	done
+
+restart: all
+	service tomcat5 restart

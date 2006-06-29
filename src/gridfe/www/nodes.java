@@ -36,26 +36,32 @@ public class nodes {
 		String s = "", emsg = "";
 
 		String host = req.getParameter("host");
+		String type = req.getParameter("type");
 
 		if (host == null || host.equals(""))
-			emsg += " Please specify a host to add.";
+			emsg += " Please specify a resource to add.";
+		else if (type == null ||
+		  (!type.equals("archiver") && !type.equals("gridftp") &&
+		   !type.equals("scratch") && !type.equals("other")))
+			emsg += " Please specify a resource type.";
 		else {
 			PreparedStatement sth = p.getDBH().prepareStatement(
 				"	INSERT INTO hosts (		" +
-				"		uid, host			" +
+				"		uid, host, type		" +
 				"	) VALUES (				" +
-				"		?, ?				" +
+				"		?, ?, ?				" +
 				"	)						");
 			sth.setInt(1, p.getUID());
 			sth.setString(2, host);
+			sth.setString(3, type);
 			int nrows = sth.executeUpdate();
 
 			if (nrows != 1)
-				emsg += " The host could not be added to the system.";
+				emsg += " The resource could not be added to the system.";
 
 			if (emsg.equals("")) {
 				s += p.header("Host Added")
-				   + oof.p("The host " + p.escapeHTML(host) +
+				   + oof.p("The resource " + p.escapeHTML(host) +
 						" has been successfully added.")
 				   + p.footer();
 				return (s);
@@ -87,8 +93,8 @@ public class nodes {
 		sth.setString(2, host);
 		sth.execute();
 
-		s += p.header("Hosts Removed")
-		   + oof.p("Hosts removed successfully.")
+		s += p.header("Resources Removed")
+		   + oof.p("Resources removed successfully.")
 		   + p.footer();
 		return (s);
 	}
@@ -120,7 +126,8 @@ public class nodes {
 					"cellpadding", "0"
 				})
 		   +		oof.table_row(new Object[][] {
-		   				new Object[] { "class", "subhdr", "value", "Host" },
+		   				new Object[] { "class", "subhdr", "value", "Resource" },
+		   				new Object[] { "class", "subhdr", "value", "Type" },
 		   				new Object[] { "class", "subhdr", "value", "GRAM" },
 		   				new Object[] { "class", "subhdr", "value", "GridFTP" },
 		   				new Object[] { "class", "subhdr", "value", "Remove" }
@@ -129,6 +136,7 @@ public class nodes {
 		int i = 0;
 		for (; rs.next(); i++) {
 			String host = rs.getString("host");
+			String type = rs.getString("type");
 
 			boolean up = true;
 			try {
@@ -151,6 +159,7 @@ public class nodes {
 			String cl = p.genClass();
 			s += 	oof.table_row(new Object[][] {
 						new Object[] { "class", cl, "value", p.escapeHTML(host) },
+						new Object[] { "class", cl, "value", type },
 						new Object[] { "class", cl, "style", "text-align: center",
 							"value", oof.img(new Object[] {
 								"src", path + (up ? "on.png" : "off.png"),
@@ -172,15 +181,15 @@ public class nodes {
 			s += 	oof.table_row(new Object [][] {
 						new Object[] {
 							"class", "data1",
-							"colspan", "4",
-							"value", "You do not have any hosts configured at this time."
+							"colspan", "5",
+							"value", "You do not have any resources configured at this time."
 						}
 					 });
 		else
 			s += 	oof.table_row(new Object [][] {
 						new Object[] {
 							"class", "tblftr",
-							"colspan", "4",
+							"colspan", "5",
 							"value", "" +
 								oof.input(new Object[] {
 									"type", "hidden",
@@ -199,10 +208,31 @@ public class nodes {
 		   + oof.form_end()
 		   + oof.br()
 		   + oof.form_start(new Object[] { })
-		   +	"Add a new host: "
-		   +	oof.input(new Object[] { "type", "text", "name", "host" })
-		   +	oof.input(new Object[] { "type", "hidden", "name", "action", "value", "add" })
-		   +	oof.input(new Object[] { "type", "submit", "class", "button", "value", "Add Host" })
+		   +	"Add a new resource: "
+		   +	oof.input(new Object[] {
+		   			"type", "text",
+					"name", "host"
+				})
+		   +	oof.input(new Object[] {
+		   			"type", "select",
+					"name", "type",
+					"options", new Object[] {
+						"other", "Other"
+						"archiver", "Archiver",
+						"gridftp", "GridFTP",
+						"scratch", "Scratch",
+					}
+				})
+		   +	oof.input(new Object[] {
+		   			"type", "hidden",
+					"name", "action",
+					"value", "add"
+				})
+		   +	oof.input(new Object[] {
+		   			"type", "submit",
+					"class", "button",
+					"value", "Add Host"
+				})
 		   + oof.form_end()
 		   + p.footer();
 		return (s);

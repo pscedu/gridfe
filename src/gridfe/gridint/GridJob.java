@@ -87,8 +87,11 @@ public class GridJob extends RSLElement implements Serializable {
 		 * needs to default to "~".
 		 */
 		if (file != null) {
+			String rsldir = this.getDirectory();
+
 			dir = (file.charAt(0) != '/') ? "~" : "";
-			dir += (this.dir != null) ? "/" + this.dir : "";
+			if (rsldir != null)
+				dir += "/" + rsldir;
 		}
 
 		/*

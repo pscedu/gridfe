@@ -11,7 +11,8 @@ import java.util.*;
 public class suite {
 	public static void main(String[] args)
 	    throws Exception {
-		String thost = "gridfe.psc.edu";
+		String thost = "gridfe.psc.edu/jobmanager-ben-pbs";
+//		String thost = "gt4-submit.psc.teragrid.org/jobmanager-lemieux-pbs";
 	    	String stdout_dir = "gram_jobs";
 
 		GridInt gi = new GridInt(BasicServices.getUserID(), GridInt.GIF_REGCERT);
@@ -39,37 +40,41 @@ public class suite {
 		/* Create a new job */
 		System.out.println("Creating jobs...");
 
+		HashMap m;
 		GridJob j1 = new GridJob(thost);
-		j1.setRSL(new String[] {"executable", "stdout"},
-			new String[] {"/bin/sleep", "gram.out"},
-			new String("arguments"),
-			new String[] {"2s"});
 		j1.setName("J1");
+		m = j1.getMap();
+		m.put("executable", "/bin/sleep");
+		m.put("stdout", "gram.out");
+		m.put("arguments", new String[] { "2" } );
 
 		GridJob j2 = new GridJob(thost);
-		j2.setRSL(new String[] {"executable"},
-			new String[] {"/bin/sleep"},
-			new String("arguments"),
-			new String[] {"5s"});
 		j2.setName("J2");
+		m = j2.getMap();
+		m.put("executable", "/bin/sleep");
+		m.put("arguments", new String[] { "5" } );
 
 		GridJob j3 = new GridJob(thost);
-		j3.setRSL(new String[] {"executable", "arguments"},
-			new String[] {"/bin/mkdir", "-p " + stdout_dir});
-		j3.setName("mkdir");
+		j3.setName("J3.mkdir");
+		m = j3.getMap();
+		m.put("executable", "/bin/mkdir");
+		m.put("arguments", new String[] { "-p", stdout_dir });
 
 		/* Job to test output permission */
 		GridJob j4 = new GridJob(thost);
-		j4.setRSL(new String[] {"executable", "directory", "stdout", "stderr"},
-			new String[] {"/bin/date", stdout_dir, "gram.out.date", "gram.err.date"});
 		j4.setName("Date");
+		m = j4.getMap();
+		m.put("executable", "/bin/date");
+		m.put("directory", stdout_dir);
+		m.put("stdout", "gram.out.date");
+		m.put("stderr", "gram.err.date");
 
 		/* Submit the job to GRAM */
 		System.out.println("RSL: " + j4);
 		System.out.println("Submitting jobs...");
+		gi.jobSubmit(j3); /* try to mkdir first */
 		gi.jobSubmit(j1);
 		gi.jobSubmit(j2);
-		gi.jobSubmit(j3);
 		gi.jobSubmit(j4);
 
 		int qid1 = j1.getQID();
@@ -120,9 +125,10 @@ public class suite {
 		System.out.println(j4);
 
 		/* Data retrieval (read a few chunks, then the rest */
-		String[] data = {"", ""};
-		String[] file = {j4.stdout, j4.stderr};
+		String[] data = { "", "" };
+		String[] file = { j4.getStdout(), j4.getStderr() };
 		for (int i = 0; i < 2; i++) {
+System.out.println("retrieve #" + i + ": " + file[i]);
 			if (file[i] == null)
 				continue;
 
@@ -174,11 +180,11 @@ public class suite {
 
 		System.out.println("\n");
 
-		UserMap m = new UserMap();
+		UserMap um = new UserMap();
 		String id = "yanovich";
 
 		System.out.println("Kerberos ID: " + id);
-		System.out.println("System UID: " + m.kerberosToSystem(id));
+		System.out.println("System UID: " + um.kerberosToSystem(id));
 
 		/*
 		 * XXX this seems like the only way the test suite will terminate
@@ -186,6 +192,5 @@ public class suite {
 		 * thread still running that needs terminated.
 		 */
 		System.exit(0);
-		return;
 	}
 };

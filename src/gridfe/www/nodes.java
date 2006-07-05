@@ -162,7 +162,7 @@ public class nodes {
 			String path = p.getWebRoot() + "/img/";
 
 			String cl = p.genClass();
-			s = oof.table_row(new Object[][] {
+			s = "" + oof.table_row(new Object[][] {
 						new Object[] { "class", cl, "value", p.escapeHTML(host) },
 						new Object[] { "class", cl, "value", type },
 						new Object[] { "class", cl, "style", "text-align: center",

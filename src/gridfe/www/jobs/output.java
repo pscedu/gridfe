@@ -22,7 +22,7 @@ public class output {
 			/* This should never throw an exception since we just checked it. */
 			GridJob j = jl.get(Integer.parseInt(s_qid));
 			if (j != null) {
-				gi.startRetrieve(j, j.stdout, 28000, 28255);
+				gi.startRetrieve(j, j.getStdout(), 28000, 28255);
 				int size = (int)gi.getGass().getSize();
 /*
 				if (size > )
@@ -36,7 +36,7 @@ public class output {
 					p.getResponse().setContentType("application/octet-stream");
 					p.getResponse().setHeader("Content-disposition",
 					    "attachment; filename=\"" +
-						p.getJASP().escapeAttachName(j.stdout) + "\"");
+						p.getJASP().escapeAttachName(j.getStdout()) + "\"");
 					return (data);
 				}
 

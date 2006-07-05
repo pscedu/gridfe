@@ -5,6 +5,7 @@ package gridfe.www.jobs;
 import gridfe.*;
 import gridfe.gridint.*;
 import java.sql.*;
+import java.util.*;
 import javax.servlet.http.*;
 import oof.*;
 
@@ -52,56 +53,20 @@ public class submit {
 				GridInt gi = p.getGridInt();
 				j.setName(label);
 
-				int n = 1; /* exec */
-				if (!dir.equals(""))
-					n++;
-				if (!stdout.equals(""))
-					n++;
-				if (!stderr.equals(""))
-					n++;
+				HashMap m = j.getMap();
+				m.put("executable", remoteexec);
 				if (!args.equals(""))
-					n++;
+					m.put("arguments", parse_args(args));
+				if (!dir.equals(""))
+					m.put("directory", dir);
+				if (!stdout.equals(""))
+					m.put("stdout", stdout);
+				if (!stderr.equals(""))
+					m.put("stderr", stderr);
 				if (!mpi.equals(""))
-					n++;
-				if(!queue.equals(""))
-					n++;
-				String[] r_keys = new String[n];
-				String[] r_vals = new String[n];
-				n = 0;
-				r_keys[n] = "executable";
-				r_vals[n] = remoteexec;
-				n++;
-				if (!args.equals("")) {
-					r_keys[n] = "arguments";
-					r_vals[n] = args;
-					n++;
-				}
-				if (!dir.equals("")) {
-					r_keys[n] = "directory";
-					r_vals[n] = dir;
-					n++;
-				}
-				if (!stdout.equals("")) {
-					r_keys[n] = "stdout";
-					r_vals[n] = stdout;
-					n++;
-				}
-				if (!stderr.equals("")) {
-					r_keys[n] = "stderr";
-					r_vals[n] = stderr;
-					n++;
-				}
-				if (!mpi.equals("")) {
-					r_keys[n] = "jobtype";
-					r_vals[n] = "mpi";
-					n++;
-				}
-				if (!queue.equals("")) {
-					r_keys[n] = "queue";
-					r_vals[n] = queue;
-					n++;
-				}
-				j.setRSL(r_keys, r_vals);
+					m.put("jobtype", "mpi");
+				if (!queue.equals(""))
+					m.put("queue", queue);
 
 				if (req.getParameter("submitted").equals("View RSL"))
 					rlsout = j.toString();
@@ -295,7 +260,9 @@ public class submit {
 										}) +
 										oof.br() +
 										"&raquo; Any optional command-line arguments to " +
-										"the program can be placed here."
+										"the program can be placed here, separated by space.  " +
+										"If an argument need contain a space, the argument " +
+										"may be surrounded by double quote characters (&dquot;&dquot;)"
 								}
 							},
 							new Object[][] {
@@ -430,6 +397,43 @@ public class submit {
 		}
 		s += p.footer();
 		return (s);
+	}
+
+	private static List parse_args(String args) {
+		boolean dquot = false;
+		boolean esc = false;
+		List argv = new LinkedList();
+		String arg = "";
+
+		for (int k = 0; k < args.length(); k++) {
+			char c = args.charAt(k);
+
+			switch (c) {
+			case '\\':
+				esc = !esc;
+				break;
+			case '"':
+				if (esc) {
+					esc = false;
+					arg += c;
+				} else
+					dquot = !dquot;
+				break;
+			case ' ':
+				if (!dquot) {
+					argv.add(arg);
+					arg = "";
+					break;
+				}
+				/* FALLTHROUGH */
+			default:
+				arg += c;
+				break;
+			}
+		}
+		argv.add(arg);
+
+		return (argv);
 	}
 };
 

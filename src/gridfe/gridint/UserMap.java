@@ -20,14 +20,11 @@ public class UserMap {
 			    new BufferedReader(new FileReader(f));
 			while ((line = br.readLine()) != null) {
 				DN dn = this.parseDN(line);
-				String[] fields =
-				    BasicServices.splitString(dn.getDN(), "/");
+				String[] fields = dn.getDN().split("/");
 				if (fields.length == 1)
-					fields = BasicServices.splitString(dn.getDN(),
-					    ":");
+					fields = dn.getDN().split(":");
 				for (int j = 0; j < fields.length; j++) {
-					String[] pair = BasicServices.splitString(fields[j],
-					    "=");
+					String[] pair = fields[j].split("=");
 					/*
 					 * OpenSSL 0.9.6 (Globus 2.x) uses `USERID'.
 					 * OpenSSL 0.9.7 (Globus 4.x) uses `UID'.

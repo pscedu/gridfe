@@ -47,6 +47,7 @@ public class GassInt extends RemoteGassServer {
 		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
 */
 		this.setOptions(this.options);
+		System.err.println(host);
 		this.start(this.host);
 	}
 
@@ -99,6 +100,19 @@ public class GassInt extends RemoteGassServer {
 			buf.append(new String(tmp));
 		}
 		return (read);
+	}
+
+	/* Write data to a remote file using Gass */
+	public void write(String buf, int port, String file)
+		throws GSSException, GassException, IOException {
+
+		GassOutputStream fout = new
+		GassOutputStream(this.gss, this.host, port, file, -1, false);
+
+		byte[] data = buf.getBytes();
+		fout.write(data);
+		fout.close();
+		fout = null;
 	}
 
 	/* Get the size of the file opened by the GassInputStream */

@@ -70,7 +70,7 @@ public class Page {
 			if (hdr.startsWith("Basic "))
 				hdr = hdr.substring(6);
 			String combo = new String(Base64.decode(hdr));
-			String[] auth = BasicServices.splitString(combo, ":");
+			String[] auth = combo.split(":");
 			this.kuid = auth[0];
 
 			if (!this.restoreGI()) {

@@ -177,7 +177,7 @@ public class GridInt implements Serializable {
 		** timing problems with job submissions and Globus.
 		*/
 		System.out.println("sleeping like a baby - ugly Globus Hack");
-		try{ Thread.sleep(5000);}catch(Exception e){}
+		try{Thread.sleep(7000);}catch(Exception e){}
 	}
 
 	/* Setup file retrieval */

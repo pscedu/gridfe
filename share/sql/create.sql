@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS hosts;
 CREATE TABLE hosts (
 	uid	VARCHAR(32)	NOT NULL,
 	host	VARCHAR(255),
+	type	VARCHAR(32),
 
 	KEY(uid),
 	KEY(host)

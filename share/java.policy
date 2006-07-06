@@ -1,7 +1,2 @@
 /* $Id$ */
 
-grant codeBase "file:/var/www/gridfe/WEB-INF/src" {
-	permission java.net.SocketPermission "gridfe.psc.edu", "resolve";
-	permission java.net.SocketPermission "gridfe.psc.edu:*", "connect";
-	permission java.net.SocketPermission "gridfe.psc.edu:*", "resolve";
-};

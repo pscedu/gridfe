@@ -27,6 +27,7 @@ body {
 	font-weight: bold;
 	width: 20%;
 	vertical-align: top;
+	text-shadow: #333333 1px 1px 1px;
 }
 
 .data1, .monodata1 {
@@ -51,6 +52,7 @@ td + .data1, td + .monodata1, td + .data2, td + .monodata2 {
 
 .hdr {
 	text-align: center;
+	background-image: url(/gridfe/img/back.png);
 	background-color: #336699;
 	color: #FFFFFF;
 	font-weight: bold;
@@ -58,6 +60,7 @@ td + .data1, td + .monodata1, td + .data2, td + .monodata2 {
 }
 
 td.hdr, td.subhdr {
+	text-shadow: #333333 1px 1px 2px;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
@@ -75,7 +78,7 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 
 .subhdr {
 	text-align: center;
-	background-color: #003366;
+	background-color: #6699cc;
 	color: #FFFFFF;
 	font-weight: bold;
 	font-size: 13px;
@@ -88,6 +91,7 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 
 .tblftr {
 	text-align: center;
+	background-image: url(/gridfe/img/back.png);
 	background-color: #336699;
 	padding: 3px;
 	border-bottom: 1px solid black;
@@ -98,6 +102,10 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 
 a:link, a:visited {
 	color: #336699;
+}
+
+a[href^="mailto:"]:before {
+	content: "\2709 ";
 }
 
 input, select {
@@ -114,6 +122,11 @@ input, textarea, select {
 	padding: 1px;
 	margin-right: 1px;
 	margin-top: 1px;
+	color: #000033;
+}
+
+input:hover {
+	color: #eeeeff;
 }
 
 option {
@@ -121,13 +134,17 @@ option {
 }
 
 .button, button {
-	background-color: #336699;
+	font-size: 13px;
+	background-color: #6699cc;
 	color: #ffffff;
 	border: 1px solid black;
 	font-weight: bold;
 	cursor: pointer;
+	padding-top: 0px;
+	padding-bottom: 0px;
 	padding-left: 8px;
 	padding-right: 8px;
+	text-shadow: #333333 1px 1px 1px;
 }
 
 label, input[type="checkbox"] {
@@ -135,7 +152,7 @@ label, input[type="checkbox"] {
 }
 
 .err {
-	color: #990000;
+	color: #993333;
 }
 
 pre {

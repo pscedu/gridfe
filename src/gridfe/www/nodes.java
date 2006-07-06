@@ -131,7 +131,7 @@ public class nodes {
 		   				new Object[] { "class", "subhdr", "value", "Type" },
 		   				new Object[] { "class", "subhdr", "value", "GRAM" },
 		   				new Object[] { "class", "subhdr", "value", "GridFTP" },
-		   				new Object[] { "class", "subhdr", "value", "Remove" }
+		   				new Object[] { "class", "subhdr", "value", "Remove?" }
 		   			});
 
 		PrintWriter w = p.getResponse().getWriter();
@@ -182,6 +182,7 @@ public class nodes {
 							}) }
 					 });
 			w.print(s);
+			s = "";
 		}
 		if (i == 0)
 			s += 	oof.table_row(new Object [][] {

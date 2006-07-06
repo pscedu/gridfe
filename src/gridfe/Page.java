@@ -194,8 +194,9 @@ public class Page {
 				"Status", "/jobs/status"
 			});
 		this.addMenu("Certificate Management", "/certs", null);
-//		this.addMenu("MDS/LDAP", "/ldap", null);
-//		this.addMenu("GRIS/GIIS", "/gris", null);
+/*
+		this.addMenu("MDS/LDAP", "/ldap", null);
+		this.addMenu("GRIS/GIIS", "/gris", null);
 		this.addMenu("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalog",		"/rls/addcat",
@@ -203,6 +204,7 @@ public class Page {
 				"Search Catalogs",	"/rls/search",
 				"Add Resource",		"/rls/addres"
 			});
+*/
 		this.addMenu("GridFTP", "/gridftp",
 			new Object[] {
 				"URL Copy",		"/gridftp/copy",

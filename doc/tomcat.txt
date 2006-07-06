@@ -103,3 +103,11 @@ After a successful build, the 'src' directory needs to be renamed to
 the servlet classes:
 
   $ ln -s src classes
+
+Some of the CoG code establishes connections to grid services using
+the Java network framework, so the Java security manager must be
+configured to allow outgoing connections to be made with sockets
+by copying the following file to the home directory of the user
+which runs the Java sevlets (which should be user "apache"):
+
+  $ cp share/java.policy /var/www

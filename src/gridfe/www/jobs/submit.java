@@ -226,8 +226,7 @@ public class submit {
 											"name", "queue"
 										}) +
 										oof.br() +
-										"&raquo; This field should contain the queue name " +
-										"on the target machine on which you wish to submit."
+										"&raquo; This optional field may contain the PBS queue name."
 								}
 							},
 							new Object[][] {
@@ -262,7 +261,7 @@ public class submit {
 										"&raquo; Any optional command-line arguments to " +
 										"the program can be placed here, separated by space.  " +
 										"If an argument need contain a space, the argument " +
-										"may be surrounded by double quote characters (&dquot;&dquot;)"
+										"may be surrounded by double quote characters (&quot;&quot;)."
 								}
 							},
 							new Object[][] {

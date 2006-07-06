@@ -9,6 +9,7 @@ import org.globus.io.gass.client.*;
 import org.globus.io.gass.server.*;
 import org.globus.io.streams.*;
 import org.ietf.jgss.*;
+import java.util.*;
 
 public class GassInt extends RemoteGassServer {
 	private GassInputStream fin;
@@ -31,45 +32,47 @@ public class GassInt extends RemoteGassServer {
 		    GassServer.READ_ENABLE;
 	}
 
-	/* Overload start */
+	/*
+	** Overload start 
+	** Update: This works for GT 4.0 and is used for machines running
+	** the standard fork manager.  However, this fails for unknown reasons
+	** on gsissh setups like ben, lemieux, etc...
+	*/
 	public void start()
 	    throws GassException, IOException {
-/*
-		//This is additions after hacked CoG code, where the file RemoteGassServer.java
-		//was modified to allow additional customization. However, this still FUBAR.
 
-		int success = 0;
-		int n = 0;
-
-		super.RBudden_set_env(new String[] {"GLOBUS_TCP_PORT_RANGE", "GLOBUS_UDP_PORT_RANGE"},
-					new String[] {"\"28000 28255\"", "\"28000 28255\""});
-		super.RBudden_set_port(0);
-		super.RBudden_set_output("/tmp/gram.stdout","/tmp/gram.stderr");
-*/
 		this.setOptions(this.options);
-		System.err.println(host);
 		this.start(this.host);
 	}
 
-	/* Manually remote start a server - this fails for some reason though (GT2.4.3), more FUBAR */
-/*
+	/*
+	** Manually remote start a server - this fails for some reason though (GT2.4.3), more FUBAR
+	** Update: This works for GT 4.0 and is necessary for our ben gsissh setup. The job should
+	** be run through out BenShell.pm JobManager (which basically executes commands via gsissh)
+	*/
 	public void start_remote()
 	    throws GramException, GSSException {
-//		GridJob j = new GridJob("intel2.psc.edu");
 		GridJob j = new GridJob(this.host);
 
 		// Build a gridjob that starts the gass server
-		j.setRSL(new String[] { "executable", "stdout", "stderr" },
-		    new String[] { "$GLOBUS_LOCATION/bin/globus-gass-server",
-			"/tmp/gram.stdout", "/tmp/gram.stderr" },
-		new String("arguments"),
-//		new String[] { "-p", Integer.toString(this.port),"-c", "-r", "&" });
-		new String[] { "-p", Integer.toString(this.port),"-c", "-r" });
+		HashMap m = j.getMap();
+//		m.put("executable", "${GLOBUS_LOCATION}/bin/globus-gass-server");
+		m.put("executable", "/usr/local/packages/tg/globus-4.0.1-r3/bin/globus-gass-server");
+		m.put("arguments", new String[] {"-c", "-p", Integer.toString(this.port), "-t", "-u", "-r"});
+		m.put("stdout", "gass-out.log");
+		m.put("stderr", "gass-err.log");
+
+
+		/*
+		** This needs to be executed to start our gass server properly...
+		   gsissh ben 'export GLOBUS_LOCATION=/usr/local/packages/tg/globus-4.0.1-r3; 
+		   . $GLOBUS_LOCATION/etc/globus-user-env.sh; 
+		  /usr/local/packages/tg/globus-4.0.1-r3/bin/globus-gass-server -c -p 50001 -t -u'
+		*/
 
 		j.init(this.gss);
 		j.run();
 	}
-*/
 
 	/*
 	** Inherited Methods (needed from RemoteGassServer):
@@ -82,8 +85,16 @@ public class GassInt extends RemoteGassServer {
 		/* SelfAuthorization uses GlobusCredentials for authentication */
 		SelfAuthorization auth = new SelfAuthorization();
 
-		/* Create a secure input stream */
-		this.fin = new GassInputStream(this.gss, auth, this.host,
+		/*
+		** Create a secure input stream
+		**
+		** Update: XXX there needs to be a way to figure out the 
+		** machine that the file resides on. For example, submitting
+		** to the ben jobmanager on gridfe (where host = gridfe.psc.edu/jobmanager-ben-pbs)
+		** we need to know that the machine being executed on is ben.psc.edu.
+		*/
+		this.fin = new GassInputStream(this.gss, auth, "ben.psc.edu",
+//		this.fin = new GassInputStream(this.gss, auth, this.host,
 		    this.port, file);
 	}
 

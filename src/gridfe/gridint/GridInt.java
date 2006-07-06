@@ -129,7 +129,7 @@ public class GridInt implements Serializable {
 
 	/* Start the Gass server on a random port within our range */
 	private void startGass(int min, int max, String host)
-	    throws GassException, IOException {
+	    throws GassException, IOException, GSSException, GramException {
 		Random r;
 		int port;
 
@@ -158,27 +158,37 @@ public class GridInt implements Serializable {
 
 	/* Allow override of random port in range */
 	private void startGass(int port, String host)
-	    throws GassException, IOException {
+	    throws GassException, IOException, GSSException, GramException {
 		/* Create a GASS Server to connect to */
 		this.gass = new GassInt(this.gss.getGSSCredential(),
 		    host, port);
 
-		/* Start the Gass Server */
-		this.gass.start();
+		/*
+		** Start the Gass Server 
+		** CoG Gass doesn't work so we have to do it ourselves
+		** go figure...
+		*/
+//		this.gass.start();
+		this.gass.start_remote();
 
-		/* XXX - Remote Start Support Needed */
-		// this.gass.start_remote();
+		/*
+		** Sleep so that the Server is set to listen before
+		** trying to make the connection. This is a Hack around
+		** timing problems with job submissions and Globus.
+		*/
+		System.out.println("sleeping like a baby - ugly Globus Hack");
+		try{ Thread.sleep(5000);}catch(Exception e){}
 	}
 
 	/* Setup file retrieval */
 	public void startRetrieve(GridJob job, String file, int port)
-	    throws GassException, IOException, GSSException {
+	    throws GassException, IOException, GSSException, GramException {
 		/* Start with min/max == port */
 		this.startRetrieve(job, file, port, port);
 	}
 
 	public void startRetrieve(GridJob job, String file, int min, int max)
-	    throws GassException, IOException, GSSException {
+	    throws GassException, IOException, GSSException, GramException {
 		/*
 		** Assume all are remote (this should work for
 		** localhost also)

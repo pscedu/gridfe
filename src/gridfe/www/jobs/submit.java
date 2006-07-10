@@ -25,6 +25,7 @@ public class submit {
 		String stderr = req.getParameter("stderr");
 		String mpi = req.getParameter("mpi");
 		String queue = req.getParameter("queue");
+		String addres = req.getParameter("addres");
 
 		if (label == null)
 			label = "";
@@ -42,7 +43,7 @@ public class submit {
 			stderr = "";
 		if (mpi == null)
 			mpi = "";
-		if(queue == null)
+		if (queue == null)
 			queue = "";
 
 		if (req.getParameter("submitted") != null) {
@@ -79,6 +80,19 @@ public class submit {
 					return (j.toString());
 				} else {
 					gi.jobSubmit(j);
+
+					if (addres != null) {
+						PreparedStatement sth = p.getDBH().prepareStatement(
+							"	INSERT INTO hosts (		" +
+							"		uid, host, type		" +
+							"	) VALUES (				" +
+							"		?, ?, ?				" +
+							"	)						");
+						sth.setInt(1, p.getUID());
+						sth.setString(2, host);
+						sth.setString(3, "other");
+						sth.executeUpdate();
+					}
 
 					String s = "";
 					s += p.header("Submitted Job")
@@ -203,11 +217,18 @@ public class submit {
 											"options", hlist
 										}) +
 										oof.br() +
+										oof.input(new Object[] {
+											"type", "checkbox",
+											"name", "addres",
+											"label", "Add this to my " +
+											  oof.link("resource list", p.buildURL("/nodes")) + "."
+										}) +
+										oof.br() +
+										oof.br() +
 										"&raquo; This field should contain the host name " +
-										"of the target machine on which you would " +
-										"your job to run.  You may select a previously " +
-										"configured host from the drop-down box on the " +
-										"right, which may be done through the " +
+										"of the target machine where your job will run." +
+										"You may select a previously configured host from " +
+										"the drop-down box, which may be done through the " +
 										oof.link("Node Availability", p.buildURL("/nodes")) +
 										" page."
 								}

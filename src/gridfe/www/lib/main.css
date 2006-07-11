@@ -125,7 +125,7 @@ input, textarea, select {
 	color: #000033;
 }
 
-input:hover {
+.button:hover, button:hover {
 	color: #eeeeff;
 }
 

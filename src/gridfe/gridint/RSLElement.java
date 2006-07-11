@@ -60,8 +60,16 @@ public class RSLElement implements Serializable {
 				s += build(null, (HashMap)val);
 			else if (val instanceof String[]) {
 				String[] vs = (String[])val;
+
 				for (int j = 0; j < vs.length; j++)
 					s += " \"" + vs[j] + '"';
+			} else if (val instanceof List) {
+				List l = (List)val;
+				String lv;
+
+				for (Iterator i = l.iterator();
+				  i.hasNext() && (lv = (String)i.next()) != null; )
+					s += " \"" + lv + '"';
 			} else
 				s += " \"" + (String)val + '"';
 			s += ")";

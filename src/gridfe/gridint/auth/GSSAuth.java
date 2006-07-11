@@ -25,21 +25,14 @@ public class GSSAuth {
 	public void createCredential()
 	    throws GSSException {
 		/*
-		** The following class does a conversion between
-		** GlobusCredential to GSSCredential... However,
-		** this is broken in CoG 1.1 (and previous also
-		** I assume)... In order for this to work properly
-		** CoG jglobus was compiled from the "CoG 2.0 pre alpha"
-		** source code. (cvs.globus.org) How there is such a
-		** thing as pre alpha is beyond me...
-		*/
+		 * The following class does a conversion between
+		 * GlobusCredential to GSSCredential.
+		 */
 		this.gss = new GlobusGSSCredentialImpl(this.gc,
-		    GSSCredential.INITIATE_AND_ACCEPT);
+		  GSSCredential.INITIATE_AND_ACCEPT);
 	}
 
-	/*
-	** Generic Private Data Interfaces
-	*/
+	/* Generic private data interfaces */
 	public GlobusCredential getGlobusCredential() {
 		return (this.gc);
 	}
@@ -48,9 +41,7 @@ public class GSSAuth {
 		return (this.gss);
 	}
 
-	/*
-	** GSSCredential Methods
-	*/
+	/* GSSCredential Methods */
 	public GSSName getName()
 	    throws GSSException {
 		return (this.gss.getName());

@@ -27,9 +27,10 @@ CREATE TABLE hosts (
 	KEY(host)
 );
 
-/*
-
+DROP TABLE IF EXISTS x509_certs;
 CREATE TABLE x509_certs (
-)
+	uid	VARCHAR(32)	NOT NULL,
+	cert	TEXT		NOT NULL,
 
-*/
+	PRIMARY KEY(uid)
+);

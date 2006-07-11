@@ -74,10 +74,6 @@ public class Page {
 			this.kuid = auth[0];
 
 			if (!this.restoreGI()) {
-//				UserMap m = new UserMap();
-//				String user = m.kerberosToSystem(kuid);
-//				this.uid = BasicServices.getUserID(user);
-
 				/*
 				 * XXX - Assume user's Kerberos principal
 				 * and system username are the same.
@@ -90,12 +86,38 @@ public class Page {
 				 */
 				this.gi = new GridInt(this.uid);
 				this.gi.auth();
+
+				this.storeCert();
 			}
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {
 			this.error(e.getClass().getName() + ": " + e.toString());
 		}
+	}
+
+	private void storeCert() throws Exception {
+		OutputStream os = new ByteArrayOutputStream();
+		this.gi.getGSS().getGlobusCredential().save(os);
+		String scert = os.toString();
+
+		PreparedStatement sth = this.dbh.prepareStatement(
+			"	DELETE FROM					" +
+			"		x509_certs				" +
+			"	WHERE						" +
+			"		uid = ?					");
+		sth.setInt(1, this.uid);
+		sth.executeUpdate();
+
+		sth = this.dbh.prepareStatement(
+			"	INSERT INTO x509_certs (	" +
+			"		uid, cert				" +
+			"	) VALUES (					" +
+			"		?, ?					" +
+			"	)							");
+		sth.setInt(1, this.uid);
+		sth.setString(2, scert);
+		sth.executeUpdate();
 	}
 
 	public int getUID() {

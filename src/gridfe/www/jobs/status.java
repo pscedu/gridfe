@@ -72,7 +72,8 @@ public class status {
 				},
 				new Object[] { "class", c, "value",
 				  j.getStatus() == GramJob.STATUS_ACTIVE ? "" +
-				  oof.link("Cancel", p.buildURL("/jobs/cancel?qid=" + j.getQID())) : ""
+				  oof.link("Cancel",
+				    p.buildURL("/jobs/cancel?qid=" + j.getQID())) : "N/A"
 				},
 				new Object[] { "class", c, "value",
 					oof.input(new Object[] {

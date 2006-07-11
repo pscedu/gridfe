@@ -164,20 +164,22 @@ public class GridInt implements Serializable {
 		    host, port);
 
 		/*
-		** Start the Gass Server 
-		** CoG Gass doesn't work so we have to do it ourselves
-		** go figure...
-		*/
+		 * Start the GASS server
+		 * CoG GASS doesn't work so we have to do it ourselves
+		 * go figure...
+		 */
 //		this.gass.start();
 		this.gass.start_remote();
 
 		/*
-		** Sleep so that the Server is set to listen before
-		** trying to make the connection. This is a Hack around
-		** timing problems with job submissions and Globus.
-		*/
+		 * Sleep so that the server is set to listen before
+		 * trying to make the connection. This is a hack around
+		 * timing problems with job submissions and Globus.
+		 */
 		System.out.println("sleeping like a baby - ugly Globus Hack");
-		try{Thread.sleep(7000);}catch(Exception e){}
+		try {
+			Thread.sleep(50000);
+		} catch (Exception e) { }
 	}
 
 	/* Setup file retrieval */
@@ -190,9 +192,9 @@ public class GridInt implements Serializable {
 	public void startRetrieve(GridJob job, String file, int min, int max)
 	    throws GassException, IOException, GSSException, GramException {
 		/*
-		** Assume all are remote (this should work for
-		** localhost also)
-		*/
+		 * Assume all are remote (this should work for
+		 * localhost also)
+		 */
 		this.startGass(min, max, job.getHost());
 
 		/* Convert from GRAM -> GASS convention */
@@ -203,8 +205,9 @@ public class GridInt implements Serializable {
 	/* End file retrieval */
 	public void stopRetrieve()
 	    throws IOException {
-		this.gass.close();
-		this.gass.shutdown();
+//		this.gass.close();
+//		this.gass.shutdown();
+		this.gass.stop_remote();
 	}
 
 	/* File (Chunk of 'len' bytes, 'len < 1' read all) */
@@ -268,6 +271,10 @@ public class GridInt implements Serializable {
 
 	public GSSAuth getGSS() {
 		return (this.gss);
+	}
+
+	public GlobusAuth getGA() {
+		return (this.ga);
 	}
 
 	public Uid getUID() {

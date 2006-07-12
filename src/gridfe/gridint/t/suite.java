@@ -29,13 +29,21 @@ public class suite {
 		long min = (sec / 60);
 		sec -= min * 60;
 
-		System.out.print("Remaining Lifetime: " + ci.time +
-			" (" + days + " days, " + hours + " hours, " +
-			min + " minutes, " + sec + " Seconds)\n" +
-			"Subject: " + ci.sub + "\n" +
-			"Identity: " + ci.ident + "\n" +
-			"Issuer: " + ci.issuer + "\n" +
-			"KeyStrength: " + ci.key + "\n");
+		System.out.print("Certificate Information\n" +
+		  "  Remaining lifetime: " + ci.time + " (" +
+		  days + " days, " + hours + " hours, " +
+		  min + " minutes, " + sec + " seconds)\n" +
+		  "  Subject: " + ci.sub + "\n" +
+		  "  Identity: " + ci.ident + "\n" +
+		  "  Issuer: " + ci.issuer + "\n" +
+		  "  Type: " + ci.type + "\n" +
+		  "  Key strength: " + ci.key + "\n\n");
+
+		System.out.print("GlobusCredential Info\n" +
+		  gi.getGSS().getGlobusCredential() + "\n\n");
+
+		System.out.print("GSSCredential Info\n" +
+		  gi.getGSS().getGSSCredential() + "\n");
 
 		/* Create a new job */
 		System.out.println("Creating jobs...");

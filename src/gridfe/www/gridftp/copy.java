@@ -136,10 +136,10 @@ public class copy {
 										}) +
 										oof.br() +
 										"&raquo; This field should contain the host name " +
-										"of the source machine from which the copy will be" +
+										"of the source machine from which the copy will be " +
 										"made.  You may select a previously configured host " +
-										"from the drop-down box on the right, which may be " +
-										"done through the " +
+										"from the drop-down box, which may be configured " +
+										"through the " +
 										oof.link("Node Availability", p.buildURL("/nodes")) +
 										" page."
 								}
@@ -166,7 +166,7 @@ public class copy {
 										"&raquo; This field should contain the host name " +
 										"of the target machine to which the copy will be " +
 										"made.  You may select a previously configured host " +
-										"from the drop-down box on the right."
+										"from the drop-down box."
 								}
 							},
 							new Object[][] {
@@ -184,10 +184,7 @@ public class copy {
 										}) +
 										oof.br() +
 										"&raquo; This field specifies the location of the " +
-										"source file on the source host that will be copied.  " +
-										"Use the checkbox to specify whether the path is " +
-										"relative to your home directory or is an absolute " +
-										"system path."
+										"source file on the source host that will be copied."
 								}
 							},
 							new Object[][] {
@@ -205,9 +202,7 @@ public class copy {
 										}) +
 										oof.br() +
 										"&raquo; This field specifies the location of the " +
-										"target file on the target host.  Use the checkbox " +
-										"to specify whether the path is relative to your " +
-										"home directory or is an absolute system path."
+										"target file on the target host."
 								}
 							},
 							new Object[][] {

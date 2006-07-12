@@ -98,10 +98,15 @@ td.hdr + td.hdr, td.subhdr + td.subhdr {
 	border-left: 1px solid black;
 	border-right: 1px solid black;
 	color: #ffffff;
+	font-weight: bold;
 }
 
 a:link, a:visited {
 	color: #336699;
+}
+
+.hdr a:link, .hdr a:visited {
+	color: #eeeeff;
 }
 
 a[href^="mailto:"]:before {
@@ -112,7 +117,7 @@ input, select {
 	font-family: Tahoma, sans-serif;
 }
 
-input[type="text"] {
+input[type="text"], textarea {
 	width: 300px;
 }
 
@@ -125,12 +130,38 @@ input, textarea, select {
 	color: #000033;
 }
 
+/*
+textarea {
+	overflow: scroll;
+}
+*/
+
+input[type="text"]:focus, textarea:focus {
+	background-color: #ccddff;
+	border-color: #cc6600;
+	color: #111133;
+}
+
+input[type="text"] {
+	font-family: monospace;
+}
+
+input, textarea {
+	-moz-border-radius: 5px;
+}
+
+input[type="checkbox"] {
+	vertical-align: middle;
+	margin-right: 5px;
+	margin-left: 0px;
+}
+
 .button:hover, button:hover {
 	color: #eeeeff;
 }
 
-option {
-	border-bottom: 1px solid black;
+option + option {
+	border-top: 1px dotted #333399;
 }
 
 .button, button {

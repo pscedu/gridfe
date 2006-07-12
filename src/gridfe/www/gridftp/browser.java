@@ -538,6 +538,21 @@ public class browser {
 					"value", "Stage Selected to Host"
 				});
 
+		String buildpath = "";
+		String path = "";
+		String[] ancestors = cwd.split("/");
+		for (int j = 0; j < ancestors.length; j++) {
+			if (ancestors[j].length() == 0)
+				continue;
+
+			buildpath += "/" + ancestors[j];
+			path += "/" + oof.link(ancestors[j],
+			  buildQS(p, params, new String[] {
+				display + "cwd", buildpath
+			  })
+			);
+		}
+
 		/* Form field for logging in */
 		s += ""
 		  + oof.p("Click on a file to download or a directory to view its contents.")
@@ -561,7 +576,7 @@ public class browser {
 		  + oof.table_row(new Object[][] {
 				new Object[] {
 					"class", Page.CCHDR,
-					"value", "Viewing gridftp://" + hostname + gftp.getCurrentDir(),
+					"value", "Viewing gridftp://" + hostname + path,
 					"colspan", "5"
 				}
 			})

@@ -14,7 +14,7 @@ public class submit {
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
 		String rlsout = null;
-		String errmsg = null;
+		String errmsg = "";
 
 		String label = req.getParameter("label");
 		String host = req.getParameter("host");
@@ -26,6 +26,9 @@ public class submit {
 		String mpi = req.getParameter("mpi");
 		String queue = req.getParameter("queue");
 		String addres = req.getParameter("addres");
+		String maxtime = req.getParameter("maxtime");
+		String nnodes = req.getParameter("nnodes");
+		String nprocs = req.getParameter("nprocs");
 
 		if (label == null)
 			label = "";
@@ -45,11 +48,27 @@ public class submit {
 			mpi = "";
 		if (queue == null)
 			queue = "";
+		if (maxtime == null)
+			maxtime = "";
+		if (nnodes == null)
+			nnodes = "";
+		if (nprocs == null)
+			nprocs = "";
 
 		if (req.getParameter("submitted") != null) {
 			if (host.equals("") || label.equals("") || remoteexec.equals(""))
-				errmsg = "Please specify all required form fields.";
-			if (errmsg == null) {
+				errmsg += "Please specify all required form fields.  ";
+			if (!maxtime.equals("") && !maxtime.matches("^\\d+$"))
+				errmsg += "Please enter a numerical value for maximum wall time.  ";
+			if (!nnodes.equals("") && !nnodes.matches("^\\d+$"))
+				errmsg += "Please enter a numerical value for number of nodes.  ";
+			if (!nprocs.equals("") && !nprocs.matches("^\\d+$"))
+				errmsg += "Please enter a numerical value for number of processes.  ";
+			if (!nprocs.equals("") && !nnodes.equals("") &&
+			  Integer.parseInt(nprocs) < Integer.parseInt(nnodes))
+				errmsg += "Number of processes must be greater than number of nodes.  ";
+
+			if (errmsg.equals("")) {
 				GridJob j = new GridJob(host);
 				GridInt gi = p.getGridInt();
 				j.setName(label);
@@ -68,6 +87,12 @@ public class submit {
 					m.put("jobtype", "mpi");
 				if (!queue.equals(""))
 					m.put("queue", queue);
+				if (!maxtime.equals(""))
+					m.put("maxWallTime", maxtime);
+				if (!nnodes.equals(""))
+					m.put("hostCount", nnodes);
+				if (!nprocs.equals(""))
+					m.put("count", nprocs);
 
 				if (req.getParameter("submitted").equals("View RSL"))
 					rlsout = j.toString();
@@ -153,7 +178,7 @@ public class submit {
 		   +   "navigate the menu on the left side of the page to view status "
 		   +   "information about the job and retrieve any output from the job "
 		   +   "once it is completed.");
-		if (errmsg != null)
+		if (!errmsg.equals(""))
 			s += oof.p(new Object[] { "class", "err" },
 			  "" + oof.strong("An error has occurred while processing your submission: ") +
 			  errmsg);
@@ -193,9 +218,9 @@ public class submit {
 											"name", "label"
 										}) +
 										oof.br() +
-										"&raquo; This field should contain a label " +
-										"that serves as a mnemonic to you so that " +
-										"you can later quickly identify the job."
+										"&raquo; This field serves as a mnemonic " +
+										"to you so that you can quickly later " +
+										"identify this job."
 								}
 							},
 							new Object[][] {
@@ -225,11 +250,11 @@ public class submit {
 										}) +
 										oof.br() +
 										oof.br() +
-										"&raquo; This field should contain the host name " +
-										"of the target machine where your job will run." +
+										"&raquo; This field specifies the resource host name " +
+										"of the target machine where your job will run.  " +
 										"You may select a previously configured host from " +
-										"the drop-down box, which may be done through the " +
-										oof.link("Node Availability", p.buildURL("/nodes")) +
+										"the drop-down box, which may be configured through the " +
+										oof.link("node availability", p.buildURL("/nodes")) +
 										" page."
 								}
 							},
@@ -257,12 +282,19 @@ public class submit {
 								},
 								new Object[] {
 									"class", p.genClass(),
-									"value",
+									"value", "" +
 										oof.input(new Object[] {
 											"type", "text",
 											"value", p.escapeHTML(remoteexec),
 											"name", "remoteexec"
-										})
+										}) +
+										oof.br() +
+										"&raquo; This field specifies the path on the " +
+										"remote machine to the executable that will be " +
+										"run.  You may follow the steps on the " +
+										oof.link("stage job", p.buildURL("/jobs/StageJob")) +
+										" page to set up any necessary files on the remote " +
+										"machine, including this executable."
 								}
 							},
 							new Object[][] {
@@ -288,7 +320,7 @@ public class submit {
 							new Object[][] {
 								new Object[] {
 									"class", Page.CCDESC,
-									"value", "Message Passing Interface:"
+									"value", "Message passing interface:"
 								},
 								new Object[] {
 									"class", p.genClass(),
@@ -300,6 +332,66 @@ public class submit {
 										})
 								}
 							},
+
+							new Object[][] {
+								new Object[] {
+									"class", Page.CCDESC,
+									"value", "Max wall time:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "text",
+											"value", p.escapeHTML(maxtime),
+											"name", "maxtime"
+										}) +
+										oof.br() +
+										"&raquo; This optional field specifies the maximum " +
+										"amount of time for which your job will run according " +
+										"to total elasped time or &quot;wall&quot; clock time.  " +
+										"This value must be specified in minutes."
+								}
+							},
+
+							new Object[][] {
+								new Object[] {
+									"class", Page.CCDESC,
+									"value", "Number of processes:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "text",
+											"value", p.escapeHTML(nprocs),
+											"name", "nprocs"
+										}) +
+										oof.br() +
+										"&raquo; This optional field specifies the number of execution " + 
+										"processes required to run the job."
+								}
+							},
+
+							new Object[][] {
+								new Object[] {
+									"class", Page.CCDESC,
+									"value", "Number of nodes:"
+								},
+								new Object[] {
+									"class", p.genClass(),
+									"value", "" +
+										oof.input(new Object[] {
+											"type", "text",
+											"value", p.escapeHTML(nnodes),
+											"name", "nnodes"
+										}) +
+										oof.br() +
+										"&raquo; This optional field specifies the number of nodes " +
+										"to distribute the execution processes across."
+								}
+							},
+
 							new Object[][] {
 								new Object[] {
 									"class", Page.CCDESC,
@@ -342,7 +434,7 @@ public class submit {
 										"run your job.  The contents may, however, be " +
 										"displayed or saved to your local computer from the " +
 										"job output page, which can be accessed through the " +
-										oof.link("Job Status", p.buildURL("/jobs/status")) +
+										oof.link("job status", p.buildURL("/jobs/status")) +
 										" page." +
 										oof.br() +
 										oof.br() +
@@ -370,7 +462,7 @@ public class submit {
 										"run your job." +
 										oof.br() +
 										oof.br() +
-										"Leaving this field blank will result in no output " +
+										"Leaving this field blank will result in no error output " +
 										"being saved."
 								}
 							},
@@ -401,7 +493,8 @@ public class submit {
 										oof.input(new Object[] {
 											"type", "reset",
 											"class", "button",
-											"value", "Reset Fields"
+											"value", "Reset Fields",
+											"onclick", "return (confirm('OK to reset all fields?'))"
 										})
 								}
 							}

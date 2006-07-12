@@ -25,8 +25,14 @@ public class browser {
 		String rhost = req.getParameter("rhost");
 		String lcwd = req.getParameter("lcwd");
 		String rcwd = req.getParameter("rcwd");
+		String ltype = req.getParameter("ltype");
+		String rtype = req.getParameter("rtype");
 		String action = req.getParameter("action");
 		String display = req.getParameter("display");
+
+		/* Host and Directory Archived file is being staged to */
+		String ahost = req.getParameter("ahost");
+		String acwd = req.getParameter("acwd");
 
 		if (lhost == null)
 			lhost = "";
@@ -36,11 +42,21 @@ public class browser {
 			lcwd = "";
 		if (rcwd == null)
 			rcwd = "";
+		if (ltype == null ||
+		  (!ltype.equals("archiver") && !ltype.equals("gridftp")))
+			ltype = "gridftp";
+		if (rtype == null ||
+		  (!rtype.equals("archiver") && !rtype.equals("gridftp")))
+			rtype = "gridftp";
 		if (action == null)
 			action = "";
 		if (display == null ||
-		    (!display.equals("l") && !display.equals("r")))
+		  (!display.equals("l") && !display.equals("r")))
 			display = "";
+		if (ahost == null)
+			ahost = "";
+		if (acwd == null)
+			acwd = "";
 
 		if (action.equals("Logout")) {
 			if (display.equals("l"))
@@ -55,10 +71,14 @@ public class browser {
 			len++;
 			if (!lcwd.equals(""))
 				len++;
+			if (!ltype.equals(""))
+				len++;
 		}
 		if (!rhost.equals("")) {
 			len++;
 			if (!rcwd.equals(""))
+				len++;
+			if (!rtype.equals(""))
 				len++;
 		}
 
@@ -73,6 +93,10 @@ public class browser {
 				params[j++] = "lcwd";
 				params[j++] = lcwd;
 			}
+			if (!ltype.equals("")) {
+				params[j++] = "ltype";
+				params[j++] = ltype;
+			}
 		}
 		if (!rhost.equals("")) {
 			params[j++] = "rhost";
@@ -80,6 +104,10 @@ public class browser {
 			if (!rcwd.equals("")) {
 				params[j++] = "rcwd";
 				params[j++] = rcwd;
+			}
+			if (!rtype.equals("")) {
+				params[j++] = "rtype";
+				params[j++] = rtype;
 			}
 		}
 
@@ -213,7 +241,7 @@ public class browser {
 
 			String[] files = req.getParameterValues("file");
 
-			try  {
+			try {
 				if (sgftp == null || dgftp == null ||
 				  files == null || files.length == 0)
 					throw new Exception("no files specified");
@@ -229,6 +257,46 @@ public class browser {
 			} catch (Exception e) {
 				emsg += "Error while trying to transfer files: " +
 				  e.getMessage();
+			}
+		} else if (action.equals("Stage Selected to Host")) {
+			String[] files = req.getParameterValues("file");
+			String type = null, host = null, cwd = null;
+			GridFTP gftp = null;
+
+			if (display.equals("l")) {
+				type = ltype;
+				host = lhost;
+				gftp = lgftp;
+				cwd = lcwd;
+			} else if (display.equals("r")) {
+				type = rtype;
+				host = rhost;
+				gftp = rgftp;
+				cwd = rcwd;
+			}
+
+			try {
+				if (files == null || files.length == 0)
+					throw new Exception("no files specified");
+
+				/* XXX - add support to url-copy to archiver then run above */
+				/* Indirect staging, must be copied to archiver first */
+				if (!type.equals("archiver"))
+					throw new Exception("Files can only be staged from " +
+					  "the archiver.  Please use the GridFTP browser to " +
+					  "copy the files to the archiver.");
+
+				/* Allows direct staging */
+				for(int i = 0; i < files.length; i++) {
+					MlsxEntry mx = gftp.mlst(files[i]);
+					if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
+						continue;
+
+					StageJob.archive2host(p.getGridInt(), host, ahost,
+					  cwd, acwd, files[i]);
+				}
+			} catch (Exception e) {
+				emsg += "Error while staging files: " + e.getMessage();
 			}
 		}
 
@@ -252,14 +320,16 @@ public class browser {
 					"files between your local machine and that target resource.")
 			  +  login(p, "l", params, hlist, lgftp);
 		else
-			s += browse(p, "l", lhost, params, lcwd, lgftp, rgftp != null);
+			s += browse(p, "l", lhost, params, lcwd,
+			  ltype, lgftp, rgftp != null);
 
 		s += oof.hr();
 
 		if (rhost.equals(""))
 			s += login(p, "r", params, hlist, rgftp);
 		else
-			s += browse(p, "r", rhost, params, rcwd, rgftp, lgftp != null);
+			s += browse(p, "r", rhost, params, rcwd,
+			  rtype, rgftp, lgftp != null);
 		s += p.footer();
 		return (s);
 	}
@@ -320,7 +390,7 @@ public class browser {
 
 		String extra = "";
 		String other = (display.equals("r") ? "l" : "r");
-		String ohost, ocwd;
+		String ohost, ocwd, otype;
 		if ((ohost = getParam(other + "host", params)) != null) {
 			extra += "" + oof.input(new Object[] {
 					"type", "hidden",
@@ -333,6 +403,13 @@ public class browser {
 						"type", "hidden",
 						"name", other + "cwd",
 						"value", ocwd
+					});
+
+			if ((otype = getParam(other + "type", params)) != null)
+				extra += "" + oof.input(new Object[] {
+						"type", "hidden",
+						"name", other + "type",
+						"value", otype
 					});
 		}
 
@@ -353,6 +430,15 @@ public class browser {
 						"onchange", js_hostchg(display + "host"),
 						"options", hlist
 					}) +
+					oof.br() + "Host type: " +
+					oof.input(new Object[] {
+						"type", "select",
+						"name", display + "type",
+						"options", new Object[] {
+							"gridftp", "GridFTP",
+							"archiver", "Archiver"
+						}
+					}) +
 					oof.p("&raquo; Enter the host name of the resource " +
 					"that you would like to browse over GridFTP.") +
 					extra +
@@ -366,7 +452,7 @@ public class browser {
 	}
 
 	public static String browse(Page p, String display, String hostname,
-	  String[] params, String cwd, GridFTP gftp, boolean oconn)
+	  String[] params, String cwd, String type, GridFTP gftp, boolean oconn)
 	  throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
@@ -382,9 +468,15 @@ public class browser {
 					"name", display + "cwd",
 					"value", cwd
 				});
+		if (type != null)
+			extra += "" + oof.input(new Object[] {
+					"type", "hidden",
+					"name", display + "type",
+					"value", type
+				});
 
 		String other = (display.equals("r") ? "l" : "r");
-		String ohost, ocwd;
+		String ohost, ocwd, otype;
 		if ((ohost = getParam(other + "host", params)) != null) {
 			extra += "" + oof.input(new Object[] {
 					"type", "hidden",
@@ -397,6 +489,13 @@ public class browser {
 						"type", "hidden",
 						"name", other + "cwd",
 						"value", ocwd
+					});
+
+			if ((otype = getParam(other + "type", params)) != null)
+				extra += "" + oof.input(new Object[] {
+						"type", "hidden",
+						"name", other + "type",
+						"value", otype
 					});
 		}
 
@@ -419,9 +518,29 @@ public class browser {
 		  "			f.checked = !f.checked;					" +
 		  "	}												";
 
+		String archextra = "";
+		if (type.equals("archiver"))
+			archextra += oof.br() + "" + oof.br() +
+				"Stage to Host: " +
+				oof.input(new Object[] {
+					"type", "text",
+					"name", "ahost"
+				}) + oof.br() +
+				"Directory: " +
+				oof.input(new Object[] {
+					"type", "text",
+					"name", "acwd"
+				}) + oof.br() +
+				oof.input(new Object[] {
+					"type", "submit",
+					"class", "button",
+					"name", "action",
+					"value", "Stage Selected to Host"
+				});
+
 		/* Form field for logging in */
 		s += ""
-		  + oof.p("Click on a file to download or a directory to view it's contents.")
+		  + oof.p("Click on a file to download or a directory to view its contents.")
 		  + oof.form_start(new Object[] {
 				"action", "browser",
 				"method", "GET",
@@ -498,7 +617,8 @@ public class browser {
 							"class", "button",
 							"name", "action",
 							"value", "Logout"
-						})
+						}) +
+						archextra
 				}
 			})
 		  + oof.table_end()
@@ -531,6 +651,7 @@ public class browser {
 		GridFile gf;
 
 		Vector v = gftp.gls();
+
 		Collections.sort(v);
 		String cwd = gftp.getCurrentDir();
 

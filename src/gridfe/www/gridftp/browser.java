@@ -30,9 +30,9 @@ public class browser {
 		String action = req.getParameter("action");
 		String display = req.getParameter("display");
 
-		/* Host and Directory Archived file is being staged to */
-		String ahost = req.getParameter("ahost");
-		String acwd = req.getParameter("acwd");
+		/* Host and directory archived file is being staged to */
+		String st_host = req.getParameter("st_host");
+		String st_cwd = req.getParameter("st_cwd");
 
 		if (lhost == null)
 			lhost = "";
@@ -53,10 +53,10 @@ public class browser {
 		if (display == null ||
 		  (!display.equals("l") && !display.equals("r")))
 			display = "";
-		if (ahost == null)
-			ahost = "";
-		if (acwd == null)
-			acwd = "";
+		if (st_host == null)
+			st_host = "";
+		if (st_cwd == null)
+			st_cwd = "";
 
 		if (action.equals("Logout")) {
 			if (display.equals("l"))
@@ -122,7 +122,7 @@ public class browser {
 					lgftp.changeDir(lcwd);
 			} catch (Exception e) {
 				emsg += "Error connecting to " +
-				  p.escapeHTML(lhost) + ": " + e.getMessage();
+				  p.escapeHTML(lhost + ": " + e.getMessage());
 			}
 			if (lgftp != null)
 				lcwd = lgftp.getCurrentDir();
@@ -136,7 +136,7 @@ public class browser {
 					rgftp.changeDir(rcwd);
 			} catch (Exception e) {
 				emsg += "Error connecting to " +
-				  p.escapeHTML(rhost) + ": " + e.getMessage();
+				  p.escapeHTML(rhost + ": " + e.getMessage());
 			}
 			if (rgftp != null)
 				rcwd = rgftp.getCurrentDir();
@@ -258,7 +258,7 @@ public class browser {
 				emsg += "Error while trying to transfer files: " +
 				  e.getMessage();
 			}
-		} else if (action.equals("Stage Selected to Host")) {
+		} else if (action.equals("Stage Checked to Host")) {
 			String[] files = req.getParameterValues("file");
 			String type = null, host = null, cwd = null;
 			GridFTP gftp = null;
@@ -292,8 +292,8 @@ public class browser {
 					if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
 						continue;
 
-					StageJob.archive2host(p.getGridInt(), host, ahost,
-					  cwd, acwd, files[i]);
+					StageJob.archive2host(p.getGridInt(), host, st_host,
+					  cwd, st_cwd, files[i]);
 				}
 			} catch (Exception e) {
 				emsg += "Error while staging files: " + e.getMessage();
@@ -462,12 +462,6 @@ public class browser {
 				"name", display + "host",
 				"value", hostname
 			});
-		if (cwd != null)
-			extra += "" + oof.input(new Object[] {
-					"type", "hidden",
-					"name", display + "cwd",
-					"value", cwd
-				});
 		if (type != null)
 			extra += "" + oof.input(new Object[] {
 					"type", "hidden",
@@ -498,6 +492,14 @@ public class browser {
 						"value", otype
 					});
 		}
+		String cd_extra = extra;
+
+		if (cwd != null)
+			extra += "" + oof.input(new Object[] {
+					"type", "hidden",
+					"name", display + "cwd",
+					"value", cwd
+				});
 
 		String rctl = "";
 		if (oconn)
@@ -506,6 +508,26 @@ public class browser {
 					"class", "button",
 					"name", "action",
 					"value", "Copy Checked To Other Host"
+				});
+
+		String st_extra = "";
+		if (type.equals("archiver"))
+			st_extra += oof.br() + "" + oof.br() +
+				"Stage to host: " +
+				oof.input(new Object[] {
+					"type", "text",
+					"name", "st_host"
+				}) + oof.br() +
+				"Directory: " +
+				oof.input(new Object[] {
+					"type", "text",
+					"name", "st_cwd"
+				}) + oof.br() +
+				oof.input(new Object[] {
+					"type", "submit",
+					"class", "button",
+					"name", "action",
+					"value", "Stage Checked to Host"
 				});
 
 		String js_toggle =
@@ -518,25 +540,10 @@ public class browser {
 		  "			f.checked = !f.checked;					" +
 		  "	}												";
 
-		String archextra = "";
-		if (type.equals("archiver"))
-			archextra += oof.br() + "" + oof.br() +
-				"Stage to Host: " +
-				oof.input(new Object[] {
-					"type", "text",
-					"name", "ahost"
-				}) + oof.br() +
-				"Directory: " +
-				oof.input(new Object[] {
-					"type", "text",
-					"name", "acwd"
-				}) + oof.br() +
-				oof.input(new Object[] {
-					"type", "submit",
-					"class", "button",
-					"name", "action",
-					"value", "Stage Selected to Host"
-				});
+		String js_gohome =
+		  "	this.form.elements['" + display +
+			"cwd'].value = '~';								" +
+		  "	this.form.submit();								";
 
 		String buildpath = "";
 		String path = "";
@@ -546,7 +553,7 @@ public class browser {
 				continue;
 
 			buildpath += "/" + ancestors[j];
-			path += "/" + oof.link(ancestors[j],
+			path += "/" + oof.link(p.escapeHTML(ancestors[j]),
 			  buildQS(p, params, new String[] {
 				display + "cwd", buildpath
 			  })
@@ -633,11 +640,12 @@ public class browser {
 							"name", "action",
 							"value", "Logout"
 						}) +
-						archextra
+						st_extra
 				}
 			})
 		  + oof.table_end()
 		  + oof.form_end()
+/*
 		  + oof.form(new Object[] {
 				"action", "browser",
 				"enctype", "multipart/form-data"
@@ -654,7 +662,53 @@ public class browser {
 					"name", "action",
 					"value", "Upload"
 				})
-			});
+			})
+*/
+		  + oof.form(new Object[] {
+				"action", "browser"
+		 	},
+		  	  new Object[] {
+				oof.table(new Object[] {
+					"class", Page.CCTBL,
+					"border", "0",
+					"cellspacing", "0",
+					"cellpadding", "0"
+				  },
+				  new Object[][][] {
+				    new Object[][] {
+				      new Object[] {
+						"class", Page.CCTBLFTR,
+						"value",
+							"Change directory: " +
+							oof.input(new Object[] {
+								"type", "text",
+								"name", display + "cwd",
+								"value", cwd
+							}) +
+							oof.br() +
+							cd_extra +
+							oof.input(new Object[] {
+								"type", "reset",
+								"class", "button",
+								"value", "Reset to Current"
+							}) +
+							oof.input(new Object[] {
+								"type", "submit",
+								"class", "button",
+								"value", "Change Directory"
+							}) +
+							oof.input(new Object[] {
+								"type", "button",
+								"class", "button",
+								"value", "Go Home",
+								"onclick", js_gohome
+							})
+					  }
+					}
+				  }
+				)
+			  }
+			);
 		 return (s);
 	}
 

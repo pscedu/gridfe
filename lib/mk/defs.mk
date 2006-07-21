@@ -5,12 +5,15 @@ JAVAC = ${JAVA_PREFIX}/bin/javac
 JAVA = ${JAVA_PREFIX}/bin/java
 SCLASSPATH =						\
 	${SYSROOT}/src:					\
-	/usr/share/java/servlet.jar:			\
+	${SERVLET_PREFIX}/servlet.jar:			\
+	${SERVLET_PREFIX}/commons-fileupload-1.1.1.jar:	\
 	${JAVA_PREFIX}/jre/lib/rt.jar:			\
 	${COG_PREFIX}/lib/gt4_0_0/cog-jglobus.jar:	\
 	${COG_PREFIX}/lib/puretls.jar:			\
 	${COG_PREFIX}/lib/commons-logging.jar:		\
+	${COG_PREFIX}/lib/log4j-1.2.8.jar:		\
 	${COG_PREFIX}/lib/cryptix32.jar:		\
+	${COG_PREFIX}/lib/cryptix.jar:			\
 	${COG_PREFIX}/lib/cryptix-asn1.jar:		\
 	${COG_PREFIX}/lib/jce-jdk13-125.jar:		\
 	.

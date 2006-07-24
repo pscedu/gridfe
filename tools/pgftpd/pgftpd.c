@@ -21,7 +21,7 @@ const char *progname;
 void
 serve(int clifd)
 {
-	
+
 }
 
 int
@@ -76,6 +76,7 @@ main(int argc, char *argv[])
 				break;
 			}
 		}
+		/* NOTREACHED */
 	}
 
 	close(s);

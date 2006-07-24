@@ -306,7 +306,7 @@ public class browser {
 		OOF oof = p.getOOF();
 		s += p.header("GridFTP File Browser");
 		if (!emsg.equals(""))
-			s += oof.p(emsg);
+			s += oof.p(new Object[] { "class", "err" }, emsg);
 
 		/*
 		 * Set the content to display -- browser if

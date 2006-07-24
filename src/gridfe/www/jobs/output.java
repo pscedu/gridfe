@@ -22,7 +22,10 @@ public class output {
 			/* This should never throw an exception since we just checked it. */
 			GridJob j = jl.get(Integer.parseInt(s_qid));
 			if (j != null) {
-				gi.startRetrieve(j, j.getStdout(), 28000, 28255);
+				
+				/* This should not be hard coded! read env?? */
+//				gi.startRetrieve(j, j.getStdout(), 28000, 28255);
+				gi.startRetrieve(j, j.getStdout(), 50000, 51000);
 				int size = (int)gi.getGass().getSize();
 /*
 				if (size > )

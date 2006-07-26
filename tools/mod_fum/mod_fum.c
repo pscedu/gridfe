@@ -690,10 +690,11 @@ mf_valid_user(const char *principal, const char *password)
 	 */
 	if ((err = krb5_get_init_creds_password(ki.ki_ctx,
 	     &ki.ki_cred, ki.ki_prin, (char *)kp.kp_pw,
-	     krb5_prompter_posix, NULL, 0, NULL, &opt)) != 0)
+	     krb5_prompter_posix, NULL, 0, NULL, &opt)) == 0)
+		ki.ki_init = 1;
+	else
 		/* XXX: ki.ki_init = 0 ? */
 		mf_log("bad authentication (%d)", err);
-	ki.ki_init = 1;
 
 cleanup:
 	mf_kinit_cleanup(&ki);

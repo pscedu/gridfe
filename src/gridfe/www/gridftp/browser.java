@@ -27,10 +27,7 @@ public class browser {
 	private static final int I_RTYPE	= 5;
 	private static final int I_ACTION	= 6;
 	private static final int I_DISPLAY	= 7;
-	private static final int I_UPFILE	= 8;
-	private static final int I_ST_HOST	= 9;
-	private static final int I_ST_CWD	= 10;
-	private static final int NI			= 11;
+	private static final int NI			= 8;
 
 	public static String main(Page p)
 	  throws Exception {
@@ -52,9 +49,6 @@ public class browser {
 			v[I_RTYPE] = req.getParameter("rtype");
 			v[I_ACTION] = req.getParameter("action");
 			v[I_DISPLAY] = req.getParameter("display");
-			v[I_UPFILE] = req.getParameter("upfile");
-			v[I_ST_HOST] = req.getParameter("st_host");
-			v[I_ST_CWD] = req.getParameter("st_cwd");
 		}
 
 		for (int j = 0; j < v.length; j++)
@@ -69,9 +63,6 @@ public class browser {
 		String rtype = v[I_RTYPE];
 		String action = v[I_ACTION];
 		String display = v[I_DISPLAY];
-		String upfile = v[I_UPFILE];
-		String st_host = v[I_ST_HOST];
-		String st_cwd = v[I_ST_CWD];
 
 		/* validity checks */
 		if (!ltype.equals("archiver") &&
@@ -157,8 +148,8 @@ public class browser {
 				if (!lcwd.equals(""))
 					lgftp.changeDir(lcwd);
 			} catch (Exception e) {
-				emsg += "Error connecting to " +
-				  p.escapeHTML(lhost + ": " + e.getMessage());
+				emsg += " Error connecting to " +
+				  p.escapeHTML(lhost + ": " + e.getMessage()) + ".";
 			}
 			if (lgftp != null)
 				lcwd = lgftp.getCurrentDir();
@@ -171,139 +162,47 @@ public class browser {
 				if (!rcwd.equals(""))
 					rgftp.changeDir(rcwd);
 			} catch (Exception e) {
-				emsg += "Error connecting to " +
-				  p.escapeHTML(rhost + ": " + e.getMessage());
+				emsg += " Error connecting to " +
+				  p.escapeHTML(rhost + ": " + e.getMessage()) + ".";
 			}
 			if (rgftp != null)
 				rcwd = rgftp.getCurrentDir();
 		}
 
+		GridFTP dgftp = null, ogftp = null;
+		String dhost = null, ohost = null;
+		String dcwd = null, ocwd = null;
+		String dtype = null, otype = null;
+
+		if (display.equals("l")) {
+			dgftp = lgftp;	ogftp = rgftp;
+			dhost = lhost;	ohost = rhost;
+			dcwd = lcwd;	ocwd = rcwd;
+			dtype = ltype;	otype = rtype;
+		} else if (display.equals("r")) {
+			dgftp = rgftp;	ogftp = lgftp;
+			dhost = rhost;	ohost = lhost;
+			dcwd = rcwd;	ocwd = lcwd;
+			dtype = rtype;	otype = ltype;
+		}
+
+		/*
+		 * Handle actions.
+		 */
 		if (action.equals("download")) {
-			emsg += download(p, display, lgftp, lcwd, rgftp, rcwd);
+			emsg += download(p, dgftp, dcwd);
 			if (emsg.equals(""))
 				return ("");
 		} else if (action.equals("Upload")) {
-
+			emsg += upload(p, dgftp, dcwd);
 		} else if (action.equals("Delete Checked")) {
-			String[] files = req.getParameterValues("file");
-
-			GridFTP gftp = null;
-			if (display.equals("l"))
-				gftp = lgftp;
-			else if (display.equals("r"))
-				gftp = rgftp;
-			if (gftp != null && files != null && files.length > 0) {
-				for (int k = 0; k < files.length; k++) {
-					try {
-						MlsxEntry mx = gftp.mlst(files[k]);
-						if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
-							gftp.deleteFile(files[k]);
-						else if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_DIR))
-							gftp.deleteDir(files[k]);
-						else
-							throw new Exception("unknown file type");
-					} catch (Exception e) {
-						emsg += "Error while trying to delete " +
-						  p.escapeHTML(files[k]) + ": " + e.getMessage();
-					}
-				}
-			}
+			emsg += rm(p, dgftp);
 		} else if (action.equals("Create Directory")) {
-			String dir = req.getParameter("newdir");
-
-			if (dir == null)
-				dir = "";
-			try {
-				if (dir.equals("") || dir.matches("/"))
-					throw new Exception("invalid directory name");
-
-				if (display.equals("l"))
-					lgftp.makeDir(dir);
-				else if (display.equals("r"))
-					rgftp.makeDir(dir);
-			} catch (Exception e) {
-				emsg += "Error while trying to create a new directory: " +
-				  e.getMessage();
-			}
+			emsg += mkdir(p, dgftp);
 		} else if (action.equals("Copy Checked To Other Host")) {
-			String shost = null, dhost = null, scwd = null, dcwd = null;
-			GridFTP sgftp = null, dgftp = null;
-
-			if (display.equals("l")) {
-				shost = lhost;
-				dhost = rhost;
-				scwd = lcwd;
-				dcwd = rcwd;
-				sgftp = lgftp;
-				dgftp = rgftp;
-			} else if (display.equals("r")) {
-				shost = rhost;
-				dhost = lhost;
-				scwd = rcwd;
-				dcwd = lcwd;
-				sgftp = rgftp;
-				dgftp = lgftp;
-			}
-
-			String[] files = req.getParameterValues("file");
-
-			try {
-				if (sgftp == null || dgftp == null ||
-				  files == null || files.length == 0)
-					throw new Exception("no files specified");
-				for (int k = 0; k < files.length; k++) {
-					if (files[k].equals(".") || files[k].equals(".."))
-						continue;
-					MlsxEntry mx = sgftp.mlst(files[k]);
-					if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
-						continue;
-					GridFTP.urlCopy(gi.getGSS().getGSSCredential(),
-					  shost, dhost, scwd + "/" + files[k], dcwd + "/" + files[k]);
-				}
-			} catch (Exception e) {
-				emsg += "Error while trying to transfer files: " +
-				  e.getMessage();
-			}
+			emsg += copy(p, dgftp, dhost, dcwd, ohost, ocwd);
 		} else if (action.equals("Stage Checked to Host")) {
-			String[] files = req.getParameterValues("file");
-			String type = null, host = null, cwd = null;
-			GridFTP gftp = null;
-
-			if (display.equals("l")) {
-				type = ltype;
-				host = lhost;
-				gftp = lgftp;
-				cwd = lcwd;
-			} else if (display.equals("r")) {
-				type = rtype;
-				host = rhost;
-				gftp = rgftp;
-				cwd = rcwd;
-			}
-
-			try {
-				if (files == null || files.length == 0)
-					throw new Exception("no files specified");
-
-				/* XXX - add support to url-copy to archiver then run above */
-				/* Indirect staging, must be copied to archiver first */
-				if (!type.equals("archiver"))
-					throw new Exception("Files can only be staged from " +
-					  "the archiver.  Please use the GridFTP browser to " +
-					  "copy the files to the archiver.");
-
-				/* Allows direct staging */
-				for(int i = 0; i < files.length; i++) {
-					MlsxEntry mx = gftp.mlst(files[i]);
-					if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
-						continue;
-
-					StageJob.archive2host(p.getGridInt(), host, st_host,
-					  cwd, st_cwd, files[i]);
-				}
-			} catch (Exception e) {
-				emsg += "Error while staging files: " + e.getMessage();
-			}
+			emsg += stage(p, dgftp, dhost, dcwd, dtype);
 		}
 
 		Object[] hlist = browser.createHostList(p);
@@ -324,7 +223,7 @@ public class browser {
 					"transfer files between them.  Alternatively, you may " +
 					"connect to only one resource if you wish to transfer " +
 					"files between your local machine and that target resource.")
-			  +  login(p, "l", params, hlist, lgftp);
+			  +  login(p, "l", params, hlist);
 		else
 			s += browse(p, "l", lhost, params, lcwd,
 			  ltype, lgftp, rgftp != null);
@@ -332,7 +231,7 @@ public class browser {
 		s += oof.hr();
 
 		if (rhost.equals(""))
-			s += login(p, "r", params, hlist, rgftp);
+			s += login(p, "r", params, hlist);
 		else
 			s += browse(p, "r", rhost, params, rcwd,
 			  rtype, rgftp, lgftp != null);
@@ -406,26 +305,147 @@ public class browser {
 		return (s);
 	}
 
-	private static String download(Page p, String display,
-	  GridFTP lgftp, String lcwd, GridFTP rgftp, String rcwd) {
+	private static String upload(Page p, GridFTP gftp, String cwd) {
+		String emsg = "";
+
+		return (emsg);
+	}
+
+	private static String rm(Page p, GridFTP gftp) {
+		HttpServletRequest req = p.getRequest();
+		String[] files = req.getParameterValues("file");
+		String emsg = "";
+
+		if (gftp == null)
+			return (" Error deleting files: not connected to host.");
+		if (files == null || files.length == 0)
+			return (" Error deleting files: no files specified.");
+
+		for (int k = 0; k < files.length; k++) {
+			try {
+				MlsxEntry mx = gftp.mlst(files[k]);
+				if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
+					gftp.deleteFile(files[k]);
+				else if (mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_DIR))
+					gftp.deleteDir(files[k]);
+				else
+					throw new Exception("unknown file type");
+			} catch (Exception e) {
+				emsg += " Error while trying to delete " +
+				  p.escapeHTML(files[k]) + ": " + e.getMessage() + ".";
+			}
+		}
+		return (emsg);
+	}
+
+	private static String mkdir(Page p, GridFTP gftp) {
+		HttpServletRequest req = p.getRequest();
+		String dir = req.getParameter("newdir");
+		String emsg = "";
+
+		try {
+			if (dir == null || dir.equals("") ||
+			  dir.matches("/") || dir.matches("^."))
+				throw new Exception("invalid directory name");
+			gftp.makeDir(dir);
+		} catch (Exception e) {
+			emsg += " Error while trying to create a new directory: " +
+			  e.getMessage() + ".";
+		}
+		return (emsg);
+	}
+
+	private static String copy(Page p, GridFTP src_gftp,
+	  String src_host, String src_cwd,
+	  String dst_host, String dst_cwd) {
+		HttpServletRequest req = p.getRequest();
+		GridInt gi = p.getGridInt();
+		String[] files = req.getParameterValues("file");
+		String emsg = "";
+
+		try {
+			if (src_gftp == null)
+				throw new Exception("not connected to source resource");
+			if (src_host == null)
+				throw new Exception("no source resource specified");
+			if (dst_host == null)
+				throw new Exception("no destination resource specified");
+			if (src_cwd == null)
+				throw new Exception("no source working directory specified");
+			if (dst_cwd == null)
+				throw new Exception("no destination working directory specified");
+			if (files == null || files.length == 0)
+				throw new Exception("no files specified");
+
+			for (int k = 0; k < files.length; k++) {
+				if (files[k].equals(".") || files[k].equals(".."))
+					continue;
+				MlsxEntry mx = src_gftp.mlst(files[k]);
+				if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
+					continue;
+				GridFTP.urlCopy(gi.getGSS().getGSSCredential(),
+				  src_host, dst_host, src_cwd + "/" + files[k],
+				  dst_cwd + "/" + files[k]);
+			}
+		} catch (Exception e) {
+			emsg += "Error while trying to transfer files: " +
+			  e.getMessage();
+		}
+		return (emsg);
+	}
+
+	private static String stage(Page p, GridFTP gftp, String host,
+	  String cwd, String type) {
+		HttpServletRequest req = p.getRequest();
+		String[] files = req.getParameterValues("file");
+		String st_host = req.getParameter("st_host");
+		String st_cwd = req.getParameter("st_cwd");
+		String emsg = "";
+
+		try {
+			if (gftp == null)
+				throw new Exception("no connection to host");
+			if (st_host == null)
+				throw new Exception("no stage host specified");
+			if (st_cwd == null)
+				throw new Exception("no stage working directory specified");
+			if (files == null || files.length == 0)
+				throw new Exception("no files specified");
+
+			/* XXX - add support to url-copy to archiver then run above */
+			/* Indirect staging, must be copied to archiver first */
+			if (!type.equals("archiver"))
+				throw new Exception("Files can only be staged from " +
+				  "the archiver.  Please use the GridFTP browser to " +
+				  "copy the files to the archiver.");
+
+			/* Allows direct staging */
+			for (int i = 0; i < files.length; i++) {
+				MlsxEntry mx = gftp.mlst(files[i]);
+				if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
+					continue;
+
+				StageJob.archive2host(p.getGridInt(), host, st_host,
+				  cwd, st_cwd, files[i]);
+			}
+		} catch (Exception e) {
+			emsg += " Error while staging files: " + e.getMessage() + ".";
+		}
+		return (emsg);
+	}
+
+	private static String download(Page p, GridFTP gftp, String cwd) {
 		HttpServletRequest req = p.getRequest();
 		String file = req.getParameter("file");
-		String cwd = null;
-		GridFTP gftp = null;
-
-		if (display.equals("l")) {
-			gftp = lgftp;
-			cwd = lcwd;
-		} else if (display.equals("r")) {
-			gftp = rgftp;
-			cwd = rcwd;
-		}
+		String emsg = "";
 
 		try {
 			PrintWriter w = p.getResponse().getWriter();
 
 			if (gftp == null)
 				throw new Exception("not connected to host");
+			if (cwd == null)
+				throw new Exception("no working directory specified");
 			if (file == null || file.equals(""))
 				throw new Exception("no file specified");
 
@@ -441,18 +461,18 @@ public class browser {
 			int c;
 			while ((c = r.read()) != -1)
 				w.write(c);
-			return ("");
 		} catch (Exception e) {
-			return ("Error while trying to fetch " +
-			  p.escapeHTML(file) + ": " + e.getMessage());
+			emsg += "Error while trying to fetch " +
+			  p.escapeHTML(file) + ": " + e.getMessage();
 		}
+		return (emsg);
 	}
 
 	/*
 	 * Login table for the gridftp structure
 	 */
-	public static String login(Page p, String display, String[] params,
-	  Object[] hlist, GridFTP gftp) throws Exception {
+	public static String login(Page p, String display,
+	  String[] params, Object[] hlist) throws Exception {
 		String s = "";
 		OOF oof = p.getOOF();
 

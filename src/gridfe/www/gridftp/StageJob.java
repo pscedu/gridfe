@@ -4,16 +4,16 @@ package gridfe.www.gridftp;
 
 import gridfe.*;
 import gridfe.gridint.*;
-import java.sql.*;
-import javax.servlet.http.*;
-import java.util.*;
-import oof.*;
-import jasp.*;
 import gridfe.www.gridftp.*;
+import jasp.*;
+import java.sql.*;
+import java.util.*;
+import javax.servlet.http.*;
+import oof.*;
 
 public class StageJob {
-	public static void archive2host(GridInt gi, String archiver, String host, String scwd, String dcwd, String file)
-	  throws Exception {
+	public static void archive2host(GridInt gi, String archiver,
+	  String host, String scwd, String dcwd, String file) throws Exception {
 		String rlsout = null;
 		String errmsg = null;
 //		final String host = "ben.psc.edu";

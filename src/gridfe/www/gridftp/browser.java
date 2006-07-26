@@ -32,6 +32,7 @@ public class browser {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
+		List upfiles = new LinkedList();
 		String emsg = "";
 
 		String v[] = new String[NI];
@@ -39,7 +40,7 @@ public class browser {
 			v[j] = null;
 
 		if (ServletFileUpload.isMultipartContent(req)) {
-			parseMultipart(v, req);
+			parseMultipart(v, req, upfiles);
 		} else {
 			v[I_LHOST] = req.getParameter("lhost");
 			v[I_RHOST] = req.getParameter("rhost");
@@ -194,7 +195,7 @@ public class browser {
 			if (emsg.equals(""))
 				return ("");
 		} else if (action.equals("Upload")) {
-			emsg += upload(p, dgftp, dcwd);
+			emsg += upload(p, dgftp, dcwd, upfiles);
 		} else if (action.equals("Delete Checked")) {
 			emsg += rm(p, dgftp);
 		} else if (action.equals("Create Directory")) {
@@ -239,16 +240,17 @@ public class browser {
 		return (s);
 	}
 
-	private static void parseMultipart(String[] v, HttpServletRequest req) {
+	private static void parseMultipart(String[] v,
+	  HttpServletRequest req, List upfiles) {
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// maximum size that will be stored in memory
-		factory.setSizeThreshold(4096);
+		factory.setSizeThreshold(1024);
 		// the location for saving data that is larger than getSizeThreshold()
 		factory.setRepository(new File("/tmp"));
 
         ServletFileUpload upload = new ServletFileUpload(factory);
         // maximum size before a FileUploadException will be thrown
-        upload.setSizeMax(1000000);
+        upload.setSizeMax(1024 * 1024 * 10);
 
 		List fileItems;
 		try {
@@ -256,16 +258,30 @@ public class browser {
 		} catch (Exception e) {
 			return;
 		}
-        // assume we know there are two files. The first file is a small
-        // text file, the second is unknown and is written to a file on
-        // the server
+
 		FileItem fi;
         for (Iterator i = fileItems.iterator();
 		  i.hasNext() && (fi = (FileItem)i.next()) != null; ) {
-//			s += "filename=" + fi + "; name=" + fi.getName() +
-//			  "; str=" + fi.getString() + "<br>\n";
+			if (fi.isFormField()) {
+				if (fi.getFieldName().equals("lhost"))
+					v[I_LHOST] = fi.getString();
+				if (fi.getFieldName().equals("rhost"))
+					v[I_RHOST] = fi.getString();
+				if (fi.getFieldName().equals("lcwd"))
+					v[I_LCWD] = fi.getString();
+				if (fi.getFieldName().equals("rcwd"))
+					v[I_RCWD] = fi.getString();
+				if (fi.getFieldName().equals("ltype"))
+					v[I_LTYPE] = fi.getString();
+				if (fi.getFieldName().equals("rtype"))
+					v[I_RTYPE] = fi.getString();
+				if (fi.getFieldName().equals("action"))
+					v[I_ACTION] = fi.getString();
+				if (fi.getFieldName().equals("display"))
+					v[I_DISPLAY] = fi.getString();
+			} else
+				upfiles.add(fi);
 		}
-      //  fi.write(new File("/www/uploads/", fileName));
 	}
 
 	public static String getParam(String param, String[] params) {
@@ -305,9 +321,23 @@ public class browser {
 		return (s);
 	}
 
-	private static String upload(Page p, GridFTP gftp, String cwd) {
+	private static String upload(Page p, GridFTP gftp,
+	  String cwd, List upfiles) {
 		String emsg = "";
+		FileItem fi;
 
+		for (Iterator it = upfiles.iterator();
+		  it.hasNext() && (fi = (FileItem)it.next()) != null; ) {
+			try {
+				if (fi.getFieldName().equals("upfile")) {
+					File tmpf = File.createTempFile("gridfe.up", null);
+					fi.write(tmpf);
+					gftp.put(tmpf, cwd + fi.getName(), false);
+				}
+			} catch (Exception e) {
+				emsg += " Error while uploading: " + e.getMessage() + ".";
+			}
+		}
 		return (emsg);
 	}
 

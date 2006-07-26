@@ -11,53 +11,85 @@ import javax.servlet.http.*;
 import oof.*;
 import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
+import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.*;
+import org.apache.commons.fileupload.servlet.*;
+import org.apache.commons.io.output.DeferredFileOutputStream; /* needed by fileupload */
 
 public class browser {
 	public static final int GRIDFTP_PORT = 2811;
 
+	private static final int I_LHOST	= 0;
+	private static final int I_RHOST	= 1;
+	private static final int I_LCWD		= 2;
+	private static final int I_RCWD		= 3;
+	private static final int I_LTYPE	= 4;
+	private static final int I_RTYPE	= 5;
+	private static final int I_ACTION	= 6;
+	private static final int I_DISPLAY	= 7;
+	private static final int I_UPFILE	= 8;
+	private static final int I_ST_HOST	= 9;
+	private static final int I_ST_CWD	= 10;
+	private static final int NI			= 11;
+
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
-		PrintWriter w = p.getResponse().getWriter();
 		String emsg = "";
 
-		String lhost = req.getParameter("lhost");
-		String rhost = req.getParameter("rhost");
-		String lcwd = req.getParameter("lcwd");
-		String rcwd = req.getParameter("rcwd");
-		String ltype = req.getParameter("ltype");
-		String rtype = req.getParameter("rtype");
-		String action = req.getParameter("action");
-		String display = req.getParameter("display");
+		String v[] = new String[NI];
+		for (int j = 0; j < v.length; j++)
+			v[j] = null;
 
-		/* Host and directory archived file is being staged to */
-		String st_host = req.getParameter("st_host");
-		String st_cwd = req.getParameter("st_cwd");
+		if (ServletFileUpload.isMultipartContent(req)) {
+			parseMultipart(v, req);
+		} else {
+			v[I_LHOST] = req.getParameter("lhost");
+			v[I_RHOST] = req.getParameter("rhost");
+			v[I_LCWD] = req.getParameter("lcwd");
+			v[I_RCWD] = req.getParameter("rcwd");
+			v[I_LTYPE] = req.getParameter("ltype");
+			v[I_RTYPE] = req.getParameter("rtype");
+			v[I_ACTION] = req.getParameter("action");
+			v[I_DISPLAY] = req.getParameter("display");
+			v[I_UPFILE] = req.getParameter("upfile");
+			v[I_ST_HOST] = req.getParameter("st_host");
+			v[I_ST_CWD] = req.getParameter("st_cwd");
+		}
 
-		if (lhost == null)
-			lhost = "";
-		if (rhost == null)
-			rhost = "";
-		if (lcwd == null)
-			lcwd = "";
-		if (rcwd == null)
-			rcwd = "";
-		if (ltype == null ||
-		  (!ltype.equals("archiver") && !ltype.equals("gridftp")))
+		for (int j = 0; j < v.length; j++)
+			if (v[j] == null)
+				v[j] = "";
+
+		String lhost = v[I_LHOST];
+		String rhost = v[I_RHOST];
+		String lcwd = v[I_LCWD];
+		String rcwd = v[I_RCWD];
+		String ltype = v[I_LTYPE];
+		String rtype = v[I_RTYPE];
+		String action = v[I_ACTION];
+		String display = v[I_DISPLAY];
+		String upfile = v[I_UPFILE];
+		String st_host = v[I_ST_HOST];
+		String st_cwd = v[I_ST_CWD];
+
+		/* validity checks */
+		if (!ltype.equals("archiver") &&
+		    !ltype.equals("gridftp"))
 			ltype = "gridftp";
-		if (rtype == null ||
-		  (!rtype.equals("archiver") && !rtype.equals("gridftp")))
-			rtype = "gridftp";
-		if (action == null)
-			action = "";
-		if (display == null ||
-		  (!display.equals("l") && !display.equals("r")))
-			display = "";
-		if (st_host == null)
-			st_host = "";
-		if (st_cwd == null)
-			st_cwd = "";
 
+		if (!rtype.equals("archiver") &&
+		    !rtype.equals("gridftp"))
+			rtype = "gridftp";
+
+		if (!display.equals("l") &&
+		    !display.equals("r"))
+			display = "";
+
+		/*
+		 * Logout action needs to be handled
+		 * here to simply not re-login.
+		 */
 		if (action.equals("Logout")) {
 			if (display.equals("l"))
 				lhost = "";
@@ -65,6 +97,10 @@ public class browser {
 				rhost = "";
 		}
 
+		/*
+		 * Count up and add args to pass around in
+		 * an array for easy query string building.
+		 */
 		int len = 0;
 
 		if (!lhost.equals("")) {
@@ -111,7 +147,7 @@ public class browser {
 			}
 		}
 
-		/* Grab the GridInt and make the GridFTP connection */
+		/* Establish GridFTP connections. */
 		GridFTP lgftp = null, rgftp = null;
 		GridInt gi = p.getGridInt();
 		if (!lhost.equals("")) {
@@ -143,41 +179,11 @@ public class browser {
 		}
 
 		if (action.equals("download")) {
-			String file = req.getParameter("file");
-			String cwd = null;
-			GridFTP gftp = null;
-
-			if (display.equals("l")) {
-				gftp = lgftp;
-				cwd = lcwd;
-			} else if (display.equals("r")) {
-				gftp = rgftp;
-				cwd = rcwd;
-			}
-
-			try {
-				if (gftp == null)
-					throw new Exception("not connected to host");
-
-				File tmpf = File.createTempFile("gridfe.dl", null);
-				gftp.get(cwd + "/" + file, tmpf);
-
-				p.getResponse().setContentType("application/octet-stream");
-				p.getResponse().setHeader("Content-disposition",
-				    "attachment; filename=\"" +
-					p.getJASP().escapeAttachName(file) + "\"");
-
-				BufferedReader r = new BufferedReader(new FileReader(tmpf));
-				int c;
-				while ((c = r.read()) != -1)
-					w.write(c);
-
+			emsg += download(p, display, lgftp, lcwd, rgftp, rcwd);
+			if (emsg.equals(""))
 				return ("");
-			} catch (Exception e) {
-				emsg += "Error while trying to fetch " +
-				  p.escapeHTML(file) + ": " + e.getMessage();
-			}
 		} else if (action.equals("Upload")) {
+
 		} else if (action.equals("Delete Checked")) {
 			String[] files = req.getParameterValues("file");
 
@@ -334,6 +340,35 @@ public class browser {
 		return (s);
 	}
 
+	private static void parseMultipart(String[] v, HttpServletRequest req) {
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		// maximum size that will be stored in memory
+		factory.setSizeThreshold(4096);
+		// the location for saving data that is larger than getSizeThreshold()
+		factory.setRepository(new File("/tmp"));
+
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        // maximum size before a FileUploadException will be thrown
+        upload.setSizeMax(1000000);
+
+		List fileItems;
+		try {
+			fileItems = upload.parseRequest(req);
+		} catch (Exception e) {
+			return;
+		}
+        // assume we know there are two files. The first file is a small
+        // text file, the second is unknown and is written to a file on
+        // the server
+		FileItem fi;
+        for (Iterator i = fileItems.iterator();
+		  i.hasNext() && (fi = (FileItem)i.next()) != null; ) {
+//			s += "filename=" + fi + "; name=" + fi.getName() +
+//			  "; str=" + fi.getString() + "<br>\n";
+		}
+      //  fi.write(new File("/www/uploads/", fileName));
+	}
+
 	public static String getParam(String param, String[] params) {
 		for (int j = 0; j + 1 < params.length; j += 2)
 			if (params[j].equals(param))
@@ -369,6 +404,48 @@ public class browser {
 			s += pnew[k] + "=" + page.escapeURL(pnew[k + 1]) + "&amp;";
 		}
 		return (s);
+	}
+
+	private static String download(Page p, String display,
+	  GridFTP lgftp, String lcwd, GridFTP rgftp, String rcwd) {
+		HttpServletRequest req = p.getRequest();
+		String file = req.getParameter("file");
+		String cwd = null;
+		GridFTP gftp = null;
+
+		if (display.equals("l")) {
+			gftp = lgftp;
+			cwd = lcwd;
+		} else if (display.equals("r")) {
+			gftp = rgftp;
+			cwd = rcwd;
+		}
+
+		try {
+			PrintWriter w = p.getResponse().getWriter();
+
+			if (gftp == null)
+				throw new Exception("not connected to host");
+			if (file == null || file.equals(""))
+				throw new Exception("no file specified");
+
+			File tmpf = File.createTempFile("gridfe.dl", null);
+			gftp.get(cwd + "/" + file, tmpf);
+
+			p.getResponse().setContentType("application/octet-stream");
+			p.getResponse().setHeader("Content-disposition",
+			    "attachment; filename=\"" +
+				p.getJASP().escapeAttachName(file) + "\"");
+
+			BufferedReader r = new BufferedReader(new FileReader(tmpf));
+			int c;
+			while ((c = r.read()) != -1)
+				w.write(c);
+			return ("");
+		} catch (Exception e) {
+			return ("Error while trying to fetch " +
+			  p.escapeHTML(file) + ": " + e.getMessage());
+		}
 	}
 
 	/*
@@ -645,10 +722,10 @@ public class browser {
 			})
 		  + oof.table_end()
 		  + oof.form_end()
-/*
 		  + oof.form(new Object[] {
 				"action", "browser",
-				"enctype", "multipart/form-data"
+				"enctype", "multipart/form-data",
+				"method", "POST"
 			}, new Object[] {
 			    "Upload file: " +
 				oof.input(new Object[] {
@@ -663,7 +740,6 @@ public class browser {
 					"value", "Upload"
 				})
 			})
-*/
 		  + oof.form(new Object[] {
 				"action", "browser"
 		 	},

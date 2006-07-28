@@ -242,6 +242,12 @@ public class browser {
 
 	private static void parseMultipart(String[] v,
 	  HttpServletRequest req, List upfiles) {
+		try {
+			DeferredFileOutputStream df =
+			    new DeferredFileOutputStream(1024, new File("/dev/null"));
+			df.close();
+		} catch (Exception e) {
+		}
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		// maximum size that will be stored in memory
 		factory.setSizeThreshold(1024);
@@ -326,13 +332,18 @@ public class browser {
 		String emsg = "";
 		FileItem fi;
 
+		if (gftp == null)
+			return (" Error while uploading: no connection to resource.");
+		if (cwd == null)
+			return (" Error while uploading: no working directory specified.");
+
 		for (Iterator it = upfiles.iterator();
 		  it.hasNext() && (fi = (FileItem)it.next()) != null; ) {
 			try {
 				if (fi.getFieldName().equals("upfile")) {
 					File tmpf = File.createTempFile("gridfe.up", null);
 					fi.write(tmpf);
-					gftp.put(tmpf, cwd + fi.getName(), false);
+					gftp.put(tmpf, cwd + "/" + fi.getName(), false);
 				}
 			} catch (Exception e) {
 				emsg += " Error while uploading: " + e.getMessage() + ".";
@@ -584,6 +595,13 @@ public class browser {
 		String s = "";
 		OOF oof = p.getOOF();
 
+System.err.println("GFTP LS: \n" +
+  "  display: " + display + "\n" +
+  "  hostname: " + hostname + "\n" +
+  "  cwd: " + cwd + "\n" +
+  "  type: " + type + "\n" +
+  "  gftp? " + gftp);
+
 		String extra = "" + oof.input(new Object[] {
 				"type", "hidden",
 				"name", display + "host",
@@ -725,7 +743,7 @@ public class browser {
 		 * Parse the list and put each file (with size, perm,
 		 * date/time) on a table row.
 		 */
-		  + listing(display, p, gftp, params)
+		  + listing(p, display, gftp, cwd, params)
 		  + oof.table_row(new Object[][] {
 				new Object[] {
 					"class", Page.CCTBLFTR,
@@ -777,23 +795,41 @@ public class browser {
 				"enctype", "multipart/form-data",
 				"method", "POST"
 			}, new Object[] {
-			    "Upload file: " +
-				oof.input(new Object[] {
-					"type", "file",
-					"name", "upfile"
-				}) +
-				extra +
-				oof.input(new Object[] {
-					"type", "submit",
-					"class", "button",
-					"name", "action",
-					"value", "Upload"
-				})
+				oof.table(new Object[] {
+					"class", Page.CCTBL,
+					"border", "0",
+					"cellspacing", "0",
+					"cellpadding", "0"
+				  },
+				  new Object[][][] {
+				    new Object[][] {
+				      new Object[] {
+						"class", Page.CCTBLFTR,
+						"value", "Upload file: " +
+							oof.input(new Object[] {
+								"type", "file",
+								"name", "upfile"
+							}) +
+							oof.input(new Object[] {
+								"type", "hidden",
+								"name", "display",
+								"value", display
+							}) +
+							extra +
+							oof.input(new Object[] {
+								"type", "submit",
+								"class", "button",
+								"name", "action",
+								"value", "Upload"
+							})
+						}
+					  }
+					}
+				)
 			})
 		  + oof.form(new Object[] {
 				"action", "browser"
-		 	},
-		  	  new Object[] {
+		 	}, new Object[] {
 				oof.table(new Object[] {
 					"class", Page.CCTBL,
 					"border", "0",
@@ -840,15 +876,13 @@ public class browser {
 
 	public static final int MAXFNLEN = 40;
 
-	public static String listing(String display, Page p, GridFTP gftp,
-	  String[] params) throws Exception {
+	public static String listing(Page p, String display, GridFTP gftp,
+	  String cwd, String[] params) throws Exception {
 		OOF oof = p.getOOF();
 		GridFile gf;
 
 		Vector v = gftp.gls();
-
 		Collections.sort(v);
-		String cwd = gftp.getCurrentDir();
 
 		String prefix = p.getWebRoot() + "/img/";
 

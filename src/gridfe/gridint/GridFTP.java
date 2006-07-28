@@ -61,7 +61,7 @@ public class GridFTP extends GridFTPClient {
 	  throws IOException, ServerException, ClientException {
 		System.out.println("Trying GridFTP.gls()");
 //		Vector v = this.list(null, null);
-		Vector v = this.list();
+		Vector v = this.list(); /* XXX: use mlsd */
 		System.out.println("Successful GridFTP.gls()");
 		return GridFTP.fi2GridFile(v);
 	}
@@ -74,6 +74,7 @@ public class GridFTP extends GridFTPClient {
 	}
 */
 
+/*
 	public Vector test()
 	  throws IOException, ServerException, ClientException {
 		System.out.println("Trying GridFTP.mlsd()");
@@ -81,6 +82,7 @@ public class GridFTP extends GridFTPClient {
 		System.out.println("Successful GridFTP.mlsd()");
 		return GridFTP.mlsx2GridFile(v);
 	}
+*/
 
 	/* Convert FileInfo Vectors to GridFile Vectors */
 	public static Vector fi2GridFile(Vector v) {

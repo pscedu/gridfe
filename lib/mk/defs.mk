@@ -7,6 +7,7 @@ SCLASSPATH =						\
 	${SYSROOT}/src:					\
 	${SERVLET_PREFIX}/servlet.jar:			\
 	${SERVLET_PREFIX}/commons-fileupload-1.1.1.jar:	\
+	${SERVLET_PREFIX}/commons-io-1.2.jar:		\
 	${JAVA_PREFIX}/jre/lib/rt.jar:			\
 	${COG_PREFIX}/lib/gt4_0_0/cog-jglobus.jar:	\
 	${COG_PREFIX}/lib/puretls.jar:			\

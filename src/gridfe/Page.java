@@ -88,7 +88,11 @@ public class Page {
 				this.gi.auth();
 
 				this.storeCert();
+			} else {
+				if (this.gi.getGSS().getRemainingLifetime() == 0)
+					this.gi.auth();
 			}
+
 			/* XXX: load oof prefs from config/resource. */
 			this.oof = new OOF(this.jasp, "xhtml");
 		} catch (Exception e) {

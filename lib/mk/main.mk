@@ -18,9 +18,13 @@ all: ${TARGET}
 
 .java.class:
 	${JAVAC} ${JCFLAGS} $< || exit 1
+	@sudo chown gridfe:gridfe $@
+	@sudo chmod 664 $@
 
 .c.o:
 	${CC} ${CFLAGS} -c $<
+	@sudo chown gridfe:gridfe $@
+	@sudo chmod 664 $@
 
 depend:
 	@for i in ${SUBDIRS}; do						\

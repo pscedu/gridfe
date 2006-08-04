@@ -13,7 +13,8 @@ public class submit {
 	public static String main(Page p)
 	  throws Exception {
 		HttpServletRequest req = p.getRequest();
-		String rlsout = null;
+		OOF oof = p.getOOF();
+		String rslout = null;
 		String errmsg = "";
 
 		String label = req.getParameter("label");
@@ -95,7 +96,7 @@ public class submit {
 					m.put("count", nprocs);
 
 				if (req.getParameter("submitted").equals("View RSL"))
-					rlsout = j.toString();
+					rslout = j.toString();
 				else if (req.getParameter("submitted").equals("Save RSL")) {
 					HttpServletResponse res = p.getResponse();
 					res.setContentType("application/octet-stream");
@@ -119,9 +120,32 @@ public class submit {
 						sth.executeUpdate();
 					}
 
+					m.remove("arguments");
+					m.remove("executable");
+					m.remove("stdout");
+					m.remove("stderr");
+
+					String cmd = "$ globus-job-submit " + p.escapeHTML(host);
+
+					if (j.toString().length() > 0)
+						cmd += " -x '" + p.escapeHTML(j.toString()) + "'";
+
+					if (!stdout.equals(""))
+						cmd += " -stdout " + p.escapeHTML(stdout);
+					if (!stderr.equals(""))
+						cmd += " -stderr " + p.escapeHTML(stderr);
+
+					cmd += p.escapeHTML(" " + remoteexec + " " + args);
+
 					String s = "";
 					s += p.header("Submitted Job")
-					   + p.getOOF().p("The job has been submitted successfully.")
+					   + oof.p("The job has been submitted successfully.")
+					   + oof.p("You may now view the " +
+					       oof.link("job status", p.buildURL("/jobs/status")) +
+						   " page to await the completion of this job.")
+					   + oof.p("The equivalent command-line invocation of this " +
+					       "job submission would have been:")
+					   + oof.pre(new Object[] { "style", "white-space: normal" }, cmd)
 					   + p.footer();
 					return (s);
 				}
@@ -129,7 +153,6 @@ public class submit {
 		}
 
 		String s = "";
-		OOF oof = p.getOOF();
 
 		String js_hostchg =
 			"	document.forms[0].elements['host'].value = " +
@@ -368,7 +391,7 @@ public class submit {
 											"name", "nprocs"
 										}) +
 										oof.br() +
-										"&raquo; This optional field specifies the number of execution " + 
+										"&raquo; This optional field specifies the number of execution " +
 										"processes required to run the job."
 								}
 							},
@@ -503,10 +526,10 @@ public class submit {
 				}
 			 );
 
-		if (rlsout != null) {
+		if (rslout != null) {
 			s += ""
-			   + oof.p("The RLS output for this job:")
-			   + oof.pre(rlsout);
+			   + oof.p("The RSL output for this job:")
+			   + oof.pre(rslout);
 		}
 		s += p.footer();
 		return (s);

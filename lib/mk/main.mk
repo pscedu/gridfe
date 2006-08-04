@@ -88,4 +88,4 @@ clean:
 	done
 
 restart: all
-	service tomcat5 restart
+	sudo service tomcat5 restart

@@ -1,12 +1,22 @@
 /* $Id$ */
 
+#include <sys/param.h>
+#include <sys/socket.h>
+
+#include <err.h>
+#include <errno.h>
+#include <netdb.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef __dead
 #define __dead __attribute__((__noreturn__))
 #endif
 
 #define LISTENQ	5
+
+__dead void usage(void);
 
 char		rss_host[MAXHOSTNAMELEN];
 char		rss_port[BUFSIZ];
@@ -20,7 +30,7 @@ const char	*progname;
 
 #define DPRINTF(x)			\
 	if (verbose)			\
-		warnx(x)
+		warnx x
 
 void
 init_conf(void)
@@ -39,36 +49,6 @@ init_conf(void)
 
 	DPRINTF(("set local_host to %s", local_host));
 	DPRINTF(("set local_port to %s", local_port));
-}
-
-int
-main(int argc, char *argv[])
-{
-	int clifd, s, c;
-	socklen_t siz;
-
-	progname = argv[0];
-
-	while ((c = getopt(argc, argv, "v")) != -1)
-		switch (c) {
-		case 'v':
-			verbose++;
-			break;
-		default:
-			usage();
-		}
-
-	init_conf();
-	s = setup();
-	siz = 0;
-	for (;;) {
-		clifd = accept(s, NULL, siz);
-		if (clifd == -1)
-			err(1, "accept");
-		serve(clifd);
-		close(clifd);
-	}
-	/* NOTREACHED */
 }
 
 int
@@ -118,12 +98,14 @@ setup(void)
 	return (s);
 }
 
-__dead void
+void
 serve(int clifd)
 {
 	struct addrinfo hints, *res, *res0;
 	int rssfd, error, save_errno, len;
 	const char *lastcause = NULL;
+	char buf[BUFSIZ];
+	ssize_t n;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -151,7 +133,7 @@ serve(int clifd)
 		break;
 	}
 	if (rssfd != -1)
-		err(1, "%s", cause);
+		err(1, "%s", lastcause);
 	freeaddrinfo(res0);
 
 	len = snprintf(buf, sizeof(buf),
@@ -171,6 +153,42 @@ serve(int clifd)
 		err(1, "snprintf");
 	if (write(rssfd, buf, (size_t)len) != (ssize_t)len)
 		err(1, "write");
+
+	while ((n = read(rssfd, buf, sizeof(buf))) != 0 && n != -1)
+		if (write(clifd, buf, n) != n)
+			err(1, "write");
+	if (n == -1)
+		err(1, "read");
+}
+
+int
+main(int argc, char *argv[])
+{
+	int clifd, s, c;
+	socklen_t siz;
+
+	progname = argv[0];
+
+	while ((c = getopt(argc, argv, "v")) != -1)
+		switch (c) {
+		case 'v':
+			verbose++;
+			break;
+		default:
+			usage();
+		}
+
+	init_conf();
+	s = setup();
+	siz = 0;
+	for (;;) {
+		clifd = accept(s, NULL, &siz);
+		if (clifd == -1)
+			err(1, "accept");
+		serve(clifd);
+		close(clifd);
+	}
+	/* NOTREACHED */
 }
 
 __dead void

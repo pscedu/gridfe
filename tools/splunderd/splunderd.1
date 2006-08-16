@@ -1,0 +1,28 @@
+.\" $Id$
+.Dd August 16, 2006
+.Dt SPLUNDERD 1
+.ds volume Pittsburgh Supercomputing Center
+.Os http://www.psc.edu/
+.Sh NAME
+.Nm splunderd
+.Nd GridFE RSS proxy
+.Sh SYNOPSIS
+.Nm splunderd
+.Sh DESCRIPTION
+.Nm
+is an application proxy intended for RSS retrieval from
+GridFE.
+It authenticates to GridFE using existing Kerberos credentials
+and attempts to grab the RSS stream specified in its
+configuration, which defaults to the RSS for job status.
+.Sh FILES
+.Bl -tag -width Pa -compact
+.It Pa ~/.splunder
+.Nm
+configuration file
+.El
+.Sh COPYRIGHT
+Copyright
+.Pq c
+2006 Pittsburgh Supercomputing Center.
+http://www.psc.edu/

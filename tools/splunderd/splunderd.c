@@ -2,6 +2,8 @@
 
 #include <sys/param.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <err.h>
 #include <errno.h>
@@ -10,7 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+
 #include <krb5.h>
+#include <gssapi.h>
 
 #ifndef __dead
 #define __dead __attribute__((__noreturn__))
@@ -35,7 +41,7 @@ const char	*progname;
 		warnx x
 
 void
-init_conf(void)
+conf_init(void)
 {
 	snprintf(rss_host, sizeof(rss_host), "gridfe.psc.edu");
 	snprintf(rss_port, sizeof(rss_port), "443");
@@ -59,6 +65,7 @@ setup(void)
 	struct addrinfo hints, *res, *res0;
 	const char *lastcause = NULL;
 	int error, save_errno, s;
+	char buf[BUFSIZ];
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -97,9 +104,19 @@ setup(void)
 	if (s != -1)
 		err(1, "%s", lastcause);
 	freeaddrinfo(res0);
-	/* XXX print the truth */
-	DPRINTF(("listening on %s:%s", local_host, local_port));
+	if (inet_ntop(res->ai_family, res->ai_addr,
+	    buf, sizeof(buf)) == NULL)
+		err(1, "inet_ntop");
+	DPRINTF(("listening on %s", buf));
 	return (s);
+}
+
+void
+ssl_init(void)
+{
+	SSL_library_init();
+	OpenSSL_add_all_algorithms();
+	SSL_load_error_strings();
 }
 
 const char *
@@ -112,11 +129,13 @@ ssl_error(void)
 }
 
 void
-ssl_init(void)
+xwrite(SSL *ssl, const void *buf, size_t siz)
 {
-	SSL_library_init();
-	OpenSSL_add_all_algorithms();
-	SSL_load_error_strings();
+	int len = siz;
+
+	/* XXX try to write more on short writes instead of failure */
+	if (SSL_write(ssl, buf, len) != len)
+		errx(1, "SSL_write: %s", ssl_error());
 }
 
 /*
@@ -166,69 +185,41 @@ base64_encode(const void *buf, char *enc, size_t siz)
 	DPRINTF(("base64: wrote %d chars\n", i));
 }
 
-gss_name_t	 gss_server;
-gss_ctx_id_t	 gss_ctx;
-OM_uint32	 gss_minor;
-gss_buffer_desc	 gss_otoken = GSS_C_EMPTY_BUFFER;
-
 void
-gss_finish(void)
-{
-	gss_release_name(&gss_minor, &gss_server);
-	if (gss_ctx != GSS_C_NO_CONTEXT)
-		gss_delete_sec_context(&gss_minor,
-		    &gss_ctx, GSS_C_NO_BUFFER);
-}
-
-void
-gss_build_auth(const struct ustream *us)
+serve(int clifd)
 {
 	const char authline[] = "Authorization: Negotiate ";
-	const char nl[] = "\r\n";
-	size_t bsiz;
-	char *p;
-
-	bsiz = (gss_otoken.length + 3) * 4 / 3 + 1;
-	DPRINTF(("base64: have %d chars\n", bsiz));
-	if ((p = malloc(bsiz)) == NULL)
-		err(1, "malloc");
-	base64_encode(gss_otoken.value, p, gss_otoken.length);
-
-	if (us_write(us, authline, strlen(authline)) != strlen(authline))
-		err(1, "us_write");
-
-	if (us_write(us, p, strlen(p)) != (ssize_t)strlen(p))
-		err(1, "us_write");
-	free(p);
-
-	if (us_write(us, nl, strlen(nl)) != strlen(nl))
-		err(1, "us_write");
-
-	gss_finish();
-}
-
-int
-gss_valid(const char *host)
-{
-	static int valid = 1;
-
-	gss_OID_desc krb5_oid = {9, "\x2a\x86\x48\x86\xf7\x12\x01\x02\x02"};
-	gss_buffer_desc itoken = GSS_C_EMPTY_BUFFER;
-	OM_uint32 major, rflags, rtime;
 	const char service[] = "HTTP";
+	const char nl[] = "\r\n";
+
+	gss_OID_desc krb5_oid = { 9, "\x2a\x86\x48\x86\xf7\x12\x01\x02\x02" };
+	gss_buffer_desc otoken = GSS_C_EMPTY_BUFFER;
+	gss_buffer_desc itoken = GSS_C_EMPTY_BUFFER;
+	OM_uint32 major, minor, rflags, rtime;
+	gss_ctx_id_t gss_ctx;
+	gss_name_t name;
 	gss_OID oid;
+
+	int n, rssfd, error, save_errno, len;
+	struct addrinfo hints, *res, *res0;
+	const char *lastcause = NULL;
+	char *p, buf[BUFSIZ];
+	size_t bsiz;
+
+	SSL_CTX *ssl_ctx;
+	SSL *ssl;
 
 	/* Default to MIT Kerberos */
 	oid = &krb5_oid;
 
 	/* itoken = "HTTP/f.q.d.n" aka "HTTP@hostname.foo.bar" */
 	if ((itoken.length = asprintf((char **)&itoken.value,
-	    "%s@%s", service, host)) == (size_t)-1)
+	    "%s@%s", service, rss_host)) == (size_t)-1)
 		err(1, "asprintf");
 
 	/* Convert the printable name to an internal format */
-	major = gss_import_name(&gss_minor, &itoken,
-	    GSS_C_NT_HOSTBASED_SERVICE, &gss_server);
+	major = gss_import_name(&minor, &itoken,
+	    GSS_C_NT_HOSTBASED_SERVICE, &name);
 
 	free(itoken.value);
 
@@ -239,28 +230,14 @@ gss_valid(const char *host)
 	rflags = 0;
 	rtime = GSS_C_INDEFINITE;
 	gss_ctx = GSS_C_NO_CONTEXT;
-	major = gss_init_sec_context(&gss_minor, GSS_C_NO_CREDENTIAL,
-	    &gss_ctx, gss_server, oid, rflags, rtime,
-	    GSS_C_NO_CHANNEL_BINDINGS, GSS_C_NO_BUFFER,
-	    NULL, &gss_otoken, NULL, NULL);
+	major = gss_init_sec_context(&minor, GSS_C_NO_CREDENTIAL, &gss_ctx,
+	    name, oid, rflags, rtime, GSS_C_NO_CHANNEL_BINDINGS,
+	    GSS_C_NO_BUFFER, NULL, &otoken, NULL, NULL);
 
-	if (GSS_ERROR(major) || gss_otoken.length == 0) {
-		gss_finish();
-		warnx("gss_init_sec_context");
-		valid = 0;
-	}
-	return (valid);
-}
+	if (GSS_ERROR(major) || otoken.length == 0)
+		err(1, "gss_init_sec_context");
 
-void
-serve(int clifd)
-{
-	struct addrinfo hints, *res, *res0;
-	int rssfd, error, save_errno, len;
-	const char *lastcause = NULL;
-	char buf[BUFSIZ];
-	ssize_t n;
-
+	/* resolve and connect to rss host */
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -290,8 +267,20 @@ serve(int clifd)
 		err(1, "%s", lastcause);
 	freeaddrinfo(res0);
 
-	/* XXX print the truth */
-	DPRINTF(("established connection to %s:%s", rss_host, rss_port));
+	if (inet_ntop(res->ai_family, res->ai_addr,
+	    buf, sizeof(buf)) == NULL)
+		err(1, "inet_ntop");
+	DPRINTF(("established connection to %s", buf));
+
+	/* initialize SSL */
+	if ((ssl_ctx = SSL_CTX_new(SSLv2_client_method())) == NULL)
+		errx(1, "SSL_CTX_new: %s", ssl_error());
+	ssl = SSL_new(ssl_ctx);
+	SSL_set_fd(ssl, rssfd);
+	if (SSL_connect(ssl) != 1)
+		errx(1, "SSL_connect: %s", ssl_error());
+
+	DPRINTF(("initialized SSL"));
 
 	len = snprintf(buf, sizeof(buf),
 	    "GET %s HTTP/1.1\r\n"
@@ -300,59 +289,49 @@ serve(int clifd)
 	    rss_path, rss_host);
 	if (len == -1)
 		err(1, "snprintf");
-	if (write(rssfd, buf, (size_t)len) != (ssize_t)len)
-		err(1, "write");
+	xwrite(ssl, buf, len);
 
-
-
-
-
-
-
-
-	bsiz = (gss_otoken.length + 3) * 4 / 3 + 1;
-	DPRINTF(("base64: have %d chars\n", bsiz));
+	bsiz = (otoken.length + 3) * 4 / 3 + 1;
+	DPRINTF(("base64: have %zu chars\n", bsiz));
 	if ((p = malloc(bsiz)) == NULL)
 		err(1, "malloc");
-	base64_encode(gss_otoken.value, p, gss_otoken.length);
-
-	if (us_write(us, authline, strlen(authline)) != strlen(authline))
-		err(1, "us_write");
-
-	if (us_write(us, p, strlen(p)) != (ssize_t)strlen(p))
-		err(1, "us_write");
+	base64_encode(otoken.value, p, otoken.length);
+	xwrite(ssl, authline, strlen(authline));
+	xwrite(ssl, p, strlen(p));
 	free(p);
-
-	if (us_write(us, nl, strlen(nl)) != strlen(nl))
-		err(1, "us_write");
-
-	gss_finish();
-
-
-
-
+	xwrite(ssl, nl, strlen(nl));
 
 	len = snprintf(buf, sizeof(buf), "\r\n");
 	if (len == -1)
 		err(1, "snprintf");
-	if (write(rssfd, buf, (size_t)len) != (ssize_t)len)
-		err(1, "write");
+	xwrite(ssl, buf, len);
 
-	while ((n = SSL_read(rssfd, buf, sizeof(buf))) != 0 &&
-	    n != -1)
+	while ((n = SSL_read(ssl, buf, sizeof(buf))) != 0 && n != -1)
 		if (write(clifd, buf, n) != n)
 			err(1, "write");
 	if (n == -1)
 		errx(1, "SSL_read: %s", ssl_error());
+
+	SSL_free(ssl);
+	SSL_CTX_free(ssl_ctx);
+
+	gss_release_name(&minor, &name);
+	if (gss_ctx != GSS_C_NO_CONTEXT)
+		gss_delete_sec_context(&minor, &gss_ctx, GSS_C_NO_BUFFER);
 }
 
 int
 main(int argc, char *argv[])
 {
+	struct sockaddr_storage ss;
+	char buf[BUFSIZ];
 	int clifd, s, c;
 	socklen_t siz;
 
 	progname = argv[0];
+
+	ssl_init();
+	conf_init();
 
 	while ((c = getopt(argc, argv, "v")) != -1)
 		switch (c) {
@@ -363,14 +342,16 @@ main(int argc, char *argv[])
 			usage();
 		}
 
-	init_conf();
 	s = setup();
-	siz = 0;
 	for (;;) {
-		clifd = accept(s, NULL, &siz);
+		siz = sizeof(ss);
+		memset(&ss, 0, sizeof(ss));
+		clifd = accept(s, (struct sockaddr *)&ss, &siz);
 		if (clifd == -1)
 			err(1, "accept");
-		DPRINTF(("received client connection"));
+		if (inet_ntop(ss.ss_family, &ss, buf, sizeof(buf)) == NULL)
+			err(1, "inet_ntop");
+		DPRINTF(("received client connection from %s", buf));
 		serve(clifd);
 		close(clifd);
 	}

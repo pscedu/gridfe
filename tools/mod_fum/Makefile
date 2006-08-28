@@ -6,7 +6,7 @@ include ${SYSROOT}/lib/mk/defs.mk
 
 MODULE = mod_fum
 TARGET = ${MODULE}.so
-OBJS = ${MODULE}.o
+OBJS = ${MODULE}.o gss.o
 CFLAGS += -I${KX509_PREFIX} -I${APR_PREFIX}
 CFLAGS += -I${HTTPD_PREFIX} -I${KRB_PREFIX}/include
 LIBS = -lcrypto -L${KRB_PREFIX}/lib -lkrb5 -lkx509

@@ -17,3 +17,8 @@ misc
 - job get output both stdout and stderr, not just stdout
 - rename database field "host type" to "host gridftp type"
 - show all job fields on job output page (original form submission values)
+
+- XXX MAJOR TODO
+- see if kx509 can generate a full certificate from an undelegated gssapi
+  auth credential (obtained from "negotiate auth" mechanism) with konqueror
+  you cannot change the delegation parameter to gss_init_sec_context()

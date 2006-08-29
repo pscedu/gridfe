@@ -57,7 +57,7 @@ public class GridFE extends HttpServlet {
 		} catch (Exception e) {
 		}
 
-		String s;
+		String s = "";
 		try {
 			Class handler;
 			if ((handler = Class.forName(classname)) == null)
@@ -66,7 +66,16 @@ public class GridFE extends HttpServlet {
 				new Class[] { Page.class }).invoke(null, new Object[] {p});
 			p.end();
 		} catch (Exception e) {
-			s = this.handleError(p, e + ": " + e.getMessage());
+/*
+			if ()
+				s += p.header("Internal Error")
+
+			XXX: return 500 status
+
+			if ()
+				s += p.footer();
+*/
+			s += this.handleError(p, e + ": " + e.getMessage());
 			e.printStackTrace();
 		}
 

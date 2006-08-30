@@ -343,7 +343,12 @@ public class browser {
 				if (fi.getFieldName().equals("upfile")) {
 					File tmpf = File.createTempFile("gridfe.up", null);
 					fi.write(tmpf);
-					gftp.put(tmpf, cwd + "/" + fi.getName(), false);
+//					gftp.put(tmpf, cwd + "/" + fi.getName(), false);
+
+					/* It is insane that this must be done. */
+					GridFTP.urlCopy(p.getGridInt().getGSS().getGSSCredential(),
+					  java.net.InetAddress.getLocalHost().getHostName(),
+					  gftp.getHost(), tmpf.toString(), cwd + "/" + fi.getName());
 				}
 			} catch (Exception e) {
 				emsg += " Error while uploading: " + e.getMessage() + ".";

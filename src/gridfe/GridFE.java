@@ -7,8 +7,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 public class GridFE extends HttpServlet {
-//	static final long serialVersionUID = 1L;
-
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
 		this.workHorse(req, res);
@@ -26,17 +24,18 @@ public class GridFE extends HttpServlet {
 		res.setContentType("text/html");
 		PrintWriter w = res.getWriter();
 
-		Page p;
 		String uri = req.getRequestURI();
 		String classname = uri;
+		Page p = new Page(req, res);
 		try {
-			p = new Page(req, res);
-			classname = "gridfe/www" +
-			    classname.replaceAll(p.getServRoot(), "");
+			p.login();
 		} catch (Exception e) {
-			this.handleError(null, e + ": " + e.getMessage());
+			this.handleError(w, p, e);
 			return;
 		}
+
+		/* XXX: escape meta/regex chars on servroot */
+		classname = "gridfe/www" + classname.replaceFirst(p.getServRoot(), "");
 
 		/* ``/'' is optional for directory pages but see below. */
 		if (classname.charAt(classname.length() - 1) == '/')
@@ -57,43 +56,24 @@ public class GridFE extends HttpServlet {
 		} catch (Exception e) {
 		}
 
-		String s = "";
 		try {
 			Class handler;
 			if ((handler = Class.forName(classname)) == null)
 				handler = gridfe.www.notfound.class;
-			s = (String)handler.getMethod("main",
+			String s = (String)handler.getMethod("main",
 				new Class[] { Page.class }).invoke(null, new Object[] {p});
 			p.end();
+			w.print(s);
 		} catch (Exception e) {
-/*
-			if ()
-				s += p.header("Internal Error")
-
-			XXX: return 500 status
-
-			if ()
-				s += p.footer();
-*/
-			s += this.handleError(p, e + ": " + e.getMessage());
-			e.printStackTrace();
+			/* XXX: return 500 status */
+			this.handleError(w, p, e);
 		}
-
-		w.print(s);
 	}
 
-	private String handleError(Page p, String msg) {
-		String s;
-
-		try {
-			s = p.header("Fatal Error") +
-			    p.getOOF().p("A fatal error has occured: " + msg) +
-			    p.footer();
-		} catch (Exception e) {
-			/* This is bad. */
-			s  = "<br />\nFatal error: " + e + ": " + e.getMessage();
-			s += "<br />\nOriginally: " + msg;
-		}
-		return (s);
+	private void handleError(PrintWriter w, Page p, Exception e) {
+		w.println(p.header("Fatal Error") +
+		    "A fatal error has occured: " + e);
+		e.printStackTrace(w);
+		w.print(p.footer());
 	}
 }

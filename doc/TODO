@@ -22,3 +22,6 @@ misc
 - see if kx509 can generate a full certificate from an undelegated gssapi
   auth credential (obtained from "negotiate auth" mechanism) with konqueror
   you cannot change the delegation parameter to gss_init_sec_context()
+
+- fix ClassNotFoundException: gridfe.www.t
+  when requesting gridfe.psc.edu/gridfe/gridfe/t

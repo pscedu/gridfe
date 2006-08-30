@@ -14,6 +14,7 @@ struct fum {
 	krb5_creds	 f_x509cred;
 	char		*f_tktcachefn;
 	char		*f_certfn;
+	uid_t		 f_uid;
 	gss_cred_id_t	 f_delegated_cred;
 	gss_ctx_id_t	 f_gssctx;
 	gss_cred_id_t	 f_server_creds;

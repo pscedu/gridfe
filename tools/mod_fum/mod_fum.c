@@ -192,20 +192,19 @@ fum_new(request_rec *r, struct fum *f, const char *user)
 {
 	krb5_error_code kerr;
 	int error;
-	uid_t uid;
 
-	if ((error = fum_getuid(r, user, &uid)) != OK)
+	if ((error = fum_getuid(r, user, &f->f_uid)) != OK)
 		return (error);
-	if ((f->f_tktcachefn = apr_psprintf(r->pool, "%s%d",
-	    _PATH_KRB5TKT, uid)) == NULL) {
-		fum_log(r, "fum: apr_psprintf tkt %s%d",
-		    _PATH_KRB5TKT, uid);
+	if ((f->f_tktcachefn = apr_psprintf(r->pool, "%s%u",
+	    _PATH_KRB5TKT, f->f_uid)) == NULL) {
+		fum_log(r, "fum: apr_psprintf tkt %s%u",
+		    _PATH_KRB5TKT, f->f_uid);
 		return (HTTP_ISE);
 	}
-	if ((f->f_certfn = apr_psprintf(r->pool, "%s%d",
-	    _PATH_X509CERT, uid)) == NULL) {
-		fum_log(r, "fum: apr_psprintf cert %s%d",
-		    _PATH_X509CERT, uid);
+	if ((f->f_certfn = apr_psprintf(r->pool, "%s%u",
+	    _PATH_X509CERT, f->f_uid)) == NULL) {
+		fum_log(r, "fum: apr_psprintf cert %s%u",
+		    _PATH_X509CERT, f->f_uid);
 		return (HTTP_ISE);
 	}
 
@@ -556,8 +555,8 @@ fum_auth(request_rec *r)
 {
 	const char *auth, *name, *type, *pass;
 	int error, allow_neg;
+	char *user, *uid;
 	struct fum f;
-	char *user;
 
 fum_logx(r, "fum_main: handle?");
 	if ((type = ap_auth_type(r)) == NULL ||
@@ -646,6 +645,14 @@ fum_logx(r, "fum_main: adding Authentication header");
 		name = ap_auth_name(r);
 		apr_table_add(r->err_headers_out, "WWW-Authenticate",
 		    apr_pstrcat(r->pool, "Basic realm=\"", name, "\"", NULL));
+	} else {
+		if ((uid = apr_psprintf(r->pool, "%u",
+		    f.f_uid)) == NULL)
+			error = HTTP_ISE;
+		else{
+fum_logx(r, "fum_main: adding %s", uid);
+			apr_table_setn(r->headers_in, "X-Fum-UID", uid);
+}
 	}
 fum_logx(r, "fum_main: returning");
 	return (error);

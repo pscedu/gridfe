@@ -86,9 +86,7 @@ public class Page {
 			 * work.
 			 */
 			this.gi = new GridInt(this.uid);
-System.err.println("gi.auth(" + kuid + ":" + uid + ")");
 			this.gi.auth();
-System.err.println("gi.auth() -- success!");
 
 			this.storeCert();
 		} else {

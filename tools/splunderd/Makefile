@@ -7,7 +7,8 @@ include ${SYSROOT}/lib/mk/defs.mk
 TARGET = splunderd
 OBJS = splunderd.o
 PREFIX = /usr/local
-LDFLAGS += -lssl -lgssapi -lcrypto -L${KRB_PREFIX}/lib -lkrb5
+CFLAGS += -I/usr/include/gssapi
+LDFLAGS += -lssl -lcrypto -L${KRB_PREFIX}/lib -lkrb5
 
 include ${MAINMK}
 

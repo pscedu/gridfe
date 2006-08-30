@@ -12,91 +12,88 @@ import oof.*;
 import org.bouncycastle.util.encoders.*;
 
 public class Page {
-	private HttpServletRequest req;
 	private HttpServletResponse res;
-	private LinkedList menus;
-	private String servroot;
-	private String webroot;
+	private HttpServletRequest req;
 //	private String sysroot;
 	private int classCount;
 	private GridInt gi;
 	private JASP jasp;
 	private OOF oof;
-	private int uid;
-	private String kuid;
 	private Connection dbh;
 
+	private int uid;
+	private String kuid;
+
+	/* Database parameters. */
 	private static final String DB_DRIVER = "mysql";
 	private static final String DB_HOST = "localhost";
 	private static final String DB_USER = "gridfe";
 	private static final String DB_NAME = "gridfe";
 	private static final String DB_PASS = "pDMLP534AO6";
 
-	/* CSS class desc. */
-	public final static Object CCDESC = (Object)"desc";
-	public final static Object CCHDR = (Object)"hdr";
-	public final static Object CCSUBHDR = (Object)"subhdr";
-	public final static Object CCTBL = (Object)"tbl";
-	public final static Object CCTBLFTR = (Object)"tblftr";
-	public final static Object CCMONO = (Object)"mono";
+	/* CSS classes. */
+	public final static Object CCDESC	= (Object)"desc";
+	public final static Object CCHDR 	= (Object)"hdr";
+	public final static Object CCSUBHDR	= (Object)"subhdr";
+	public final static Object CCTBL	= (Object)"tbl";
+	public final static Object CCTBLFTR	= (Object)"tblftr";
+	public final static Object CCMONO	= (Object)"mono";
 
-	public final static int MENU_ITEM_HEIGHT = 35;
-
+	/* buildPath() targets. */
 	public final static int PATHTYPE_WEB = 0;
 	public final static int PATHTYPE_SERV = 1;
+
+	/* System paths. */
+	public static final String WEBROOT = "/gridfe";			/* path to gridfe root */
+	public static final String SERVROOT = "/gridfe/gridfe";	/* path to servlet root */
+//		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
 
 	Page(HttpServletRequest req, HttpServletResponse res) {
 		this.req = req;
 		this.res = res;
 		this.jasp = new JASP(req, res);
-		this.menus = new LinkedList();
-		this.webroot = "/gridfe";
-//		this.sysroot = "/var/www/gridfe/WEB-INF/classes/gridfe";
-		this.servroot = "/gridfe/gridfe";
 		this.classCount = 1;
 		this.uid = -1;
 		this.dbh = null;
+	}
 
-		try {
-			String hdr;
+	public void login() throws Exception {
+		/* XXX: load oof prefs from config/resource. */
+		this.oof = new OOF(this.jasp, "xhtml");
 
-			String dsn = "jdbc:" + DB_DRIVER + "://" + DB_HOST + "/" + DB_NAME;
-			DriverManager.registerDriver((Driver)Class.forName("com." +
-			    DB_DRIVER + ".jdbc.Driver").newInstance());
-			this.dbh = DriverManager.getConnection(dsn, DB_USER, DB_PASS);
+		String dsn = "jdbc:" + DB_DRIVER + "://" + DB_HOST + "/" + DB_NAME;
+		String dbclass = "com." + DB_DRIVER + ".jdbc.Driver";
+		DriverManager.registerDriver((Driver)Class.forName(dbclass).newInstance());
+		this.dbh = DriverManager.getConnection(dsn, DB_USER, DB_PASS);
 
-			/* XXX: check for errors here. */
-			hdr = (String)req.getHeader("authorization");
-			if (hdr.startsWith("Basic "))
-				hdr = hdr.substring(6);
-			String combo = new String(Base64.decode(hdr));
-			String[] auth = combo.split(":");
-			this.kuid = auth[0];
+		/* XXX: check for errors here. */
+		String hdr = (String)req.getHeader("authorization");
+		if (hdr.startsWith("Basic "))
+			hdr = hdr.substring(6);
+		String combo = new String(Base64.decode(hdr));
+		String[] auth = combo.split(":");
+		this.kuid = auth[0];
 
-			if (!this.restoreGI()) {
-				/*
-				 * XXX - Assume user's Kerberos principal
-				 * and system username are the same.
-				 */
-				this.uid = BasicServices.getUserID(kuid);
+		if (!this.restoreGI()) {
+			/*
+			 * XXX - Assume user's Kerberos principal
+			 * and system username are the same.
+			 */
+			this.uid = BasicServices.getUserID(kuid);
 
-				/*
-				 * Reparse authorization because getRemoteUser() doesn't
-				 * work.
-				 */
-				this.gi = new GridInt(this.uid);
+			/*
+			 * Reparse authorization because getRemoteUser() doesn't
+			 * work.
+			 */
+			this.gi = new GridInt(this.uid);
+System.err.println("gi.auth(" + kuid + ":" + uid + ")");
+			this.gi.auth();
+System.err.println("gi.auth() -- success!");
+
+			this.storeCert();
+		} else {
+			if (this.gi.getGSS().getRemainingLifetime() == 0)
 				this.gi.auth();
-
-				this.storeCert();
-			} else {
-				if (this.gi.getGSS().getRemainingLifetime() == 0)
-					this.gi.auth();
-			}
-
-			/* XXX: load oof prefs from config/resource. */
-			this.oof = new OOF(this.jasp, "xhtml");
-		} catch (Exception e) {
-			this.error(e.getClass().getName() + ": " + e.toString());
 		}
 	}
 
@@ -164,14 +161,6 @@ public class Page {
 		}
 	}
 
-	private void addMenu(String name, String url, Object[] items) {
-		this.menus.add(new Menu(name, url, items));
-	}
-
-	private LinkedList getMenus() {
-		return (this.menus);
-	}
-
 	private String addScript(String code) {
 		String s;
 
@@ -182,16 +171,6 @@ public class Page {
 			+	"// -->"
 			+ "</script>";
 		return (s);
-	}
-
-	public String divName(String name) {
-		String t = "";
-
-		for (int i = 0; i < name.length(); i++)
-			if (name.charAt(i) != ' ' &&
-			    name.charAt(i) != '/')
-				t += name.charAt(i);
-		return (t);
 	}
 
 	public String imageName(String name) {
@@ -205,25 +184,25 @@ public class Page {
 		return (t);
 	}
 
-	public String header(String title)
-	  throws OOFException {
+	public String header(String title) {
 		String s, name, url;
-		String wr = this.webroot;
+		String wr = WEBROOT;
+		LinkedList menus = new LinkedList();
 		Menu m;
 
-		/* Register menu. */
-		this.addMenu("Main", "/", null);
-		this.addMenu("System News", "http://www.psc.edu/general/posts/posts.html", null);
-		this.addMenu("Jobs", "/jobs",
-			new Object[] {
+		/* Register menus. */
+		menus.add(new Menu("Main", "/", null));
+		menus.add(new Menu("System News",
+		    "http://www.psc.edu/general/posts/posts.html", null));
+		menus.add(new Menu("Jobs", "/jobs", new Object[] {
 				"Submit", "/jobs/submit",
 				"Status", "/jobs/status"
-			});
-		this.addMenu("Certificate Management", "/certs", null);
+			}));
+		menus.add(new Menu("Certificate Management", "/certs", null));
 /*
-		this.addMenu("MDS/LDAP", "/ldap", null);
-		this.addMenu("GRIS/GIIS", "/gris", null);
-		this.addMenu("Replica Locator", "/rls",
+		menus.add("MDS/LDAP", "/ldap", null);
+		menus.add("GRIS/GIIS", "/gris", null);
+		menus.add("Replica Locator", "/rls",
 			new Object[] {
 				"Add Catalog",		"/rls/addcat",
 				"Remove Catalog",	"/rls/rmcat",
@@ -231,12 +210,12 @@ public class Page {
 				"Add Resource",		"/rls/addres"
 			});
 */
-		this.addMenu("GridFTP", "/gridftp",
+		menus.add(new Menu("GridFTP", "/gridftp",
 			new Object[] {
 				"URL Copy",		"/gridftp/copy",
 				"Browser",		"/gridftp/browser"
-			});
-		this.addMenu("Node Availability", "/nodes", null);
+			}));
+		menus.add(new Menu("Node Availability", "/nodes", null));
 
 		/* Start page output. */
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
@@ -263,8 +242,7 @@ public class Page {
 		  +						 "border=\"0\" style=\"margin-top: 5px\" />"
 		  +						"<br /><br />";
 
-//		y = -1 * MENU_ITEM_HEIGHT * this.getMenus().size();
-		for (Iterator i = this.getMenus().iterator();
+		for (Iterator i = menus.iterator();
 		     i.hasNext() && (m = (Menu)i.next()) != null; ) {
 			s +=				"<a href=\"" + this.buildURL(m.getURL()) + "\">"
 			   +					"<img src=\"" + wr + "/img/buttons/"
@@ -304,11 +282,10 @@ public class Page {
 		   +				"</td>"
 		   +				"<td style=\"background-color: #eeeeff; padding-left: 5px; "
 		   +				  "border-left: 1px solid black\" valign=\"top\">"
-		   +					this.oof.header(new Object[] {
-									"size", "3",
-									"style", "margin-top:0px"
-								}, "<img align=\"absmiddle\" src=\"" + wr + "/img/box.png\" " +
-									"alt=\"\" border=\"0\" />" + title);
+		   +					"<h3 style=\"margin-top: 0px\">"
+		   +						"<img align=\"absmiddle\" src=\"" + wr + "/img/box.png\" "
+		   +						  "alt=\"\" border=\"0\" />" + title
+		   +					"</h3>";
 		return (s);
 	}
 
@@ -330,16 +307,6 @@ public class Page {
 		return (s);
 	}
 
-	public void error(String error) {
-		try {
-			PrintWriter w;
-			w = this.res.getWriter();
-			w.println("Error: " + error);
-//			System.exit(1);
-		} catch (Exception e) {
-		}
-	}
-
 	public OOF getOOF() {
 		return (this.oof);
 	}
@@ -357,11 +324,11 @@ public class Page {
 	}
 
 	public String getServRoot() {
-		return (this.servroot);
+		return (SERVROOT);
 	}
 
 	public String getWebRoot() {
-		return (this.webroot);
+		return (WEBROOT);
 	}
 
 	public HttpServletRequest getRequest() {
@@ -380,7 +347,7 @@ public class Page {
 		if (s.indexOf(':') != -1) {
 			return (s);
 		} else {
-			return (this.servroot + s);
+			return (SERVROOT + s);
 		}
 	}
 
@@ -389,9 +356,9 @@ public class Page {
 			return (s);
 		switch (type) {
 		case PATHTYPE_WEB:
-			return (this.webroot + s);
+			return (WEBROOT + s);
 		case PATHTYPE_SERV:
-			return (this.servroot + s);
+			return (SERVROOT + s);
 		default:
 			/* throw new InvalidPathTypeException(); */
 			return (null);

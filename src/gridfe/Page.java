@@ -22,7 +22,6 @@ public class Page {
 	private Connection dbh;
 
 	private int uid;
-	private String kuid;
 
 	/* Database parameters. */
 	private static final String DB_DRIVER = "mysql";
@@ -66,21 +65,16 @@ public class Page {
 		DriverManager.registerDriver((Driver)Class.forName(dbclass).newInstance());
 		this.dbh = DriverManager.getConnection(dsn, DB_USER, DB_PASS);
 
+Enumeration e = req.getHeaderNames();
+while (e.hasMoreElements()) {
+  String h = (String)e.nextElement();
+  System.err.println(h + ": " + req.getHeader(h));
+}
+
 		/* XXX: check for errors here. */
-		String hdr = (String)req.getHeader("authorization");
-		if (hdr.startsWith("Basic "))
-			hdr = hdr.substring(6);
-		String combo = new String(Base64.decode(hdr));
-		String[] auth = combo.split(":");
-		this.kuid = auth[0];
+		this.uid = req.getIntHeader("X-Fum-UID");
 
 		if (!this.restoreGI()) {
-			/*
-			 * XXX - Assume user's Kerberos principal
-			 * and system username are the same.
-			 */
-			this.uid = BasicServices.getUserID(kuid);
-
 			/*
 			 * Reparse authorization because getRemoteUser() doesn't
 			 * work.
@@ -123,12 +117,8 @@ public class Page {
 		return (this.uid);
 	}
 
-	public String getUserName() {
-		return this.kuid;
-	}
-
 	private String getGIPath() {
-		return ("/tmp/gridfe.gi_" + this.kuid);
+		return ("/tmp/gridfe.gi_" + this.uid);
 	}
 
 	private boolean restoreGI() {

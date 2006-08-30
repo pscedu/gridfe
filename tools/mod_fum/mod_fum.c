@@ -349,16 +349,6 @@ fum_kx509(request_rec *r, struct fum *f)
 	return (OK);
 }
 
-/*
- * Apache pool cleanup handler for closing file handles.
- */
-apr_status_t
-ap_fclose(void *h)
-{
-	fclose(h);
-	return (APR_SUCCESS);
-}
-
 /* Obtain K.X509 credentials from ticket cache. */
 static int
 fum_kx509_cred(request_rec *r, struct fum *f)
@@ -442,9 +432,7 @@ fum_logx(r, "fum_kxlist: opened");
 		fum_log(r, "%s", f->f_certfn);
 		return (HTTP_ISE);
 	}
-	apr_pool_cleanup_register(r->pool, fp, ap_fclose,
-	    apr_pool_cleanup_null);
-	if (fchmod(fileno(fp), X509_FILE_PERM))
+	if (fchmod(fileno(fp), X509_FILE_PERM) == -1)
 		fum_log(r, "chmod %s", f->f_certfn);
 
 	klen = f->f_x509cred.ticket.length;
@@ -460,12 +448,15 @@ fum_logx(r, "fum_kxlist: opened");
 
 	if (priv == NULL) {
 		fum_logx(r, "d2i_RSAPrivateKey failed"); // XXX errmsg
+		remove(f->f_certfn);
+		fclose(fp);
 		return (HTTP_ISE);
 	}
 
 	/* Write the certificate, appropriately formatted. */
 	PEM_write_X509(fp, cert);
 	PEM_write_RSAPrivateKey(fp, priv, NULL, NULL, 0, NULL, NULL);
+	fclose(fp);
 	return (OK);
 }
 
@@ -582,7 +573,7 @@ fum_logx(r, "fum_main: yes");
 	if ((auth = apr_table_get(r->headers_in,
 	    "Authorization")) == NULL)
 		goto done;
-fum_logx(r, "fum_main: got %s", auth);
+fum_logx(r, "fum_main: read Authorization");
 	allow_neg = 0;
 	if ((type = ap_getword_white(r->pool, &auth)) == NULL)
 		goto done;
@@ -611,6 +602,7 @@ fum_logx(r, "fum_main: no credentials, creating new");
 		error = fum_main(r, &f, user, pass);
 		goto done;
 	}
+fum_logx(r, "fum_main: credentials exist, checking for validity");
 
 	/*
 	 * They exist, make sure the user/pass is correct;
@@ -630,7 +622,7 @@ fum_logx(r, "fum_main: no credentials, creating new");
 	 * ticket (created by mod_fum) is valid, then the
 	 * X.509 ticket is as well.
 	 */
-	if ((error = fum_valid_cred(&f)) != OK)
+	if ((error = fum_valid_cred(&f)) == OK)
 		goto done;
 
 /* May also be a permissions problem. */

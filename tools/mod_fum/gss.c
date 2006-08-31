@@ -99,6 +99,7 @@ fum_gss_error(request_rec *r, OM_uint32 emajor, OM_uint32 eminor)
 		goto done;
 	}
 
+	ctx = 0;
 	maj = gss_display_status(&min, eminor, GSS_C_MECH_CODE,
 	    GSS_C_NULL_OID, &ctx, &minbuf);
 	if (GSS_ERROR(maj)) {

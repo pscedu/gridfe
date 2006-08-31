@@ -22,7 +22,7 @@ public class output {
 
 		which = req.getParameter("which");
 		if (which == null ||
-		  (!which.equals("stdout") && !which.equals("stderr"))
+		  (!which.equals("stdout") && !which.equals("stderr")))
 			which = "stdout";
 
 		qid = req.getParameter("qid");
@@ -34,7 +34,7 @@ public class output {
 			return (s);
 		}
 
-		String fn = (which.equals("stdout") ? j.getStdOut() : j.getStdErr());
+		String fn = (which.equals("stdout") ? j.getStdout() : j.getStderr());
 		String ftype = (which.equals("stdout") ? "output" : "error");
 
 		if (fn == null) {

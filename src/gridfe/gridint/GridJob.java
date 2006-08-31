@@ -81,8 +81,7 @@ public class GridJob extends RSLElement implements Serializable {
 		 * Cache the status so we know
 		 * when it has changed.
 		 */
-		this.getStatus();
-		this.mtime = null;	/* hasn't been modified yet */
+		this.stat = this.gmi.getStatus();
 	}
 
 	public void setModTime() {
@@ -139,6 +138,8 @@ public class GridJob extends RSLElement implements Serializable {
 		int newstat = this.gmi.getStatus();
 
 		if (newstat != this.stat) {
+System.err.println("JOB " + this.name +
+  " has changed status: " + this.stat + " -> " + newstat);
 			this.setModTime();
 			this.stat = newstat;
 		}

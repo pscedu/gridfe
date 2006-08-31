@@ -112,3 +112,10 @@ home directory of the user which the GridFE sevlet runs as
 (e.g., user "apache"):
 
   $ touch /var/www/.java.policy
+
+=====================
+
+fileuploads - gridftp browser
+
+- install commons-fileupload
+- install commons-io

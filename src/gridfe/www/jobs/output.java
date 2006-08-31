@@ -42,6 +42,7 @@ public class output {
 			  +  oof.p("No standard " + ftype +
 			 		" file was specified during job submission.")
 			  +  p.footer();
+			return (s);
 		}
 
 		boolean download = false;

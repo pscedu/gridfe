@@ -120,15 +120,11 @@ public class submit {
 						sth.executeUpdate();
 					}
 
-					m.remove("arguments");
-					m.remove("executable");
-					m.remove("stdout");
-					m.remove("stderr");
-
 					String cmd = "$ globus-job-submit " + p.escapeHTML(host);
 
-					if (j.toString().length() > 0)
-						cmd += " -x '" + p.escapeHTML(j.toString()) + "'";
+					String rsl = j.extraRSL();
+					if (rsl.length() > 0)
+						cmd += " -x '" + p.escapeHTML(rsl) + "'";
 
 					if (!stdout.equals(""))
 						cmd += " -stdout " + p.escapeHTML(stdout);
@@ -529,7 +525,7 @@ public class submit {
 		if (rslout != null) {
 			s += ""
 			   + oof.p("The RSL output for this job:")
-			   + oof.pre(rslout);
+			   + oof.pre(p.escapeHTML(rslout));
 		}
 		s += p.footer();
 		return (s);

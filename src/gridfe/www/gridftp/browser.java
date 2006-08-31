@@ -471,7 +471,7 @@ public class browser {
 				if (!mx.get(MlsxEntry.TYPE).equals(MlsxEntry.TYPE_FILE))
 					continue;
 
-				StageJob.archive2host(p.getGridInt(), host, st_host,
+				archive2host(p.getGridInt(), host, st_host,
 				  cwd, st_cwd, files[i]);
 			}
 		} catch (Exception e) {
@@ -1026,6 +1026,38 @@ System.err.println("GFTP LS: \n" +
 			hlist[i] = hlist[i + 1] = rs.getString("host");
 
 		return hlist;
+	}
+
+	public static void archive2host(GridInt gi, String archiver,
+	  String host, String scwd, String dcwd, String file) throws Exception {
+		final String manager = "gridfe.psc.edu/jobmanager-ben-shell";
+		final String prog = "/usr/psc/bin/far";
+		String type = "";
+		String sfile = "";
+		String dfile = "";
+		int len = 0;
+
+//		GetPWEnt pwd = new GetPWEnt(p.getUserName());
+//		String[] fields = pwd.pw_dir.split("/");
+
+		/* Submit a job to a host with access to the archiver. */
+		GridJob j = new GridJob(manager);
+
+		type += "get";
+		sfile = scwd + "/" + file;
+		dfile = dcwd + "/" + file;
+
+		/* XXX - do an entire directory with rget/rstore commands? */
+
+		HashMap m = j.getMap();
+		m.put("executable", prog);
+		m.put("stdout", "stage-out.log");
+		m.put("stderr", "stage-err.log");
+		m.put("arguments", new String[] { type, sfile, dfile });
+
+System.err.println("archiver job: " + j);
+
+		gi.jobSubmit(j);
 	}
 };
 

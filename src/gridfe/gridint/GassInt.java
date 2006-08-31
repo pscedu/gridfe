@@ -17,7 +17,6 @@ public class GassInt extends RemoteGassServer {
 	private GassServer ga;
 	private int options, port;
 	private String host;
-	private GridJob job = null;
 
 	public GassInt(GSSCredential gss, String host, int port) {
 		/* Call superclass constructor, secure_mode=true */
@@ -59,13 +58,14 @@ public class GassInt extends RemoteGassServer {
 	public void start_remote()
 	    throws GramException, GSSException {
 		/* XXX - HARDCODED - fix */
-		this.job = new GridJob("gridfe.psc.edu/jobmanager-ben-shell");
+		GridJob j = new GridJob("gridfe.psc.edu/jobmanager-ben-shell");
+		j.setName("gassgrabber");
 
 		/*
 		 * Build and submit a GridJob which
 		 * starts the remote GASS server.
 		 */
-		HashMap m = this.job.getMap();
+		HashMap m = j.getMap();
 		m.put("executable", "${GLOBUS_LOCATION}/bin/globus-gass-server");
 
 		/*
@@ -77,20 +77,19 @@ public class GassInt extends RemoteGassServer {
 		  "-c", "-p", Integer.toString(this.port),
 		  "-t", "-u", "-r" });
 
-		this.job.init(this.gss);
-		this.job.run();
+		j.init(this.gss);
+		j.run();
 
 		// STATUS_ACTIVE ?
 		// change -1 to STATUS_DONE ?
-		while (this.job.getStatus() != GramJob.STATUS_PENDING &&
-		  this.job.getStatus() != -1) {
+		int st;
+		do {
 			try {
 				Thread.sleep(1000);
 			} catch (Exception e) {
 			}
-System.err.println("GASS job status: " + this.job.getStatus());
-		}
-System.err.println("GASS job status: " + this.job.getStatus());
+			st = j.getStatus();
+		} while (st != -1 && st != GramJob.STATUS_PENDING);
 	}
 
 	/*

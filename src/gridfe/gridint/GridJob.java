@@ -4,29 +4,36 @@ package gridfe.gridint;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import org.globus.gram.*;
 import org.ietf.jgss.*;
 
 public class GridJob extends RSLElement implements Serializable {
 	private transient GramInt gmi;
-	private String host;
-	private String id;
-	private String name;
-	private int qid;
+	private String resource;
+	private String id;	/* globus url */
+	private String name;	/* mnemonic name */
+	private Date ctime;	/* creation time */
+	private Date mtime;	/* last mod time */
+	private int qid;	/* unique id */
+	private int stat;	/* recent status */
 
-	public GridJob(String host) {
+	public GridJob(String res) {
 		this.gmi = null;
-		this.host = host;
+		this.resource = res;
 		this.qid = -1;
 		this.id = null;
+		this.mtime = null;
+		this.ctime = null;
+		this.stat = -1;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
+	public void setHost(String res) {
+		this.resource = res;
 	}
 
 	public String getHost() {
-		return (this.host);
+		return (this.resource);
 	}
 
 	/* User specified job names, for retrieval */
@@ -46,24 +53,40 @@ public class GridJob extends RSLElement implements Serializable {
 		this.qid = qid;
 	}
 
-	/*
-	 * setRSL Wrappers are inherited from RSLElement.java
-	 */
-
-	/* Internal methods to be called by GridInt ONLY */
-	public void init(GSSCredential gss) {
-		this.gmi = new GramInt(gss, this.host);
+	public Date getCreateTime() {
+		return (this.ctime);
 	}
 
-	/* Submit the job and save the ID string */
+	public Date getModTime() {
+		return (this.mtime);
+	}
+
+	/*
+	 * setRSL() wrappers are inherited from RSLElement.
+	 */
+
+	/* Internal methods to be called by GridInt only. */
+	public void init(GSSCredential gss) {
+		this.gmi = new GramInt(gss, this.resource);
+	}
+
+	/* Submit the job. */
 	public void run()
 	    throws GramException, GSSException {
-		/*
-		 * XXX - save a timestamp of when the job
-		 * was submitted? (just a thought)
-		 */
 		this.gmi.jobSubmit(this);
 		this.id = this.gmi.getIDAsString();
+		this.ctime = new Date();
+
+		/*
+		 * Cache the status so we know
+		 * when it has changed.
+		 */
+		this.getStatus();
+		this.mtime = null;	/* hasn't been modified yet */
+	}
+
+	public void setModTime() {
+		this.mtime = new Date();
 	}
 
 	/* Cancel the job and dispose of gramint instance */
@@ -81,7 +104,7 @@ public class GridJob extends RSLElement implements Serializable {
 
 		/*
 		 * Determine if directory needs prepended to output.
-		 * If std(out/err) string starts with a '/' or '~'
+		 * If stdout/stderr string starts with a '/' or '~'
 		 * then the user has explicitly stated the path.
 		 * If directory does not start with '/' then it
 		 * needs to default to "~".
@@ -106,20 +129,26 @@ public class GridJob extends RSLElement implements Serializable {
 		 * and directory accordingly.
 		 */
 		if (file != null && file.charAt(0) != '/' &&
-		    file.charAt(0) != '~') {
+		    file.charAt(0) != '~')
 			file = dir + "/" + file;
-		}
 		return (file);
 	}
 
-	/* GramInt wrappers */
 	public int getStatus()
 	    throws GSSException {
-		return (this.gmi.getStatus());
+		int newstat = this.gmi.getStatus();
+
+		if (newstat != this.stat) {
+			this.setModTime();
+			this.stat = newstat;
+		}
+
+		return (newstat);
 	}
 
 	public String getStatusAsString()
 	    throws GSSException {
+		this.getStatus();
 		return (this.gmi.getStatusAsString());
 	}
 
@@ -128,15 +157,14 @@ public class GridJob extends RSLElement implements Serializable {
 	}
 
 	/*
-	 * Revive allows a GridJob (and hence a GramJob) to be
-	 * recreated from saved values (similar to serialization).
+	 * Reinsantiate a GridJob from the given values,
+	 * e.g. after serialization.  This should be called
+	 * only once to reinstantiate.
 	 */
-
-	/* This revive should be called ONLY after a deserialization */
 	public void revive(GSSCredential gss)
 	    throws MalformedURLException {
-		/* Revive GramInt and it's private data */
-		this.gmi = new GramInt(gss, this.host, this.toString());
+		/* Revive GramInt and its private data. */
+		this.gmi = new GramInt(gss, this.resource, this.toString());
 		this.gmi.createJob(this.toString());
 		this.gmi.setID(this.id);
 	}

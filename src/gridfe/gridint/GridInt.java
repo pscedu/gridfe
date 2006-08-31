@@ -72,6 +72,7 @@ public class GridInt implements Serializable {
 		 * 1) X.509 Certificate
 		 * 2) Kerberos 5 TKT
 		 * 3) GridInt serialize file
+		 * 4) Clear out database
 		 */
 		int flags = 0;
 		if ((this.flags & GIF_REGCERT) == GIF_REGCERT)
@@ -159,27 +160,22 @@ public class GridInt implements Serializable {
 	/* Allow override of random port in range */
 	private void startGass(int port, String host)
 	    throws GassException, IOException, GSSException, GramException {
-		/* Create a GASS Server to connect to */
+		/* Create a GASS server to connect to */
 		this.gass = new GassInt(this.gss.getGSSCredential(),
 		    host, port);
 
-		/*
-		 * Start the GASS server
-		 * CoG GASS doesn't work so we have to do it ourselves
-		 * go figure...
-		 */
-//		this.gass.start();
+		/* Start the GASS server. */
 		this.gass.start_remote();
 
 		/*
-		 * Sleep so that the server is set to listen before
-		 * trying to make the connection. This is a hack around
-		 * timing problems with job submissions and Globus.
+		 * Sleep to give server time to listen before
+		 * attempting the connection.
 		 */
-		System.out.println("sleeping like a baby - ugly Globus Hack");
+System.out.println("sleeping to wait for remote GASS server");
 		try {
-			Thread.sleep(50000);
-		} catch (Exception e) { }
+			Thread.sleep(15000);
+		} catch (Exception e) {
+		}
 	}
 
 	/* Setup file retrieval */
@@ -219,13 +215,13 @@ public class GridInt implements Serializable {
 		long left = size - off;
 
 		/*
-		** Check len is not greater than len of file  (or
-		** what is left of reading it)
-		**
-		** XXX - this is messed up how the size of the file
-		** is of type long and the length to read must be an
-		** int. (precision problems possible?)
-		*/
+		 * Check len is not greater than len of file  (or
+		 * what is left of reading it).
+		 *
+		 * XXX - this is messed up how the size of the file
+		 * is of type long and the length to read must be an
+		 * int (precision problems possible?).
+		 */
 		if (len > left)
 			len = (int)left;
 
@@ -242,7 +238,7 @@ public class GridInt implements Serializable {
 		return (data);
 	}
 
-	/* Get a job from the list by unique id */
+	/* Get a job from the list by unique ID */
 	public GridJob getJob(int qid) {
 		return (this.list.get(qid));
 	}

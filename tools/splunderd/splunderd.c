@@ -1,5 +1,6 @@
 /* $Id$ */
 
+#define _GNU_SOURCE /* asprintf */
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -63,9 +64,10 @@ int
 setup(void)
 {
 	struct addrinfo hints, *res, *res0;
+	char buf[BUFSIZ], svcbuf[BUFSIZ];
+	int error, save_errno, s, opt;
 	const char *lastcause = NULL;
-	int error, save_errno, s;
-	char buf[BUFSIZ];
+	socklen_t siz;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
@@ -73,7 +75,8 @@ setup(void)
 	hints.ai_flags = AI_PASSIVE;
 	error = getaddrinfo(local_host, local_port, &hints, &res0);
 	if (error)
-		errx(1, "%s", gai_strerror(error));
+		errx(1, "getaddrinfo %s: %s", local_host,
+		    gai_strerror(error));
 
 	s = -1;
 	for (res = res0; res; res = res->ai_next) {
@@ -83,6 +86,11 @@ setup(void)
 			lastcause = "socket";
 			continue;
 		}
+		opt = 1;
+		siz = sizeof(opt);
+		if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &opt,
+		    siz) == -1)
+			err(1, "setsockopt");
 		if (bind(s, res->ai_addr, res->ai_addrlen) == -1) {
 			lastcause = "bind";
 			save_errno = errno;
@@ -101,13 +109,14 @@ setup(void)
 		}
 		break;
 	}
-	if (s != -1)
+	if (s == -1)
 		err(1, "%s", lastcause);
+	if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
+	    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
+	    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+		errx(1, "getnameinfo: %s", gai_strerror(error));
 	freeaddrinfo(res0);
-	if (inet_ntop(res->ai_family, res->ai_addr,
-	    buf, sizeof(buf)) == NULL)
-		err(1, "inet_ntop");
-	DPRINTF(("listening on %s", buf));
+	DPRINTF(("listening on %s:%s", buf, svcbuf));
 	return (s);
 }
 
@@ -182,7 +191,7 @@ base64_encode(const void *buf, char *enc, size_t siz)
 	} else if (pos + 2 >= siz)
 		enc[i++] = '=';
 	enc[i++] = '\0';
-	DPRINTF(("base64: wrote %d chars\n", i));
+	DPRINTF(("base64: wrote %d chars", i));
 }
 
 void
@@ -200,10 +209,10 @@ serve(int clifd)
 	gss_name_t name;
 	gss_OID oid;
 
+	char *p, buf[BUFSIZ], svcbuf[BUFSIZ];
 	int n, rssfd, error, save_errno, len;
 	struct addrinfo hints, *res, *res0;
 	const char *lastcause = NULL;
-	char *p, buf[BUFSIZ];
 	size_t bsiz;
 
 	SSL_CTX *ssl_ctx;
@@ -227,12 +236,13 @@ serve(int clifd)
 		errx(1, "gss_import_name");
 
 	/* Initiate a security context */
-	rflags = 0;
+	rflags = GSS_C_DELEG_FLAG;
 	rtime = GSS_C_INDEFINITE;
 	gss_ctx = GSS_C_NO_CONTEXT;
-	major = gss_init_sec_context(&minor, GSS_C_NO_CREDENTIAL, &gss_ctx,
-	    name, oid, rflags, rtime, GSS_C_NO_CHANNEL_BINDINGS,
-	    GSS_C_NO_BUFFER, NULL, &otoken, NULL, NULL);
+	major = gss_init_sec_context(&minor, GSS_C_NO_CREDENTIAL,
+	    &gss_ctx, name, oid, rflags, rtime,
+	    GSS_C_NO_CHANNEL_BINDINGS, GSS_C_NO_BUFFER,
+	    NULL, &otoken, NULL, NULL);
 
 	if (GSS_ERROR(major) || otoken.length == 0)
 		err(1, "gss_init_sec_context");
@@ -263,17 +273,19 @@ serve(int clifd)
 		}
 		break;
 	}
-	if (rssfd != -1)
+	if (rssfd == -1)
 		err(1, "%s", lastcause);
+	if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
+	    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
+	    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+		errx(1, "getnameinfo: %s", gai_strerror(error));
+
 	freeaddrinfo(res0);
 
-	if (inet_ntop(res->ai_family, res->ai_addr,
-	    buf, sizeof(buf)) == NULL)
-		err(1, "inet_ntop");
-	DPRINTF(("established connection to %s", buf));
+	DPRINTF(("established connection to %s:%s", buf, svcbuf));
 
 	/* initialize SSL */
-	if ((ssl_ctx = SSL_CTX_new(SSLv2_client_method())) == NULL)
+	if ((ssl_ctx = SSL_CTX_new(SSLv23_client_method())) == NULL)
 		errx(1, "SSL_CTX_new: %s", ssl_error());
 	ssl = SSL_new(ssl_ctx);
 	SSL_set_fd(ssl, rssfd);
@@ -292,7 +304,7 @@ serve(int clifd)
 	xwrite(ssl, buf, len);
 
 	bsiz = (otoken.length + 3) * 4 / 3 + 1;
-	DPRINTF(("base64: have %zu chars\n", bsiz));
+	DPRINTF(("base64: have %zu chars", bsiz));
 	if ((p = malloc(bsiz)) == NULL)
 		err(1, "malloc");
 	base64_encode(otoken.value, p, otoken.length);
@@ -323,9 +335,9 @@ serve(int clifd)
 int
 main(int argc, char *argv[])
 {
+	char buf[BUFSIZ], svcbuf[BUFSIZ];
 	struct sockaddr_storage ss;
-	char buf[BUFSIZ];
-	int clifd, s, c;
+	int error, clifd, s, c;
 	socklen_t siz;
 
 	progname = argv[0];
@@ -349,9 +361,12 @@ main(int argc, char *argv[])
 		clifd = accept(s, (struct sockaddr *)&ss, &siz);
 		if (clifd == -1)
 			err(1, "accept");
-		if (inet_ntop(ss.ss_family, &ss, buf, sizeof(buf)) == NULL)
-			err(1, "inet_ntop");
-		DPRINTF(("received client connection from %s", buf));
+		if ((error = getnameinfo((struct sockaddr *)&ss, siz,
+		    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
+		    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+			errx(1, "getnameinfo: %s", gai_strerror(error));
+		DPRINTF(("received client connection from %s:%s",
+		    buf, svcbuf));
 		serve(clifd);
 		close(clifd);
 	}

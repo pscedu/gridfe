@@ -65,27 +65,17 @@ public class Page {
 		DriverManager.registerDriver((Driver)Class.forName(dbclass).newInstance());
 		this.dbh = DriverManager.getConnection(dsn, DB_USER, DB_PASS);
 
-Enumeration e = req.getHeaderNames();
-while (e.hasMoreElements()) {
-  String h = (String)e.nextElement();
-  System.err.println(h + ": " + req.getHeader(h));
-}
-
-		/* XXX: check for errors here. */
+		/* XXX: check for errors here? */
 		this.uid = req.getIntHeader("X-Fum-UID");
 
-		if (!this.restoreGI()) {
-			/*
-			 * Reparse authorization because getRemoteUser() doesn't
-			 * work.
-			 */
+		if (this.restoreGI()) {
+			if (this.gi.getGSS().getRemainingLifetime() == 0)
+				this.gi.auth();
+		} else {
 			this.gi = new GridInt(this.uid);
 			this.gi.auth();
 
 			this.storeCert();
-		} else {
-			if (this.gi.getGSS().getRemainingLifetime() == 0)
-				this.gi.auth();
 		}
 	}
 

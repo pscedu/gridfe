@@ -41,23 +41,37 @@ public class RSLElement implements Serializable {
 	}
 
 	public String build() {
-		return build(this.req, this.pairs);
+		return build(this.req, this.pairs, new String[] { });
 	}
 
-	public static String build(String req, HashMap m) {
+	public String build(String[] skip) {
+		return build(this.req, this.pairs, skip);
+	}
+
+	private static boolean inArray(Object o, Object[] list) {
+		if (list == null)
+			return (false);
+		for (int i = 0; i < list.length; i++)
+			if (list[i].equals(o))
+				return (true);
+		return (false);
+	}
+
+	public static String build(String req, HashMap m, String[] skip) {
 		String name, iv, s = "";
 
 		if (req != null)
 			s += req;
 		for (Iterator k = m.keySet().iterator();
 		     k.hasNext() && (name = (String)k.next()) != null; ) {
+			if (inArray(name, skip))
+				continue;
 			Object val = m.get(name);
-
 			s += "(" + name;
 			if (req != null)
 				s += " =";
 			if (val instanceof HashMap)
-				s += build(null, (HashMap)val);
+				s += build(null, (HashMap)val, null);
 			else if (val instanceof String[]) {
 				String[] vs = (String[])val;
 
@@ -75,6 +89,11 @@ public class RSLElement implements Serializable {
 			s += ")";
 		}
 		return (s);
+	}
+
+	public String extraRSL() {
+		return (this.build(new String[] {
+		  "arguments", "executable", "stdout", "stderr" }));
 	}
 
 	public String toString() {

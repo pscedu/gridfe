@@ -3,7 +3,7 @@
 .SUFFIXES: .class .java
 
 all: ${TARGET}
-	@# XXX: make recursion factorable
+	@# XXX: factor recursion
 	@for i in ${SUBDIRS}; do						\
 		echo -n "===> ";						\
 		if [ -n "${DIRPREFIX}" ]; then					\
@@ -18,13 +18,13 @@ all: ${TARGET}
 
 .java.class:
 	${JAVAC} ${JCFLAGS} $< || exit 1
-	@sudo chown gridfe:gridfe $@
-	@sudo chmod 664 $@
+	@sudo chown -f gridfe:gridfe $@
+	@sudo chmod -f 664 $@
 
 .c.o:
 	${CC} ${CFLAGS} -c $<
-	@sudo chown gridfe:gridfe $@
-	@sudo chmod 664 $@
+	@sudo chown -f gridfe:gridfe $@ || true
+	@sudo chmod -f 664 $@
 
 depend:
 	@for i in ${SUBDIRS}; do						\

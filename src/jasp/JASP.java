@@ -7,7 +7,7 @@ import javax.servlet.http.*;
 public class JASP {
 	private entity[] entmap = new entity[] {
 		new entity('"', "quot"),
-//		new entity('\'', "apos"),
+		new entity('\'', "apos"),
 		new entity('&', "amp"),
 		new entity('<', "lt"),
 		new entity('>', "gt"),
@@ -15,7 +15,9 @@ public class JASP {
 	private String validHTML =
 		"abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-		"0123456789,./?;:[]{}\\|`~!@#$%^*()_+-=";
+		"0123456789" +
+		" \n\t\r" +
+		",./?;:[]{}\\|`~!@#$%^*()_+-=";
 	private HttpServletRequest req;
 	private HttpServletResponse res;
 

@@ -93,7 +93,8 @@ public class RSLElement implements Serializable {
 
 	public String extraRSL() {
 		return (this.build(new String[] {
-		  "arguments", "executable", "stdout", "stderr" }));
+		  "arguments", "executable",
+		  "stdout", "stderr", "queue" }));
 	}
 
 	public String toString() {

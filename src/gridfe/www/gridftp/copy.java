@@ -97,7 +97,7 @@ public class copy {
 		s += oof.form(
 				new Object[] {
 					"action", "copy",
-					"method", "POST",
+					"method", "post",
 					"enctype", "application/x-www-form-urlencoded"
 				},
 				new Object[] {

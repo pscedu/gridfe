@@ -4,38 +4,27 @@ Add configuration to Apache to not permit SSLv2.
 	- should be the command "SSLProtocol all -SSLv2" but figure
 	  out where it goes (this should be a real quick fix)
 
-- Add timestamp to submitted jobs.
 - Add job submission example suite/guide
 - load rsl for job submit option
-
-overview/index page
-- where to go for what to do (tutorial pages)
-
-misc
+- add goto gridftp browser button to overview/index page
 - move to jmk (java make) or even ant
 - move MKDEP from defs.mk to local.mk
 - job get output both stdout and stderr, not just stdout
 - rename database field "host type" to "host gridftp type"
-- show all job fields on job output page (original form submission values)
-
-- XXX MAJOR TODO
 - see if kx509 can generate a full certificate from an undelegated gssapi
   auth credential (obtained from "negotiate auth" mechanism) with konqueror
   you cannot change the delegation parameter to gss_init_sec_context()
+	- perhaps requires modifications to kx509 software itself
 
 - fix ClassNotFoundException: gridfe.www.t
   when requesting gridfe.psc.edu/gridfe/gridfe/t
-
 - revamp buildURL -- take an array of query string params which
   all get URL-escaped, use & instead of &amp;, and make sure resulting
   URLs are always HTML-escaped when being written to a page.
-
 - add x509 cert to db to test globus-job-submit (job manager dependency,
   but also fails for "make test")
-
 - add a "show more options" button which shows/hides advanced
   job submission options
-
 - unhardcode all the ben stuff
 - redo stop/go host status buttons
 - add file rename functionality into gftp browser

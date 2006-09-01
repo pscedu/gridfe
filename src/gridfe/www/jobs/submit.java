@@ -126,6 +126,8 @@ public class submit {
 					if (rsl.length() > 0)
 						cmd += " -x '" + p.escapeHTML(rsl) + "'";
 
+					if (!queue.equals(""))
+						cmd += " -queue " + p.escapeHTML(queue);
 					if (!stdout.equals(""))
 						cmd += " -stdout " + p.escapeHTML(stdout);
 					if (!stderr.equals(""))
@@ -204,7 +206,7 @@ public class submit {
 		s += oof.form(
 				new Object[] {
 					"action", "submit",
-					"method", "POST",
+					"method", "post",
 					"enctype", "application/x-www-form-urlencoded"
 				},
 				new Object[] {

@@ -88,7 +88,7 @@ public class copy {
 		   + oof.p("You can fill out the fields below and press the copy "
 		   +   "button to copy a file to another machine.  Alternatively, "
 		   +   "you can use the "
-		   +   oof.link("GridFTP browser", "/gridftp/browser")
+		   +   oof.link("GridFTP browser", p.buildURL("/gridftp/browser"))
 		   +   " to navigate the host file system.");
 		if (errmsg != null)
 			s += oof.p(new Object[] { "class", "err" },

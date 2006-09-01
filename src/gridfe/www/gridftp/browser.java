@@ -507,6 +507,30 @@ public class browser {
 			int c;
 			while ((c = r.read()) != -1)
 				w.write(c);
+/*
+			Thread dl = new Thread {
+				public void run() {
+					gftp.get(cwd + "/" + file, tmpf);
+				}
+			};
+			dl.run();
+
+			while (download < size) {
+				c = r.read();
+				if (c == -1) {
+					if (error = EOF) {
+						sleep 500
+						continue;
+					} else {
+						throw IOException
+					}
+				}
+				w.write(c);
+				if ((download % CHUNKSIZ) == 0)
+					w.flush();
+			}
+
+*/
 		} catch (Exception e) {
 			emsg += "Error while trying to fetch " +
 			  p.escapeHTML(file) + ": " + e.getMessage();
@@ -715,7 +739,7 @@ System.err.println("GFTP LS: \n" +
 		  + oof.p("Click on a file to download or a directory to view its contents.")
 		  + oof.form_start(new Object[] {
 				"action", "browser",
-				"method", "GET",
+				"method", "get",
 				"enctype", "application/x-www-form-urlencoded"
 			})
 		  + oof.table_start(new Object[] {
@@ -724,7 +748,7 @@ System.err.println("GFTP LS: \n" +
 				"cellspacing", "0",
 				"cellpadding", "0",
 				"cols", new Object[][] {
-					new Object[] { },
+					new Object[] { "width", "60%" },
 					new Object[] { "align", "char", "char", "." },
 					new Object[] { },
 					new Object[] { },
@@ -798,7 +822,7 @@ System.err.println("GFTP LS: \n" +
 		  + oof.form(new Object[] {
 				"action", "browser",
 				"enctype", "multipart/form-data",
-				"method", "POST"
+				"method", "post"
 			}, new Object[] {
 				oof.table(new Object[] {
 					"class", Page.CCTBL,
@@ -943,10 +967,11 @@ System.err.println("GFTP LS: \n" +
 				new Object[] { "class", cl, "value",
 					/* XXX: escapeHTML() these? */
 					gf.date + " " + gf.time,
-					"style", "text-align: center; white-space: nowrap" },
+					"style", "text-align: right; white-space: nowrap" },
 				new Object[] { "class", cl,
-					"value", gf.perm,
-					"align", "center" },
+					"align", "center",
+					"value", gf.perm
+				},
 				new Object[] { "class", cl,
 					"align", "center",
 					"value", cbox

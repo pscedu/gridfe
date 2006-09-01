@@ -29,3 +29,9 @@ misc
 - revamp buildURL -- take an array of query string params which
   all get URL-escaped, use & instead of &amp;, and make sure resulting
   URLs are always HTML-escaped when being written to a page.
+
+- add x509 cert to db to test globus-job-submit (job manager dependency,
+  but also fails for "make test")
+
+- add a "show more options" button which shows/hides advanced
+  job submission options

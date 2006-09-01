@@ -159,6 +159,9 @@ public class status {
 		String args = (String)j.getMap().get("arguments");
 		if (args != null)
 			cmd += " " + args;
+		String queue = (String)j.getMap().get("queue");
+		if (queue == null)
+			queue = "unspecified";
 
 		s += p.header("Job Status")
 		  +  oof.p("Viewing information for job " +
@@ -180,39 +183,43 @@ public class status {
 					new Object[] { "class", Page.CCSUBHDR, "value", "Value" }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Name" },
+					new Object[] { "class", Page.CCDESC, "value", "Name:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(j.getName()) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Globus URL" },
+					new Object[] { "class", Page.CCDESC, "value", "Globus URL:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(j.getIDAsString()) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Resource" },
+					new Object[] { "class", Page.CCDESC, "value", "Resource:" },
 					new Object[] { "class", p.genClass(), "value", j.getHost() }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Submission Time" },
+					new Object[] { "class", Page.CCDESC, "value", "Submission Time:" },
 					new Object[] { "class", p.genClass(), "value", rssdate(j.getCreateTime()) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Modification Time" },
+					new Object[] { "class", Page.CCDESC, "value", "Modification Time:" },
 					new Object[] { "class", p.genClass(), "value", rssdate(j.getModTime()) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Command" },
+					new Object[] { "class", Page.CCDESC, "value", "Command:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(cmd) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Output File" },
+					new Object[] { "class", Page.CCDESC, "value", "Queue:" },
+					new Object[] { "class", p.genClass(), "value", p.escapeHTML(queue) }
+				})
+		  +		oof.table_row(new Object[][] {
+					new Object[] { "class", Page.CCDESC, "value", "Output File:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(stdout) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "Error File" },
+					new Object[] { "class", Page.CCDESC, "value", "Error File:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(stderr) }
 				})
 		  +		oof.table_row(new Object[][] {
-					new Object[] { "class", Page.CCDESC, "value", "RSL" },
+					new Object[] { "class", Page.CCDESC, "value", "RSL:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(j.extraRSL()) }
 				})
 		  +  oof.table_end()

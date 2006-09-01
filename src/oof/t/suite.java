@@ -72,16 +72,16 @@ public class suite {
 			"field1: ", o.input(),
 			"field2: ", o.input()}),
 		    "<form action=\"#\" " +
-		      "enctype=\"application/x-www-form-urlencoded\" method=\"GET\">" +
+		      "enctype=\"application/x-www-form-urlencoded\" method=\"get\">" +
 		      "field1: <input />field2: <input />" +
 		    "</form>");
 
-		t("form_start", o.form_start(new Object[] { "method", "GET" }),
+		t("form_start", o.form_start(new Object[] { "method", "get" }),
 			"<form action=\"#\" " +
-			  "enctype=\"application/x-www-form-urlencoded\" method=\"GET\">");
+			  "enctype=\"application/x-www-form-urlencoded\" method=\"get\">");
 		t("form_start", o.form_start(),
 			"<form action=\"#\" enctype=\"application/x-www-form-urlencoded\" " +
-			  "method=\"GET\">");
+			  "method=\"get\">");
 
 		t("form_end", o.form_end(), "</form>");
 

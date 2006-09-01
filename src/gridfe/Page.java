@@ -20,7 +20,7 @@ public class Page {
 	private JASP jasp;
 	private OOF oof;
 	private Connection dbh;
-
+	private boolean dohdr;
 	private int uid;
 
 	/* Database parameters. */
@@ -53,6 +53,7 @@ public class Page {
 		this.jasp = new JASP(req, res);
 		this.classCount = 1;
 		this.uid = -1;
+		this.dohdr = true;
 		this.dbh = null;
 	}
 
@@ -162,11 +163,18 @@ public class Page {
 		return (t);
 	}
 
+	public void sentHeader() {
+		this.dohdr = false;
+	}
+
 	public String header(String title) {
 		String s, name, url;
 		String wr = WEBROOT;
 		LinkedList menus = new LinkedList();
 		Menu m;
+
+		if (!this.dohdr)
+			return ("");
 
 		/* Register menus. */
 		menus.add(new Menu("Main", "/", null));
@@ -199,11 +207,11 @@ public class Page {
 		s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\">"
 		  + "<html lang=\"en-US\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/1999/xhtml\">"
 		  + 	"<head>"
-		  +	 		"<title>GridFE - " + this.jasp.escapeHTML(title) + "</title>"
+		  +	 		"<title>GridFE - " + this.escapeHTML(title) + "</title>"
 		  +			"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />"
 		  +			"<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />"
 		  +			"<link rel=\"stylesheet\" type=\"text/css\" "
-		  +				"href=\"" + wr + "/lib/main.css\" media=\"screen\">"
+		  +				"href=\"" + wr + "/lib/main.css\" media=\"screen\" />"
 		  +			"<script type=\"text/javascript\" src=\"" + wr + "/lib/Global.js\"></script>"
 		  +			this.addScript(
 		   				"include('" + wr + "/lib/Browser.js');" +
@@ -251,10 +259,10 @@ public class Page {
 		   +					"</a>"
 		   +					"<br /><br />"
 		   +					"<a href=\"http://www-unix.globus.org/cog/\">"
-		   +						"<img src=\"" + wr + "/img/cog-toolkit.png\" border=\"0\" />"
+		   +						"<img src=\"" + wr + "/img/cog-toolkit.png\" alt=\"[cog]\" border=\"0\" />"
 		   +					"</a>"
 		   +					"<a href=\"http://www.globus.org/toolkit/\">"
-		   +						"<img src=\"" + wr + "/img/globus-toolkit.png\" border=\"0\" />"
+		   +						"<img src=\"" + wr + "/img/globus-toolkit.png\" alt=\"[globus]\" border=\"0\" />"
 		   +					"</a>"
 		   +					"<br /><br />"
 		   +				"</td>"
@@ -262,7 +270,7 @@ public class Page {
 		   +				  "border-left: 1px solid black\" valign=\"top\">"
 		   +					"<h3 style=\"margin-top: 0px\">"
 		   +						"<img align=\"absmiddle\" src=\"" + wr + "/img/box.png\" "
-		   +						  "alt=\"\" border=\"0\" />" + title
+		   +						  "alt=\"\" border=\"0\" />" + this.escapeHTML(title)
 		   +					"</h3>";
 		return (s);
 	}
@@ -344,25 +352,7 @@ public class Page {
 	}
 
 	public String escapeHTML(String s) {
-		String t = "";
-		char ch;
-		for (int i = 0; i < s.length(); i++) {
-			ch = s.charAt(i);
-			switch (ch) {
-			case '<':  t += "&lt;";		break;
-			case '>':  t += "&gt;";		break;
-			case '"':  t += "&quot;";	break;
-			case '\'': t += "&apos;";	break;
-			case '&':  t += "&amp;";	break;
-			default:
-				if (ch == ' ' || ch == '\n' || (32 <= ch && ch <= 126))
-					t += ch;
-				else if (ch != '\0')
-					t += "&#" + new Integer(ch) + ";";
-				break;
-			}
-		}
-		return (t);
+		return (this.jasp.escapeHTML(s));
 	}
 
 	public String escapeURL(String s) {

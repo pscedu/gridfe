@@ -37,3 +37,5 @@ misc
   job submission options
 
 - unhardcode all the ben stuff
+- redo stop/go host status buttons
+- add file rename functionality into gftp browser

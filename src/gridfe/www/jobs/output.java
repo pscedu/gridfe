@@ -68,6 +68,8 @@ public class output {
 			w.print(s.replaceFirst("</pre>", ""));
 			s = "";
 		}
+		p.sentHeader();
+		w.flush();
 
 		/* This should not be hard coded! read env?? */
 //		gi.startRetrieve(j, fn, 28000, 28255);
@@ -84,6 +86,7 @@ public class output {
 			if (!download)
 				chunk = p.escapeHTML(chunk);
 			w.print(chunk);
+			w.flush();
 			size -= chunksiz;
 			off += chunksiz;
 		}

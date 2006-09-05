@@ -60,8 +60,6 @@ public class RSLElement implements Serializable {
 	public static String build(String req, HashMap m, String[] skip) {
 		String name, iv, s = "";
 
-		if (req != null)
-			s += req;
 		for (Iterator k = m.keySet().iterator();
 		     k.hasNext() && (name = (String)k.next()) != null; ) {
 			if (inArray(name, skip))
@@ -88,6 +86,8 @@ public class RSLElement implements Serializable {
 				s += " \"" + (String)val + '"';
 			s += ")";
 		}
+		if (!s.equals("") && req != null)
+			s = req + s;
 		return (s);
 	}
 

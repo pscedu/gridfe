@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -49,7 +50,7 @@ conf_init(void)
 	snprintf(rss_path, sizeof(rss_path),
 	    "/gridfe/gridfe/jobs/status?out=rss");
 
-	snprintf(local_host, sizeof(local_host), "*");
+	snprintf(local_host, sizeof(local_host), "localhost");
 	snprintf(local_port, sizeof(local_port), "4521");
 
 	DPRINTF(("set rss_host to %s", rss_host));

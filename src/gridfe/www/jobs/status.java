@@ -79,12 +79,9 @@ public class status {
 
 			String outlinks = "";
 			String cancel = "";
-			if (stat == GramJob.STATUS_ACTIVE ||
-			  stat == GramJob.STATUS_PENDING) {
-				outlinks = "N/A";
-				cancel = "" + oof.link("Cancel",
-				  p.buildURL("/jobs/cancel?qid=" + j.getQID()));
-			} else {
+			if (stat == -1 ||
+			  stat == GramJob.STATUS_DONE ||
+			  stat == GramJob.STATUS_FAILED) {
 				boolean stdout, stderr;
 
 				String path = "/jobs/output?qid=" + j.getQID();
@@ -103,6 +100,10 @@ public class status {
 				if (!stdout && !stderr)
 					outlinks = "N/A";
 				cancel = "N/A";
+			} else {
+				outlinks = "N/A";
+				cancel = "" + oof.link("Cancel",
+				  p.buildURL("/jobs/cancel?qid=" + j.getQID()));
 			}
 
 			s += oof.table_row(new Object [][] {
@@ -172,22 +173,27 @@ public class status {
 		Date mtime = j.getModTime();
 		String s_mtime = (mtime == null ? "unspecified" : rssdate(mtime));
 
+		int st = j.getStatus();
+		boolean done = (st == -1 ||
+		  st == GramJob.STATUS_FAILED ||
+		  st == GramJob.STATUS_DONE);
+
 		String path = "/jobs/output?qid=" + j.getQID();
 		String stdout = j.getStdout();
-		if (stdout == null)
-			stdout = "unspecified";
+		if (stdout == null || !done)
+			stdout = "N/A";
 		else
 			stdout = "" +
-			  oof.link(p.escapeHTML(stdout), path + "&amp;which=stdout") + " [" +
-			  oof.link("save", path + "&amp;which=stderr&amp;act=save") + "]";
+			  oof.link(p.escapeHTML(stdout), p.buildURL(path + "&amp;which=stdout")) + " [" +
+			  oof.link("save", p.buildURL(path + "&amp;which=stderr&amp;act=save")) + "]";
 
 		String stderr = j.getStderr();
-		if (stderr == null)
-			stderr = "unspecified";
+		if (stderr == null || !done)
+			stderr = "N/A";
 		else
 			stderr = "" +
-			  oof.link(p.escapeHTML(stderr), path + "&amp;which=stderr") + " [" +
-			  oof.link("save", path + "&amp;which=stderr&amp;act=save") + "]";
+			  oof.link(p.escapeHTML(stderr), p.buildURL(path + "&amp;which=stderr")) + " [" +
+			  oof.link("save", p.buildURL(path + "&amp;which=stderr&amp;act=save")) + "]";
 
 		String cmd = (String)j.getMap().get("executable");
 		String args = (String)j.getMap().get("arguments");
@@ -221,6 +227,10 @@ public class status {
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(j.getName()) }
 				})
 		  +		oof.table_row(new Object[][] {
+					new Object[] { "class", Page.CCDESC, "value", "Status:" },
+					new Object[] { "class", p.genClass(), "value", j.getStatusAsString() }
+				})
+		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "Globus URL:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(j.getIDAsString()) }
 				})
@@ -238,7 +248,7 @@ public class status {
 				})
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "Command:" },
-					new Object[] { "class", p.genClass(), "value", p.escapeHTML(cmd) }
+					new Object[] { "class", p.genClass(), "value", oof.code(p.escapeHTML(cmd)) }
 				})
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "Queue:" },
@@ -251,11 +261,17 @@ public class status {
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "Error File:" },
 					new Object[] { "class", p.genClass(), "value", stderr }
-				})
-		  +		oof.table_row(new Object[][] {
+				});
+
+		String rsl = j.extraRSL();
+		if (!rsl.equals(""))
+			s += ""
+			  +  oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "RSL:" },
 					new Object[] { "class", p.genClass(), "value", p.escapeHTML(j.extraRSL()) }
-				})
+				 });
+
+		s += ""
 		  +  oof.table_end()
 		  +  p.footer();
 		return (s);

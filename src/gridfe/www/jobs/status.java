@@ -75,22 +75,43 @@ public class status {
 			j = (GridJob)list.get(i);
 			String c = p.genClass();
 
+			int stat = j.getStatus();
+
+			String outlinks = "";
+			String cancel = "";
+			if (stat == GramJob.STATUS_ACTIVE ||
+			  stat == GramJob.STATUS_PENDING) {
+				outlinks = "N/A";
+				cancel = "" + oof.link("Cancel",
+				  p.buildURL("/jobs/cancel?qid=" + j.getQID()));
+			} else {
+				boolean stdout, stderr;
+
+				String path = "/jobs/output?qid=" + j.getQID();
+				stdout = (j.getStdout() != null);
+				stderr = (j.getStderr() != null);
+				if (stdout)
+					outlinks += "" +
+					  oof.link("output", p.buildURL(path + "&amp;which=stdout")) + " [" +
+					  oof.link("save", p.buildURL(path + "&amp;which=stdout&amp;act=save")) + "]";
+				if (stdout && stderr)
+					outlinks += " : ";
+				if (stderr)
+					outlinks += "" +
+					  oof.link("error", p.buildURL(path + "&amp;which=stderr")) + " [" +
+					  oof.link("save", p.buildURL(path + "&amp;which=stderr&amp;act=save")) + "]";
+
+				cancel = "N/A";
+			}
+
 			s += oof.table_row(new Object [][] {
 				new Object[] { "class", c, "value", "" +
 				  oof.link(p.escapeHTML(j.getName()),
 				   p.buildURL("/jobs/status?qid=" + j.getQID())) },
 				new Object[] { "class", c, "value", j.getHost() },
 				new Object[] { "class", c, "value", j.getStatusAsString() },
-				new Object[] { "class", c, "value", "" +
-				  oof.link("View", p.buildURL("/jobs/output?qid=" + j.getQID())) +
-				  " / " +
-				  oof.link("Save", p.buildURL("/jobs/output?qid=" + j.getQID() + "&amp;act=save"))
-				},
-				new Object[] { "class", c, "value",
-				  j.getStatus() == GramJob.STATUS_ACTIVE ? "" +
-				  oof.link("Cancel",
-				    p.buildURL("/jobs/cancel?qid=" + j.getQID())) : "N/A"
-				},
+				new Object[] { "class", c, "value", outlinks },
+				new Object[] { "class", c, "value", cancel },
 				new Object[] { "class", c, "value",
 					oof.input(new Object[] {
 						"type", "checkbox",

@@ -100,7 +100,8 @@ public class status {
 					outlinks += "" +
 					  oof.link("error", p.buildURL(path + "&amp;which=stderr")) + " [" +
 					  oof.link("save", p.buildURL(path + "&amp;which=stderr&amp;act=save")) + "]";
-
+				if (!stdout && !stderr)
+					outlinks = "N/A";
 				cancel = "N/A";
 			}
 

@@ -17,6 +17,7 @@ public class GassInt extends RemoteGassServer {
 	private GassServer ga;
 	private int options, port;
 	private String host;
+	private GridJob j;
 
 	public GassInt(GSSCredential gss, String host, int port) {
 		/* Call superclass constructor, secure_mode=true */
@@ -58,7 +59,7 @@ public class GassInt extends RemoteGassServer {
 	public void start_remote()
 	    throws GramException, GSSException {
 		/* XXX - HARDCODED - fix */
-		GridJob j = new GridJob("gridfe.psc.edu/jobmanager-ben-shell");
+		j = new GridJob("gridfe.psc.edu/jobmanager-ben-shell");
 		j.setName("gassgrabber");
 
 		/*
@@ -80,16 +81,24 @@ public class GassInt extends RemoteGassServer {
 		j.init(this.gss);
 		j.run();
 
-		// STATUS_ACTIVE ?
-		// change -1 to STATUS_DONE ?
-		int st;
-		do {
+		for (;;) {
+			int st = j.getStatus();
+/*
+			if (st == GramJob.STATUS_FAILED)
+				internal server error
+			if (st == GramJob.STATUS_DONE)
+				internal server error
+*/
+			if (st == -1 ||
+			  st == GramJob.STATUS_FAILED ||
+			  st == GramJob.STATUS_PENDING ||
+			  st == GramJob.STATUS_DONE)
+				break;
 			try {
 				Thread.sleep(1000);
 			} catch (Exception e) {
 			}
-			st = j.getStatus();
-		} while (st != -1 && st != GramJob.STATUS_PENDING);
+		}
 	}
 
 	/*

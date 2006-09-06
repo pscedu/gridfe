@@ -173,7 +173,7 @@ public class GridInt implements Serializable {
 		 */
 System.out.println("sleeping to wait for remote GASS server");
 		try {
-			Thread.sleep(15000);
+			Thread.sleep(5000);
 		} catch (Exception e) {
 		}
 	}

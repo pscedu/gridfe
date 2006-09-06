@@ -149,12 +149,24 @@ public class status {
 
 		Date mtime = j.getModTime();
 		String s_mtime = (mtime == null ? "unspecified" : rssdate(mtime));
+
+		String path = "/jobs/output?qid=" + j.getQID();
 		String stdout = j.getStdout();
 		if (stdout == null)
 			stdout = "unspecified";
+		else
+			stdout = "" +
+			  oof.link(p.escapeHTML(stdout), path + "&amp;which=stdout") + " [" +
+			  oof.link("save", path + "&amp;which=stderr&amp;act=save") + "]";
+
 		String stderr = j.getStderr();
 		if (stderr == null)
 			stderr = "unspecified";
+		else
+			stderr = "" +
+			  oof.link(p.escapeHTML(stderr), path + "&amp;which=stderr") + " [" +
+			  oof.link("save", path + "&amp;which=stderr&amp;act=save") + "]";
+
 		String cmd = (String)j.getMap().get("executable");
 		String args = (String)j.getMap().get("arguments");
 		if (args != null)
@@ -212,11 +224,11 @@ public class status {
 				})
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "Output File:" },
-					new Object[] { "class", p.genClass(), "value", p.escapeHTML(stdout) }
+					new Object[] { "class", p.genClass(), "value", stdout }
 				})
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "Error File:" },
-					new Object[] { "class", p.genClass(), "value", p.escapeHTML(stderr) }
+					new Object[] { "class", p.genClass(), "value", stderr }
 				})
 		  +		oof.table_row(new Object[][] {
 					new Object[] { "class", Page.CCDESC, "value", "RSL:" },

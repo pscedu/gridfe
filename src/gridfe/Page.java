@@ -351,6 +351,31 @@ public class Page {
 		}
 	}
 
+	public String buildURL(int type, String path, String[] params) {
+		String qs = "";
+		if (params != null && params.length > 0) {
+//			if ((params.length % 2) != 0)
+//				throw new InvalidPathException();
+			for (int i = 0; i + 1 < params.length; i += 2)
+				qs += this.escapeURL(params[i]) + "=" + this.escapeURL(params[i + 1]) + "&";
+			qs = "?" + qs;
+		}
+
+		switch (type) {
+		case PATHTYPE_WEB:
+			if (path.indexOf(':') != -1) // match `^\w+://'
+				return (path);
+			return (WEBROOT + path + qs);
+//		case PATHTYPE_ABSWEB:
+//			return (ENV[PROTOCOL] + server + WEBROOT + path + qs);
+		case PATHTYPE_SERV:
+			return (SERVROOT + path);
+		default:
+			/* throw new InvalidPathTypeException(); */
+			return (null);
+		}
+	}
+
 	public String escapeHTML(String s) {
 		return (this.jasp.escapeHTML(s));
 	}

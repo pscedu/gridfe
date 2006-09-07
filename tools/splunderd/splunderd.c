@@ -2,6 +2,7 @@
 
 #define _GNU_SOURCE /* asprintf */
 #include <sys/param.h>
+#include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -20,13 +21,26 @@
 #include <krb5.h>
 #include <gssapi.h>
 
+#include "queue.h"
+
 #ifndef __dead
 #define __dead __attribute__((__noreturn__))
+#endif
+
+#ifndef INFTIM
+#define INFTIM (-1)
 #endif
 
 #define LISTENQ	5
 
 __dead void usage(void);
+
+struct fd {
+	int		fd_fd;
+	SLIST_ENTRY(fd)	fd_link;
+};
+
+SLIST_HEAD(fdlist, fd) fdlist = SLIST_INITIALIZER(fdlist);
 
 char		rss_host[MAXHOSTNAMELEN];
 char		rss_port[BUFSIZ];
@@ -61,13 +75,25 @@ conf_init(void)
 	DPRINTF(("set local_port to %s", local_port));
 }
 
-int
+void
+add(int fd)
+{
+	struct fd *fdp;
+
+	if ((fdp = malloc(sizeof(*fdp))) == NULL)
+		err(1, "malloc");
+	memset(fdp, 0, sizeof(*fdp));
+	fdp->fd_fd = fd;
+	SLIST_INSERT_HEAD(&fdlist, fdp, fd_link);
+}
+
+unsigned int
 setup(void)
 {
 	struct addrinfo hints, *res, *res0;
 	char buf[BUFSIZ], svcbuf[BUFSIZ];
-	int error, save_errno, s, opt;
-	const char *lastcause = NULL;
+	int error, opt, s;
+	unsigned int n;
 	socklen_t siz;
 
 	memset(&hints, 0, sizeof(hints));
@@ -76,15 +102,14 @@ setup(void)
 	hints.ai_flags = AI_PASSIVE;
 	error = getaddrinfo(local_host, local_port, &hints, &res0);
 	if (error)
-		errx(1, "getaddrinfo %s: %s", local_host,
+		errx(1, "getaddrinfo %s:%s: %s", local_host, local_port,
 		    gai_strerror(error));
 
-	s = -1;
+	n = 0U;
 	for (res = res0; res; res = res->ai_next) {
-		s = socket(res->ai_family, res->ai_socktype,
-		    res->ai_protocol);
-		if (s == -1) {
-			lastcause = "socket";
+		if ((s = socket(res->ai_family, res->ai_socktype,
+		    res->ai_protocol)) == -1) {
+			warn("socket");
 			continue;
 		}
 		opt = 1;
@@ -93,32 +118,27 @@ setup(void)
 		    siz) == -1)
 			err(1, "setsockopt");
 		if (bind(s, res->ai_addr, res->ai_addrlen) == -1) {
-			lastcause = "bind";
-			save_errno = errno;
+			warn("bind");
 			close(s);
-			errno = save_errno;
-			s = -1;
 			continue;
 		}
 		if (listen(s, LISTENQ) == -1) {
-			lastcause = "listen";
-			save_errno = errno;
+			warn("listen");
 			close(s);
-			errno = save_errno;
-			s = -1;
 			continue;
 		}
-		break;
+		if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
+		    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
+		    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+			errx(1, "getnameinfo: %s", gai_strerror(error));
+		DPRINTF(("listening on %s:%s", buf, svcbuf));
+		add(s);
+		n++;
 	}
-	if (s == -1)
-		err(1, "%s", lastcause);
-	if ((error = getnameinfo(res->ai_addr, res->ai_addrlen,
-	    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
-	    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
-		errx(1, "getnameinfo: %s", gai_strerror(error));
 	freeaddrinfo(res0);
-	DPRINTF(("listening on %s:%s", buf, svcbuf));
-	return (s);
+	if (n == 0)
+		errx(1, "no addresses to listen on");
+	return (n);
 }
 
 void
@@ -338,7 +358,10 @@ main(int argc, char *argv[])
 {
 	char buf[BUFSIZ], svcbuf[BUFSIZ];
 	struct sockaddr_storage ss;
-	int error, clifd, s, c;
+	int error, clifd, c, ret;
+	unsigned int nfds, j;
+	struct pollfd *pfds;
+	struct fd *fdp;
 	socklen_t siz;
 
 	progname = argv[0];
@@ -355,21 +378,50 @@ main(int argc, char *argv[])
 			usage();
 		}
 
-	s = setup();
+	DPRINTF(("local_host=%s", local_host));
+	DPRINTF(("local_port=%s", local_port));
+	DPRINTF(("rss_host=%s", rss_host));
+	DPRINTF(("rss_port=%s", rss_port));
+	DPRINTF(("rss_path=%s", rss_path));
+
+	nfds = setup();
+	if ((pfds = calloc(nfds, sizeof(*pfds))) == NULL)
+		err(1, "calloc");
 	for (;;) {
-		siz = sizeof(ss);
-		memset(&ss, 0, sizeof(ss));
-		clifd = accept(s, (struct sockaddr *)&ss, &siz);
-		if (clifd == -1)
-			err(1, "accept");
-		if ((error = getnameinfo((struct sockaddr *)&ss, siz,
-		    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
-		    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
-			errx(1, "getnameinfo: %s", gai_strerror(error));
-		DPRINTF(("received client connection from %s:%s",
-		    buf, svcbuf));
-		serve(clifd);
-		close(clifd);
+		j = 0;
+		SLIST_FOREACH(fdp, &fdlist, fd_link) {
+			pfds[j].events = POLLIN;
+			pfds[j].fd = fdp->fd_fd;
+			j++;
+		}
+		ret = poll(pfds, nfds, INFTIM);
+		if (ret == -1)
+			err(1, "poll");
+		for (j = 0; j < nfds; j++) {
+			if (pfds[j].revents &
+			    (POLLERR | POLLHUP | POLLNVAL)) {
+				warnx("poll failed");
+				continue;
+			}
+			if ((pfds[j].revents & POLLIN) == 0) {
+				warnx("unexpected poll behavior");
+				continue;
+			}
+			siz = sizeof(ss);
+			memset(&ss, 0, sizeof(ss));
+			clifd = accept(pfds[j].fd,
+			    (struct sockaddr *)&ss, &siz);
+			if (clifd == -1)
+				err(1, "accept");
+			if ((error = getnameinfo((struct sockaddr *)&ss, siz,
+			    buf, sizeof(buf), svcbuf, sizeof(svcbuf),
+			    NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+				errx(1, "getnameinfo: %s", gai_strerror(error));
+			DPRINTF(("received client connection from %s:%s",
+			    buf, svcbuf));
+			serve(clifd);
+			close(clifd);
+		}
 	}
 	/* NOTREACHED */
 }
